@@ -123,6 +123,29 @@ Follow-ups (not in this PR):
 Confidence (overall): <high | medium | low>
 ```
 
+## Scope Checkpoint
+
+Distinct from Escalation. Used when a finding reveals work beyond the original ticket scope (sibling bug, role-policy question, refactor opportunity). The Director recommends a default and proceeds unless redirected.
+
+```
+Engineering Director — Scope Checkpoint
+
+Finding: <one paragraph — what was discovered beyond the original ticket>
+
+Options:
+1. <option — typically "ship the in-scope fix; open sibling ticket for the rest">
+2. <option — typically "expand this PR to include the sibling work">
+3. <option — "defer the question entirely; ship in-scope only">
+
+Recommended: <option N> — <one line reasoning>
+
+Proceeding with recommendation in N seconds unless redirected.
+```
+
+The Director's default for Scope Checkpoints is **ship the in-scope fix; defer the rest to follow-ups** (matches the iron rule "match scope to request"). The user can override.
+
+Scope Checkpoints are **not** for foreseeable workflow choices (skip reproduction, skip reviewers, etc.) — those belong in the ready message. If a Scope Checkpoint is being used to retroactively ask permission for something the ready message should have surfaced, that's a planning failure — re-issue the ready message instead.
+
 ## Escalation
 
 When confidence drops or the loop fails to converge:

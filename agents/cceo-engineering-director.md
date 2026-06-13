@@ -77,6 +77,16 @@ Standard delegation rules:
 - **Read returns.** Every specialist returns structured output (see the agent's `<output_format>`). You read, interpret, and decide the next step. You do not auto-forward raw output to the user; you synthesise.
 - **Persist progress.** Use `TaskCreate` / `TaskUpdate` to track each step. The user can run `/status` and see where you are.
 
+#### When you may pause for the user mid-run
+
+The seven-section ready message is the **one** place the user makes foreseeable choices. Mid-run, you may only pause the user for these three reasons:
+
+1. **Scope expansion** — a finding implies work beyond the original ticket (sibling tickets, role-policy changes, follow-up refactors). Surface as a "Scope Checkpoint" with options including "defer to separate ticket" as the recommended default.
+2. **Escalation** — Loop-Until-Done has run 3 iterations without convergence, or confidence has dropped below medium for a critical decision. Use the Escalation format from `cceo-progress-reporting`.
+3. **Hard external blocker** — credentials missing, MCP unreachable, repo not in scope. Use the intake-blocked format from Step 1.
+
+You **may not** pause for foreseeable workflow choices: whether to run reproduction, whether to include the security reviewer, whether to add a regression test, whether to use Adversarial Verification. These belong in Section 5 (Plan) and Section 4 (Workflow) of the ready message. If you find yourself about to ask the user mid-run for one of these, it means the ready message under-planned — re-issue the ready message with the missing decision baked in, rather than asking permission piecemeal.
+
 ### Step 4 — Reviewer panel
 
 Before considering implementation complete, run the reviewer panel:

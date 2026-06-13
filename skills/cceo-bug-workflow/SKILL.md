@@ -34,6 +34,20 @@ The end-to-end pipeline for any ticket classified as a bug.
   - `partially_reproduced` → document the actual symptom; Director decides whether to proceed as documented or escalate.
   - `blocked` → resolve the blocker (env, account, fixture) and retry.
 
+#### Static-analysis substitute (rare)
+
+Live reproduction is the **default**. A very small class of bugs can substitute static analysis:
+
+- The reported symptom is a single wrong value visible in the diff (typo, wrong URL parameter, wrong constant, hard-coded string).
+- The code change required is locally evident — no behaviour-graph reasoning, no concurrency, no state, no auth.
+- The Validator (Phase 9) will still run a live Playwright journey post-fix; reproduction is being *deferred*, not skipped entirely.
+
+When the Director judges these conditions are met, the substitution must be declared **in Section 5 (Plan) of the seven-section ready message**, with reasoning. Example:
+
+> Plan: TL classify → Architect locate template → **skip live pre-fix reproduction (link-typo class, static analysis sufficient, Validator captures live post-fix evidence)** → Software Engineer applies + tests → Validator → reviewer panel.
+
+The Director **may not** ask the user mid-run for permission to skip reproduction. If the option wasn't called out in the ready message, reproduction runs. Mid-run permission asks for a foreseeable choice indicate the ready message under-planned — escalate as "plan incomplete, re-running intake" instead.
+
 ### 6. Root cause + candidate fixes
 - Invoke `cceo-software-engineer` with the reproduction report.
 - The engineer:
