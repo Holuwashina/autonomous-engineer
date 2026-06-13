@@ -207,7 +207,7 @@ if [ "$GLOBAL" -eq 1 ]; then
 
 Autonomous Engineer installed globally.
 
-The 15 agents, 9 commands, and 9 skills are now available in every
+The 15 agents, 10 commands, and 10 skills are now available in every
 Claude Code session, regardless of working directory.
 
 Next steps:

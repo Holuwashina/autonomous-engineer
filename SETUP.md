@@ -64,7 +64,7 @@ After install, jump to [§4 Expose your repositories](#4-expose-your-repositorie
 
 ```bash
 cd ~/path/to/your-project
-mkdir -p .autonomous-engineer
+mkdir -p .ae
 cp ~/.claude/plugins/autonomous-engineer/.ae/resources.yaml.example .ae/resources.yaml.example
 cp .ae/resources.yaml.example .ae/resources.yaml
 $EDITOR .ae/resources.yaml
@@ -93,18 +93,18 @@ sh ~/autonomous-engineer/install.sh
 ```
 
 Installs into:
-- `<project>/.claude/agents/autonomous-engineer-*`
-- `<project>/.claude/commands/*`
-- `<project>/.claude/skills/autonomous-engineer-*/`
+- `<project>/.claude/agents/*.md`
+- `<project>/.claude/commands/*.md`
+- `<project>/.claude/skills/*/`
 - `<project>/CLAUDE.md` (or `CLAUDE.ae.md` if one already exists)
 - `<project>/.ae/resources.yaml.example`
 
 Verify:
 
 ```bash
-ls .claude/agents/autonomous-engineer-*.md | wc -l           # → 15
-ls .claude/commands/*.md | wc -l              # → 9
-ls .claude/skills/autonomous-engineer-*/SKILL.md | wc -l     # → 9
+ls .claude/agents/*.md | wc -l                # → 15
+ls .claude/commands/*.md | wc -l              # → 10
+ls .claude/skills/*/SKILL.md | wc -l          # → 10
 ```
 
 ### Global mode
@@ -114,18 +114,18 @@ sh ~/autonomous-engineer/install.sh --global
 ```
 
 Installs into:
-- `~/.claude/agents/autonomous-engineer-*`
-- `~/.claude/commands/*`
-- `~/.claude/skills/autonomous-engineer-*/`
+- `~/.claude/agents/*.md`
+- `~/.claude/commands/*.md`
+- `~/.claude/skills/*/`
 
 Does **not** touch `CLAUDE.md` or `.ae/` (those live per-project).
 
 Verify:
 
 ```bash
-ls ~/.claude/agents/autonomous-engineer-*.md | wc -l         # → 15
-ls ~/.claude/commands/*.md | wc -l            # → 9 (or more, if you have other commands)
-ls ~/.claude/skills/autonomous-engineer-*/SKILL.md | wc -l   # → 9
+ls ~/.claude/agents/*.md | wc -l              # → 15 (or more, if you have other agents)
+ls ~/.claude/commands/*.md | wc -l            # → 10 (or more, if you have other commands)
+ls ~/.claude/skills/*/SKILL.md | wc -l        # → 10 (or more, if you have other skills)
 ```
 
 **After a global install, restart Claude Code** so it re-scans `~/.claude/`.
@@ -247,7 +247,7 @@ Same `gh` MCP from above. Or use the `gh` CLI through Bash if you prefer.
 ### Browser automation
 
 ```bash
-claude mcp add playwright --command npx --args "@modelcontextprotocol/server-playwright"
+claude mcp add playwright --command npx --args "@playwright/mcp"
 ```
 
 ### Communications (only if your features use email/SMS)

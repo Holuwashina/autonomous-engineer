@@ -4,11 +4,6 @@
 !.ae/resources.yaml.example
 .ae/runs/
 
-# Legacy paths (pre-rename) — kept gitignored so anyone with an older checkout doesn't accidentally commit them
-.cceo/resources.yaml
-.cceo/resources.*.yaml
-.cceo/runs/
-
 .claude/settings.local.json
 .mcp.json
 

@@ -148,7 +148,7 @@ sh ~/autonomous-engineer/install.sh --global
 
 ```bash
 cd <your-project>
-mkdir -p .autonomous-engineer
+mkdir -p .ae
 cp ~/.autonomous-engineer/.ae/resources.yaml.example .ae/resources.yaml
 $EDITOR .ae/resources.yaml        # fill in real values
 
@@ -160,8 +160,6 @@ claude mcp add playwright --command npx --args "@playwright/mcp"
 ```
 
 Full per-provider MCP commands and troubleshooting in **[SETUP.md](SETUP.md)**.
-
-Full step-by-step in **[SETUP.md](SETUP.md)**.
 
 ---
 
@@ -177,7 +175,7 @@ The plugin manifest at `.claude-plugin/plugin.json` makes this repo installable 
 /plugin install https://github.com/Holuwashina/autonomous-engineer.git
 ```
 
-Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and automatically exposes the 15 agents, 9 commands, and 9 skills in every session. Updates with `/plugin update autonomous-engineer`.
+Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and automatically exposes the 15 agents, 10 commands, and 10 skills in every session. Updates with `/plugin update autonomous-engineer`.
 
 CLAUDE.md and `.ae/resources.yaml.example` ship in the plugin tree but Claude Code does **not** auto-copy them into your project — they're per-project files. See [Configure](#configure) for the one-line copy.
 
@@ -190,7 +188,7 @@ git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-en
 sh ~/autonomous-engineer/install.sh --global
 ```
 
-Installs to `~/.claude/agents/autonomous-engineer-*`, `~/.claude/commands/*`, `~/.claude/skills/autonomous-engineer-*/`. No `CLAUDE.md` or `resources.yaml.example` are written — those stay per-project.
+Installs to `~/.claude/agents/*.md`, `~/.claude/commands/*.md`, `~/.claude/skills/*/`. No `CLAUDE.md` or `resources.yaml.example` are written — those stay per-project.
 
 ### Shell install — project
 
@@ -202,7 +200,7 @@ cd <your-project>
 sh /path/to/autonomous-engineer/install.sh
 ```
 
-Installs to `<project>/.claude/agents/autonomous-engineer-*`, `<project>/.claude/commands/*`, `<project>/.claude/skills/autonomous-engineer-*/`, plus `<project>/CLAUDE.md` and `<project>/.ae/resources.yaml.example`.
+Installs to `<project>/.claude/agents/*.md`, `<project>/.claude/commands/*.md`, `<project>/.claude/skills/*/`, plus `<project>/CLAUDE.md` and `<project>/.ae/resources.yaml.example`.
 
 ### Flags (shell installs)
 
