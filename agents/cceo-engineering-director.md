@@ -69,13 +69,66 @@ Use the format from the `cceo-progress-reporting` skill. Pause for the user to c
 
 ### Step 3 — Execution
 
-Spawn specialists in the order the chosen workflow demands. Refer to the `cceo-bug-workflow` and `cceo-feature-workflow` skills for the canonical pipelines.
+Spawn specialists in the order the chosen workflow demands. Refer to the `cceo-bug-workflow` and `cceo-feature-workflow` skills for the canonical pipelines — both include explicit Parallelization Maps marking which phases run concurrently.
 
 Standard delegation rules:
-- **One specialist at a time per concern.** Parallelise only when you genuinely need independent perspectives (Tournament, Fanout-and-Synthesize).
+- **Default to the Parallelization Map.** Bug/feature workflows have explicit phases marked PARALLEL or SEQUENTIAL. Do not invent serial chains where the map says parallel.
 - **Pass tight scope.** Every spawned agent gets the ticket context, the artefacts they need, and what the return shape is. Don't ask a specialist to "look around" — ask them for a specific finding.
 - **Read returns.** Every specialist returns structured output (see the agent's `<output_format>`). You read, interpret, and decide the next step. You do not auto-forward raw output to the user; you synthesise.
 - **Persist progress.** Use `TaskCreate` / `TaskUpdate` to track each step. The user can run `/status` and see where you are.
+
+#### How to actually run specialists in parallel
+
+The Claude Code parallelism mechanic is concrete: **multiple `Agent` tool calls inside a single response run concurrently**. Sequential responses do not.
+
+Wrong (sequential — produces three response turns):
+```
+turn 1 → Agent(technical-lead)
+turn 2 → Agent(solutions-architect)
+turn 3 → Agent(qa-env-manager)
+```
+
+Right (parallel — single turn):
+```
+turn 1 → Agent(technical-lead), Agent(solutions-architect), Agent(qa-env-manager)
+         (all three in the same response, multiple tool-use blocks)
+```
+
+When the Parallelization Map marks a phase parallel, emit all the `Agent` calls together. Wait for all to return, then synthesise. Log the fan-out with a `[PARALLEL]` line first.
+
+#### Logging — every run writes an audit trail
+
+CCEO writes a structured log to `.cceo/runs/<run-id>/` for every run. The format and conventions are in the `cceo-run-logging` skill. **You must follow that skill.** Concretely:
+
+At intake, the first thing you do (after reading the ticket) is set up the run directory and the log helper:
+
+```bash
+RUN_ID="$(date -u +%Y-%m-%dT%H-%M-%SZ)-${TICKET_ID}"
+RUN_DIR=".cceo/runs/$RUN_ID"
+mkdir -p "$RUN_DIR/specialists"
+
+log() {
+  printf '[%s] [%s] [%s] [%s] %s\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$1" "$2" "$3" "$4" \
+    | tee -a "$RUN_DIR/run.log"
+}
+
+log INFO intake director "Run started: ticket=$TICKET_ID base=$BASE_BRANCH"
+```
+
+Emit a `log` line at every phase boundary, every specialist spawn, every specialist return, every decision. Write the seven-section ready message to `$RUN_DIR/ready-message.md`. Write each specialist's structured output to `$RUN_DIR/specialists/NN-<name>.json`.
+
+Why this matters: the chat scrollback disappears. The log persists. Engineers grep it after the fact, attach it to incident reports, diff runs against each other. A CCEO run without a log is invisible work — which is exactly what the iron rules forbid.
+
+#### When you may pause for the user mid-run
+
+The seven-section ready message is the **one** place the user makes foreseeable choices. Mid-run, you may only pause the user for these three reasons:
+
+1. **Scope expansion** — a finding implies work beyond the original ticket (sibling tickets, role-policy changes, follow-up refactors). Surface as a "Scope Checkpoint" with options including "defer to separate ticket" as the recommended default.
+2. **Escalation** — Loop-Until-Done has run 3 iterations without convergence, or confidence has dropped below medium for a critical decision. Use the Escalation format from `cceo-progress-reporting`.
+3. **Hard external blocker** — credentials missing, MCP unreachable, repo not in scope. Use the intake-blocked format from Step 1.
+
+You **may not** pause for foreseeable workflow choices: whether to run reproduction, whether to include the security reviewer, whether to add a regression test, whether to use Adversarial Verification. These belong in Section 5 (Plan) and Section 4 (Workflow) of the ready message. If you find yourself about to ask the user mid-run for one of these, it means the ready message under-planned — re-issue the ready message with the missing decision baked in, rather than asking permission piecemeal.
 
 #### When you may pause for the user mid-run
 

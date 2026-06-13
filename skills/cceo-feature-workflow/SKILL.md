@@ -70,6 +70,32 @@ If the Product Engineer flags that acceptance criteria were derived (not explici
 
 ---
 
+## Parallelization Map
+
+The Director must fan out concurrent specialists in a **single response** with multiple `Agent` tool calls. Default to parallel where the map allows.
+
+| Phase | Mode | Specialists | Why |
+|---|---|---|---|
+| 1. Intake | SEQUENTIAL | (Director only) | One ticket fetch. |
+| 2–3. Classification + Repo mapping | **PARALLEL** | `cceo-technical-lead` ‖ `cceo-solutions-architect` | Independent; fan out at execution start. |
+| 4. Feature planning | SEQUENTIAL | `cceo-product-engineer` | Needs classification verdict and repo map. |
+| 5. Implementation | SEQUENTIAL | `cceo-fullstack-engineer` | Single coherent diff, one engineer. |
+| 6. Env selection for validation | SEQUENTIAL | `cceo-qa-env-manager` | Needs implementation complete. |
+| 7. Validation | SEQUENTIAL | `cceo-qa-validator` (+ `cceo-qa-comms` in **parallel** when the feature acceptance criteria reference a message) | Validator drives the journey; Comms runs alongside if the journey involves email/OTP/links. |
+| 8. Reviewer panel | **PARALLEL** | `cceo-code-reviewer` ‖ `cceo-security-engineer` ‖ `cceo-performance-engineer` ‖ `cceo-software-architect` | Independent perspectives. Always parallel — never serial. |
+| 9. Loop iteration | SEQUENTIAL | implementer → validator → reviewers (panel still parallel inside) | Iteration is serial; the reviewer fan-out inside each iteration is parallel. |
+| 10. PR + ticket close-out | SEQUENTIAL | `cceo-engineering-manager` | One agent, single push. |
+
+**Multi-repo plan note:** if the Product Engineer's plan touches ≥2 repos with independent work streams, the Director may fan out parallel Full Stack Engineer instances per repo at Phase 5 — but only when the streams have no shared types or contracts that need to land first. When in doubt, serialize.
+
+**Logging the fanout:** before parallel specialists, emit a `[PARALLEL]` log line listing them:
+```
+[T] [PARALLEL] [classify] [director] Fanout: technical-lead || solutions-architect
+```
+After both return, log each return separately (with its `specialists/NN-<name>.json` reference). This makes the audit trail explicit about which work happened concurrently.
+
+---
+
 ## Decision rules
 
 - **Acceptance criteria must be explicit.** If derived from the description, confirm with the user before implementing.

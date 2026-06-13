@@ -96,6 +96,34 @@ The Director **may not** ask the user mid-run for permission to skip reproductio
 
 ---
 
+## Parallelization Map
+
+The Director must fan out concurrent specialists in a **single response** with multiple `Agent` tool calls. Default to parallel where the map allows.
+
+| Phase | Mode | Specialists | Why |
+|---|---|---|---|
+| 1. Intake | SEQUENTIAL | (Director only) | One ticket fetch. |
+| 2–3. Classification + Repo mapping | **PARALLEL** | `cceo-technical-lead` ‖ `cceo-solutions-architect` | Classification doesn't depend on the repo map; Architect doesn't need classification to enumerate repos. Fan out together at execution start. |
+| 4. Env selection | SEQUENTIAL | `cceo-qa-env-manager` | Needs classification verdict. |
+| 5. Reproduction | SEQUENTIAL | `cceo-qa-reproducer` (+ `cceo-qa-comms` only if email-touching) | Needs env. Comms only if journey involves a message — parallel with Reproducer when both are needed. |
+| 6. Root cause | SEQUENTIAL | `cceo-software-engineer` | Needs reproduction evidence. |
+| 7. Adversarial verification (optional) | **PARALLEL** | second `cceo-software-engineer` instance | Skeptic runs simultaneously with main engineer's confirmation pass; fanout of 2. |
+| 8. Implementation | SEQUENTIAL | `cceo-software-engineer` | Single-engineer single-fix. |
+| 9. Validation | SEQUENTIAL | `cceo-qa-validator` (+ `cceo-qa-comms` only if email-touching) | Validator drives the journey end-to-end. Comms in parallel when applicable. |
+| 10. Reviewer panel | **PARALLEL** | `cceo-code-reviewer` ‖ `cceo-security-engineer` ‖ `cceo-performance-engineer` ‖ `cceo-software-architect` | Independent perspectives. Always parallel — never serial. |
+| 11. Loop iteration | SEQUENTIAL | implementer → validator → reviewers (panel still parallel inside) | Iteration is serial; the reviewer fan-out inside each iteration is parallel. |
+| 12. PR + ticket close-out | SEQUENTIAL | `cceo-engineering-manager` | One agent, single push. |
+
+**Multi-repo Architect note:** if the Solutions Architect needs to survey ≥2 repos, it should fan out its grep/Read work internally — but that's inside the Architect's run, not the Director's fan-out. The Director only sees one Architect agent.
+
+**Logging the fanout:** before parallel specialists, emit a `[PARALLEL]` log line listing them:
+```
+[T] [PARALLEL] [classify] [director] Fanout: technical-lead || solutions-architect
+```
+After both return, log each return separately (with its `specialists/NN-<name>.json` reference). This makes the audit trail explicit about which work happened concurrently.
+
+---
+
 ## Decision rules
 
 - **Skip reproduction** only if the ticket includes a verifiable test failure with a clear path to the failing assertion. Even then, validate the failure manually before fixing.

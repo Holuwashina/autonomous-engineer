@@ -1,7 +1,8 @@
-# CCEO — never commit live resource definitions or local Claude overrides
+# CCEO — never commit live resource definitions, run logs, or local Claude overrides
 .cceo/resources.yaml
 .cceo/resources.*.yaml
 !.cceo/resources.yaml.example
+.cceo/runs/
 
 .claude/settings.local.json
 .mcp.json
