@@ -43,17 +43,29 @@ If every rung fails the Director emits the "Intake blocked" message with the exa
 
 ### Reconnect protocol (rung 2)
 
-When a claude.ai connector is configured for the user but disconnected for this session, the Director invokes the same OAuth flow the user originally completed — not a "go reconnect at the URL" punt.
+When a claude.ai connector is configured for the user but disconnected for this session, the Director invokes the same OAuth flow the user originally completed and **opens the browser for them** — not a "go reconnect at the URL" punt.
 
 1. **Detect the disconnect.** Either rung 1 returns "MCP server `claude.ai <Provider>` is not connected", or the session emits a `MCP server disconnected` system reminder for the provider's deferred tools.
-2. **Probe for auth methods.** Try `ToolSearch` for `mcp__claude_ai_<Provider>__authenticate`. If absent (the whole connector is gone, not just disconnected), skip to rung 3.
+2. **Probe for auth methods.** Try `ToolSearch` for `mcp__claude_ai_<Provider>__authenticate`. If absent (the whole connector is gone, not just disconnected), drop to the "Connector entirely absent" path below.
 3. **Start auth.** Call `mcp__claude_ai_<Provider>__authenticate`. It returns either a URL the user must visit or a token-paste prompt.
-4. **Surface the URL.** Render it as a clickable line — one short sentence, no decoration:
+4. **Auto-open the URL in the browser.** Use Bash with platform detection:
+
+   ```bash
+   URL="<the URL the connector returned>"
+   if command -v open >/dev/null 2>&1; then open "$URL"        # macOS
+   elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$URL"  # Linux
+   elif command -v start >/dev/null 2>&1; then start "$URL"   # Windows / WSL
+   else echo "Open this URL manually: $URL"
+   fi
+   ```
+
+   Then surface a short status to the user so they know what just happened:
 
    ```
    Engineering Director — Reconnecting <Provider>
 
-   The <Provider> connector dropped mid-session. Click to reauthorize:
+   The <Provider> connector dropped mid-session. I opened the authorization
+   page in your browser — sign in and approve. If the browser didn't open:
      <URL>
 
    I'll resume the fetch as soon as the connector reports authorized.
@@ -66,7 +78,30 @@ The reconnect is logged as a single `[INFO] [intake] [director] Reconnected <Pro
 
 ### When the connector is entirely absent
 
-Some sessions (headless / cron / CI) genuinely lack the claude.ai connector surface — auth methods aren't even in the deferred list. That's not a failure mode the Director can heal mid-run. Skip rungs 1–2, attempt rungs 3–4, and if those fail too, emit the intake-blocked message with rung 5's paste option as the recommended unblock.
+Some sessions (headless / cron / CI; or the connector was revoked) genuinely lack the claude.ai connector surface — auth methods aren't even in the deferred list. The Director still auto-opens the browser, but to the connectors settings page rather than a connector-specific OAuth URL:
+
+```bash
+if command -v open >/dev/null 2>&1; then open https://claude.ai/settings/connectors
+elif command -v xdg-open >/dev/null 2>&1; then xdg-open https://claude.ai/settings/connectors
+elif command -v start >/dev/null 2>&1; then start https://claude.ai/settings/connectors
+fi
+```
+
+Then surface:
+
+```
+Engineering Director — <Provider> connector unavailable
+
+The <Provider> connector isn't reachable from this session at all (not just
+disconnected — the auth methods are also absent, which usually means the
+connector was never set up or was revoked). I opened your connectors page
+in the browser — connect <Provider>, then restart Claude Code so the new
+MCP tools surface, then re-run /ticket.
+
+If that's not possible (headless / cron / CI), I'll fall through to rungs
+3–4 (CLI-installed MCP, provider CLI) and then to inline-paste as a final
+fallback.
+```
 
 ## Ticket ID conventions
 
