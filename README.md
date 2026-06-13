@@ -119,27 +119,47 @@ The Director is the only agent that delegates. Every other specialist runs scope
 
 ## Quickstart
 
-The fastest path is the plugin install — one command, then per-project config:
+Pick one of three install paths — all land in the same place.
+
+### A. Plugin install (recommended, from inside Claude Code)
 
 ```bash
-# 1. Install as a Claude Code plugin (one time, from any session)
 /plugin install https://github.com/Holuwashina/autonomous-engineer.git
+```
 
-# 2. Per project: copy the resources template and edit
-cp ~/.claude/plugins/autonomous-engineer/.cceo/resources.yaml.example \
-   .cceo/resources.yaml
-$EDITOR .cceo/resources.yaml
+Claude Code clones into `~/.claude/plugins/autonomous-engineer/` and exposes everything automatically. Update with `/plugin update autonomous-engineer`.
 
-# 3. Wire up MCP servers (one-time, lives in your Claude config)
-claude mcp add jira ...           # see SETUP.md for full commands
-claude mcp add github ...
-claude mcp add playwright ...
+### B. Remote bootstrap (one-line shell, no clone needed)
 
-# 4. Use it
+```bash
+curl -fsSL https://raw.githubusercontent.com/Holuwashina/autonomous-engineer/main/bootstrap.sh | sh
+```
+
+Clones to `~/.autonomous-engineer`, runs `install.sh --global`. Safe to re-run.
+
+### C. Manual clone + install
+
+```bash
+git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-engineer
+sh ~/autonomous-engineer/install.sh --global
+```
+
+### Then, in any project where you'll run `/ticket`
+
+```bash
+cd <your-project>
+mkdir -p .cceo
+cp ~/.autonomous-engineer/.cceo/resources.yaml.example .cceo/resources.yaml
+$EDITOR .cceo/resources.yaml        # fill in real values
+
+# Minimum MCP — needed for QA reproduction / validation:
+claude mcp add playwright --command npx --args "@playwright/mcp"
+
+# Restart Claude Code, then:
 /ticket MM-123 --base develop
 ```
 
-Prefer the shell install? See [Install](#install).
+Full per-provider MCP commands and troubleshooting in **[SETUP.md](SETUP.md)**.
 
 Full step-by-step in **[SETUP.md](SETUP.md)**.
 

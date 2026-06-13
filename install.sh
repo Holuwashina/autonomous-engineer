@@ -115,7 +115,15 @@ SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 if [ ! -d "$SOURCE_DIR/agents" ]; then
     echo "install.sh: source layout missing — expected $SOURCE_DIR/agents/" >&2
+    echo "" >&2
     echo "Are you running install.sh from the autonomous-engineer repo root?" >&2
+    echo "" >&2
+    echo "If you cloned to ~/autonomous-engineer, run one of:" >&2
+    echo "  sh ~/autonomous-engineer/install.sh --global" >&2
+    echo "  cd ~/autonomous-engineer && sh ./install.sh --global" >&2
+    echo "" >&2
+    echo "Or use the remote bootstrap (no clone needed):" >&2
+    echo "  curl -fsSL https://raw.githubusercontent.com/Holuwashina/autonomous-engineer/main/bootstrap.sh | sh" >&2
     exit 1
 fi
 
