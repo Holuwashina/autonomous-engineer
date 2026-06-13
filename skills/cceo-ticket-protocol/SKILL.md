@@ -9,12 +9,23 @@ CCEO treats tickets as first-class. Every run touches the ticket at intake and a
 
 ## Provider detection
 
-Look at `claude mcp list` (or the runtime tool surface) for one of:
-- `mcp__jira__*` → Jira
-- `mcp__clickup__*` → ClickUp
-- `mcp__github__*` with issue tools → GitHub Issues
+Look at the runtime tool surface for any tool name matching these patterns. The exact prefix depends on whether the MCP is locally installed (`claude mcp add ...`) or hosted by claude.ai:
+
+| Provider | Local-install prefix | claude.ai-hosted prefix |
+|---|---|---|
+| Jira | `mcp__jira__*` | `mcp__claude_ai_Jira__*` |
+| ClickUp | `mcp__clickup__*` | `mcp__claude_ai_ClickUp__*` |
+| GitHub Issues | `mcp__github__*` | `mcp__claude_ai_GitHub__*` |
+| Linear | `mcp__linear__*` | `mcp__claude_ai_Linear__*` |
+| Notion | `mcp__notion__*` | `mcp__claude_ai_Notion__*` |
 
 If none are present, ask the user to paste the ticket description and treat it as a free-form ticket — comments and transitions become no-ops.
+
+### Tool surface gotcha (subagents)
+
+Subagent frontmatter `tools:` fields use wildcard patterns. A bare `mcp__*` is too broad — Claude Code's tool resolver does NOT expand it as a glob in subagent surfaces, so subagents declared with `mcp__*` silently miss claude.ai-hosted MCPs. The Director and Technical Lead agents enumerate explicit substring patterns (`mcp__*clickup*, mcp__*ClickUp*, mcp__*jira*, ...`) to cover both casing conventions.
+
+If a user reports a ticket-fetch failure for a provider not in the explicit list, the fix is a one-line edit to the agent's `tools:` field — add `mcp__*<provider-substring>*` (case-sensitive both ways if needed). The fallback path the Director offers (fetch from top-level session and re-hand-off) works without an edit but is less ergonomic than a clean intake.
 
 ## Ticket ID conventions
 

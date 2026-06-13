@@ -1,7 +1,7 @@
 ---
 name: cceo-technical-lead
 description: Senior Technical Lead. Classifies a ticket as bug / feature / enhancement / refactor / investigation and returns the classification with reasoning. Invoked by the Engineering Director early in every run.
-tools: Read, Grep, Glob, Bash, WebFetch, mcp__*
+tools: Read, Grep, Glob, Bash, WebFetch, mcp__*jira*, mcp__*clickup*, mcp__*ClickUp*, mcp__*github*, mcp__*linear*, mcp__*notion*
 color: cyan
 ---
 
