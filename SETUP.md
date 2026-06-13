@@ -36,23 +36,56 @@ Optional MCP-related dependencies are installed per provider in step 5 — you d
 
 | Mode | When | What lands where |
 |---|---|---|
-| **Project** (default) | You want CCEO only inside this one codebase. | `<project>/.claude/...` + `<project>/CLAUDE.md` + `<project>/.cceo/resources.yaml.example` |
-| **Global** (`--global`) | You want CCEO available in every Claude Code session. | `~/.claude/agents/`, `~/.claude/commands/`, `~/.claude/skills/`. No CLAUDE.md or resources.yaml (those stay per-project). |
-| **Both** | You want CCEO available everywhere, **and** want CLAUDE.md + resources.yaml dropped into specific projects. | Run `--global` once, then plain project install in each project where you'll run `/ticket`. |
+| **Plugin** (recommended) | You want Claude Code's plugin system to manage the install + updates. | `~/.claude/plugins/autonomous-engineer/` — Claude Code auto-exposes everything. |
+| **Shell — global** (`--global`) | You want CCEO available in every Claude Code session without using the plugin system. | `~/.claude/agents/`, `~/.claude/commands/`, `~/.claude/skills/`. No CLAUDE.md or resources.yaml (those stay per-project). |
+| **Shell — project** (default) | You want CCEO only inside this one codebase. | `<project>/.claude/...` + `<project>/CLAUDE.md` + `<project>/.cceo/resources.yaml.example` |
 
-The mixed pattern is what most power users want: agents + commands + skills live in `~/.claude/` so they show up everywhere; each individual project gets only the rules file and the resource registry.
+The plugin path is the cleanest: one install, one update command, no shell needed. The shell paths exist for users who want offline setup, CI/CD integration, or per-project scoping without plugin involvement.
 
 ---
 
 ## 3. Install
 
-Clone Autonomous Engineer somewhere stable:
+### Plugin mode (recommended)
+
+From inside Claude Code:
+
+```bash
+/plugin install https://github.com/Holuwashina/autonomous-engineer.git
+```
+
+Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and exposes the agents/commands/skills automatically. Update later with:
+
+```bash
+/plugin update autonomous-engineer
+```
+
+After install, jump to [§4 Expose your repositories](#4-expose-your-repositories) — but first copy the per-project resources template:
+
+```bash
+cd ~/path/to/your-project
+mkdir -p .cceo
+cp ~/.claude/plugins/autonomous-engineer/.cceo/resources.yaml.example .cceo/resources.yaml.example
+cp .cceo/resources.yaml.example .cceo/resources.yaml
+$EDITOR .cceo/resources.yaml
+```
+
+Optional — drop the CCEO `CLAUDE.md` rules into your project so non-`/ticket` work follows the same iron rules:
+
+```bash
+cp ~/.claude/plugins/autonomous-engineer/CLAUDE.md ./CLAUDE.md
+# or, if you already have a CLAUDE.md, merge manually
+```
+
+### Shell install — clone first
+
+For both shell modes below, clone Autonomous Engineer somewhere stable:
 
 ```bash
 git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-engineer
 ```
 
-### Project mode (default)
+### Project mode (default shell install)
 
 ```bash
 cd ~/path/to/your-project

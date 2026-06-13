@@ -119,29 +119,27 @@ The Director is the only agent that delegates. Every other specialist runs scope
 
 ## Quickstart
 
+The fastest path is the plugin install — one command, then per-project config:
+
 ```bash
-# 1. Clone
-git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-engineer
+# 1. Install as a Claude Code plugin (one time, from any session)
+/plugin install https://github.com/Holuwashina/autonomous-engineer.git
 
-# 2a. Install GLOBALLY (available in every Claude Code session)
-sh ~/autonomous-engineer/install.sh --global
-
-# 2b. AND/OR install per project (adds CLAUDE.md + resources.yaml.example)
-cd ~/your-project
-sh ~/autonomous-engineer/install.sh
-
-# 3. Configure resources (per project)
-cp .cceo/resources.yaml.example .cceo/resources.yaml
+# 2. Per project: copy the resources template and edit
+cp ~/.claude/plugins/autonomous-engineer/.cceo/resources.yaml.example \
+   .cceo/resources.yaml
 $EDITOR .cceo/resources.yaml
 
-# 4. Wire up MCP servers (one-time)
+# 3. Wire up MCP servers (one-time, lives in your Claude config)
 claude mcp add jira ...           # see SETUP.md for full commands
 claude mcp add github ...
 claude mcp add playwright ...
 
-# 5. Use it
+# 4. Use it
 /ticket MM-123 --base develop
 ```
+
+Prefer the shell install? See [Install](#install).
 
 Full step-by-step in **[SETUP.md](SETUP.md)**.
 
@@ -149,9 +147,32 @@ Full step-by-step in **[SETUP.md](SETUP.md)**.
 
 ## Install
 
-Two modes — pick one, or use both.
+Three modes — pick whichever fits your workflow.
 
-### Project mode (default)
+### Plugin install (recommended)
+
+The plugin manifest at `.claude-plugin/plugin.json` makes this repo installable directly from Claude Code:
+
+```bash
+/plugin install https://github.com/Holuwashina/autonomous-engineer.git
+```
+
+Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and automatically exposes the 15 agents, 9 commands, and 9 skills in every session. Updates with `/plugin update autonomous-engineer`.
+
+CLAUDE.md and `.cceo/resources.yaml.example` ship in the plugin tree but Claude Code does **not** auto-copy them into your project — they're per-project files. See [Configure](#configure) for the one-line copy.
+
+### Shell install — global
+
+Makes CCEO available in **every** Claude Code session, like the plugin route but without the plugin manifest involvement.
+
+```bash
+git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-engineer
+sh ~/autonomous-engineer/install.sh --global
+```
+
+Installs to `~/.claude/agents/cceo-*`, `~/.claude/commands/*`, `~/.claude/skills/cceo-*/`. No `CLAUDE.md` or `resources.yaml.example` are written — those stay per-project.
+
+### Shell install — project
 
 Scopes CCEO to a single project. Best when you want it only for this codebase.
 
@@ -161,39 +182,9 @@ cd <your-project>
 sh /path/to/autonomous-engineer/install.sh
 ```
 
-Installs to:
-- `<project>/.claude/agents/cceo-*.md`
-- `<project>/.claude/commands/*.md`
-- `<project>/.claude/skills/cceo-*/SKILL.md`
-- `<project>/CLAUDE.md`
-- `<project>/.cceo/resources.yaml.example`
+Installs to `<project>/.claude/agents/cceo-*`, `<project>/.claude/commands/*`, `<project>/.claude/skills/cceo-*/`, plus `<project>/CLAUDE.md` and `<project>/.cceo/resources.yaml.example`.
 
-### Global mode
-
-Makes CCEO available in **every** Claude Code session, regardless of working directory.
-
-```bash
-sh /path/to/autonomous-engineer/install.sh --global
-```
-
-Installs to:
-- `~/.claude/agents/cceo-*.md`
-- `~/.claude/commands/*.md`
-- `~/.claude/skills/cceo-*/SKILL.md`
-
-No `CLAUDE.md` or `resources.yaml.example` are written — those stay per-project. You can still run the project-mode install in any specific project to drop in those files without re-installing the global agents.
-
-### Both
-
-The mixed pattern: install agents/commands/skills once globally, then add the per-project CLAUDE.md + resources.yaml.example only where you actually want CCEO to drive work.
-
-```bash
-sh /path/to/autonomous-engineer/install.sh --global     # once
-cd ~/project-a && sh /path/to/autonomous-engineer/install.sh  # per project
-cd ~/project-b && sh /path/to/autonomous-engineer/install.sh  # per project
-```
-
-### Flags
+### Flags (shell installs)
 
 | Flag | Effect |
 |---|---|
@@ -203,7 +194,7 @@ cd ~/project-b && sh /path/to/autonomous-engineer/install.sh  # per project
 
 If the target project already has a `CLAUDE.md`, the installer writes ours to `CLAUDE.cceo.md` for manual merge.
 
-### What does NOT get installed
+### What does NOT get installed (any mode)
 
 - `.mcp.json` — you add MCP servers under your own credentials via `claude mcp add`
 - `.cceo/resources.yaml` — copy the `.example` and edit; the live file is gitignored

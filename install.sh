@@ -2,6 +2,10 @@
 # Autonomous Engineer installer — copies the canonical CCEO layout into a
 # project (default) or into Claude Code's user-level config (--global).
 #
+# Alternative install: this repo is also a Claude Code plugin. Run
+#   /plugin install https://github.com/Holuwashina/autonomous-engineer.git
+# from inside Claude Code for the plugin-native install path.
+#
 # Usage:
 #   ./install.sh                      # install into $PWD (project mode)
 #   ./install.sh /path/to/project     # install into that project
@@ -109,8 +113,8 @@ fi
 
 SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-if [ ! -d "$SOURCE_DIR/.claude/agents" ]; then
-    echo "install.sh: source layout missing — expected $SOURCE_DIR/.claude/agents/" >&2
+if [ ! -d "$SOURCE_DIR/agents" ]; then
+    echo "install.sh: source layout missing — expected $SOURCE_DIR/agents/" >&2
     echo "Are you running install.sh from the autonomous-engineer repo root?" >&2
     exit 1
 fi
@@ -153,19 +157,19 @@ fi
 mkdir -p "$AGENTS_DIR" "$COMMANDS_DIR" "$SKILLS_DIR"
 
 # Agents
-for f in "$SOURCE_DIR/.claude/agents/"cceo-*.md; do
+for f in "$SOURCE_DIR/agents/"cceo-*.md; do
     [ -e "$f" ] || continue
     cp "$f" "$AGENTS_DIR/$(basename "$f")"
 done
 
 # Commands
-for f in "$SOURCE_DIR/.claude/commands/"*.md; do
+for f in "$SOURCE_DIR/commands/"*.md; do
     [ -e "$f" ] || continue
     cp "$f" "$COMMANDS_DIR/$(basename "$f")"
 done
 
 # Skills (each lives in its own directory)
-for d in "$SOURCE_DIR/.claude/skills/"cceo-*/; do
+for d in "$SOURCE_DIR/skills/"cceo-*/; do
     [ -d "$d" ] || continue
     name="$(basename "$d")"
     mkdir -p "$SKILLS_DIR/$name"
