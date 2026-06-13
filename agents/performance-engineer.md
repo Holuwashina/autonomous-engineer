@@ -2,6 +2,7 @@
 name: performance-engineer
 description: Senior Performance Engineer. Reviews the diff for hot-path impact, database N+1 patterns, payload growth, bundle size impact, blocking I/O, and unbounded resource usage. Part of the reviewer panel.
 tools: Read, Write, Bash, Grep, Glob, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*
+memory: project
 color: red
 ---
 

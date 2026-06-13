@@ -301,6 +301,16 @@ Detail: [`.claude/skills/workflow-patterns/SKILL.md`](.claude/skills/workflow-pa
 
 ---
 
+## Memory
+
+The reviewer panel (`code-reviewer`, `security-engineer`, `performance-engineer`, `software-architect`) and the QA agents (`qa-engineer`, `qa-investigation-engineer`, `qa-environment-engineer`, `qa-communications-engineer`) declare `memory: project` in their frontmatter. Each gets a persistent directory at `.claude/agent-memory/<agent-name>/` in the host project — a `MEMORY.md` index loaded automatically at spawn, plus on-demand topic files. Per Claude Code's docs-standard memory primitive: read/write tools are auto-enabled, and the directory is tracked in version control so the team shares accumulated knowledge across runs (recurring N+1 patterns, project-specific auth quirks, flaky journeys to retry, etc.).
+
+Coordination and implementation agents (Director, Technical Lead, Solutions Architect, Product Engineer, Software Engineer, Engineering Manager) do **not** currently accumulate memory — they re-derive context per run from the ticket, repo, and prior specialist returns.
+
+Browse and edit anything an agent has saved with `/memory` from inside Claude Code.
+
+---
+
 ## What it deliberately won't do
 
 - Merge a PR — opens it, you merge
@@ -324,7 +334,7 @@ Autonomous Engineer is **not a framework**. It's a configuration of Claude Code 
 - **MCP servers** provide ticket systems, browser automation, communication sinks
 - **CWD + `/add-dir`** is how repositories enter scope
 
-No custom orchestrator. No parallel AI runtime. No hidden state. The whole system is a directory of markdown files plus one shell script.
+No custom orchestrator. No parallel AI runtime. No hidden runtime state — the only persistence is per-agent memory at `.claude/agent-memory/`, which is plain markdown the user can read or edit via `/memory`. The whole system is a directory of markdown files plus one shell script.
 
 Iron rules (full set in [`CLAUDE.md`](CLAUDE.md)):
 

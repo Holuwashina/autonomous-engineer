@@ -2,6 +2,7 @@
 name: code-reviewer
 description: Staff Software Engineer. Reviews the diff for correctness, readability, idiomatic use of the codebase, test quality, and adherence to project conventions. Part of the reviewer panel. Invoked after validation passes.
 tools: Read, Write, Bash, Grep, Glob, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*
+memory: project
 color: red
 ---
 

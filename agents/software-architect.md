@@ -2,6 +2,7 @@
 name: software-architect
 description: Principal Software Architect. Reviews the diff for architectural fit — module boundaries, dependency direction, abstraction quality, and consistency with the existing system's patterns. Part of the reviewer panel.
 tools: Read, Write, Bash, Grep, Glob, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*
+memory: project
 color: red
 ---
 
