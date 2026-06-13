@@ -9,12 +9,13 @@ This is the canonical walkthrough. The `/setup` slash command runs an interactiv
 ## Contents
 
 1. [Prerequisites](#1-prerequisites)
-2. [Install](#2-install)
-3. [Expose your repositories](#3-expose-your-repositories)
-4. [Configure `.cceo/resources.yaml`](#4-configure-cceoresourcesyaml)
-5. [Add MCP servers](#5-add-mcp-servers)
-6. [Smoke test](#6-smoke-test)
-7. [Troubleshooting](#7-troubleshooting)
+2. [Choose install mode](#2-choose-install-mode)
+3. [Install](#3-install)
+4. [Expose your repositories](#4-expose-your-repositories)
+5. [Configure `.cceo/resources.yaml`](#5-configure-cceoresourcesyaml)
+6. [Add MCP servers](#6-add-mcp-servers)
+7. [Smoke test](#7-smoke-test)
+8. [Troubleshooting](#8-troubleshooting)
 
 ---
 
@@ -31,7 +32,19 @@ Optional MCP-related dependencies are installed per provider in step 5 — you d
 
 ---
 
-## 2. Install
+## 2. Choose install mode
+
+| Mode | When | What lands where |
+|---|---|---|
+| **Project** (default) | You want CCEO only inside this one codebase. | `<project>/.claude/...` + `<project>/CLAUDE.md` + `<project>/.cceo/resources.yaml.example` |
+| **Global** (`--global`) | You want CCEO available in every Claude Code session. | `~/.claude/agents/`, `~/.claude/commands/`, `~/.claude/skills/`. No CLAUDE.md or resources.yaml (those stay per-project). |
+| **Both** | You want CCEO available everywhere, **and** want CLAUDE.md + resources.yaml dropped into specific projects. | Run `--global` once, then plain project install in each project where you'll run `/ticket`. |
+
+The mixed pattern is what most power users want: agents + commands + skills live in `~/.claude/` so they show up everywhere; each individual project gets only the rules file and the resource registry.
+
+---
+
+## 3. Install
 
 Clone Autonomous Engineer somewhere stable:
 
@@ -39,31 +52,73 @@ Clone Autonomous Engineer somewhere stable:
 git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-engineer
 ```
 
-Then install into your project:
+### Project mode (default)
 
 ```bash
 cd ~/path/to/your-project
 sh ~/autonomous-engineer/install.sh
 ```
 
-The installer:
-
-- Copies `.claude/agents/cceo-*`, `.claude/commands/*`, `.claude/skills/cceo-*/` into your project.
-- Writes `CLAUDE.md` (or `CLAUDE.cceo.md` if you already have one — merge manually).
-- Drops `.cceo/resources.yaml.example` for you to copy + edit.
-- Refuses to clobber an existing install without `--force`.
+Installs into:
+- `<project>/.claude/agents/cceo-*`
+- `<project>/.claude/commands/*`
+- `<project>/.claude/skills/cceo-*/`
+- `<project>/CLAUDE.md` (or `CLAUDE.cceo.md` if one already exists)
+- `<project>/.cceo/resources.yaml.example`
 
 Verify:
 
 ```bash
-ls .claude/agents/cceo-*.md | wc -l    # → 15
-ls .claude/commands/*.md | wc -l       # → 9
-ls .claude/skills/cceo-*/SKILL.md | wc -l   # → 9
+ls .claude/agents/cceo-*.md | wc -l           # → 15
+ls .claude/commands/*.md | wc -l              # → 9
+ls .claude/skills/cceo-*/SKILL.md | wc -l     # → 9
 ```
+
+### Global mode
+
+```bash
+sh ~/autonomous-engineer/install.sh --global
+```
+
+Installs into:
+- `~/.claude/agents/cceo-*`
+- `~/.claude/commands/*`
+- `~/.claude/skills/cceo-*/`
+
+Does **not** touch `CLAUDE.md` or `.cceo/` (those live per-project).
+
+Verify:
+
+```bash
+ls ~/.claude/agents/cceo-*.md | wc -l         # → 15
+ls ~/.claude/commands/*.md | wc -l            # → 9 (or more, if you have other commands)
+ls ~/.claude/skills/cceo-*/SKILL.md | wc -l   # → 9
+```
+
+**After a global install, restart Claude Code** so it re-scans `~/.claude/`.
+
+### Both (mixed install — recommended)
+
+```bash
+# Once — makes CCEO available everywhere
+sh ~/autonomous-engineer/install.sh --global
+
+# Per project — adds CLAUDE.md + resources.yaml.example
+cd ~/project-a && sh ~/autonomous-engineer/install.sh
+cd ~/project-b && sh ~/autonomous-engineer/install.sh
+```
+
+### Flags
+
+| Flag | Effect |
+|---|---|
+| `--global` | Install into `~/.claude/` instead of a project. |
+| `--force` | Overwrite an existing CCEO install in the target. |
+| `--help` | Print usage. |
 
 ---
 
-## 3. Expose your repositories
+## 4. Expose your repositories
 
 Claude Code's current working directory is **already in scope** — whatever directory you launched `claude` from is the implicit root.
 
@@ -81,7 +136,7 @@ The Solutions Architect (`cceo-solutions-architect`) surveys all of them automat
 
 ---
 
-## 4. Configure `.cceo/resources.yaml`
+## 5. Configure `.cceo/resources.yaml`
 
 Copy the example, then edit:
 
@@ -125,7 +180,7 @@ ruby -ryaml -e 'pp YAML.load_file(".cceo/resources.yaml")' | head
 
 ---
 
-## 5. Add MCP servers
+## 6. Add MCP servers
 
 Autonomous Engineer does not ship a `.mcp.json`. You install each provider under your own credentials so they live in your MCP config, not the repo.
 
@@ -191,7 +246,7 @@ Restart Claude Code so the new tools surface.
 
 ---
 
-## 6. Smoke test
+## 7. Smoke test
 
 The cheapest end-to-end confidence check:
 
@@ -217,7 +272,7 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 ---
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 ### `/ticket` does nothing
 

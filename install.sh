@@ -1,41 +1,64 @@
 #!/usr/bin/env sh
-# CCEO installer — copies the canonical Claude Code Engineering Organization
-# layout (.claude/, CLAUDE.md, .cceo/resources.yaml.example) into a target
-# project directory.
+# Autonomous Engineer installer — copies the canonical CCEO layout into a
+# project (default) or into Claude Code's user-level config (--global).
 #
 # Usage:
-#   ./install.sh                  # install into $PWD
-#   ./install.sh /path/to/project # install into that project
-#   ./install.sh --force          # overwrite existing CCEO files
+#   ./install.sh                      # install into $PWD (project mode)
+#   ./install.sh /path/to/project     # install into that project
+#   ./install.sh --global             # install into ~/.claude/ (global mode)
+#   ./install.sh --force              # overwrite existing CCEO files
 #   ./install.sh --help
 #
-# The installer refuses to clobber an existing .claude/agents/cceo-* layout
-# without --force, so an in-progress CCEO install in the target is preserved.
+# Project mode (default):
+#   - agents, commands, skills → <project>/.claude/...
+#   - CLAUDE.md, .cceo/resources.yaml.example → <project>/
+#   Use when CCEO should only operate inside one project.
+#
+# Global mode (--global):
+#   - agents, commands, skills → ~/.claude/...
+#   - No CLAUDE.md (each project keeps its own)
+#   - No .cceo/resources.yaml.example (per-project config)
+#   Use when CCEO should be available across every Claude Code session.
+#
+# The installer refuses to clobber an existing cceo-* layout without --force.
 
 set -eu
 
 print_help() {
     cat <<'EOF'
-CCEO — Claude Code Engineering Organization installer
+Autonomous Engineer installer
 
 Usage:
-  install.sh [TARGET_DIR] [--force]
+  install.sh [TARGET_DIR] [--global] [--force]
 
 Arguments:
-  TARGET_DIR   Project directory to install CCEO into. Defaults to $PWD.
+  TARGET_DIR   Project directory to install into. Ignored when --global is set.
+               Defaults to $PWD.
 
 Options:
+  --global     Install into ~/.claude/ instead of a project directory.
   --force      Overwrite existing CCEO files in the target.
   -h, --help   Show this help.
 
-What gets installed:
-  TARGET_DIR/CLAUDE.md
+Project mode (default):
   TARGET_DIR/.claude/agents/cceo-*.md
   TARGET_DIR/.claude/commands/*.md
   TARGET_DIR/.claude/skills/cceo-*/SKILL.md
+  TARGET_DIR/CLAUDE.md
   TARGET_DIR/.cceo/resources.yaml.example
 
-What does NOT get installed:
+Global mode:
+  ~/.claude/agents/cceo-*.md
+  ~/.claude/commands/*.md
+  ~/.claude/skills/cceo-*/SKILL.md
+  (No CLAUDE.md or resources.yaml.example — those stay per-project.)
+
+Mixed mode (recommended for power users):
+  1. install.sh --global              # CCEO available everywhere
+  2. install.sh /path/to/project      # per-project CLAUDE.md + resources.yaml
+                                       (skip --global if already done globally)
+
+What does NOT get installed in either mode:
   - .mcp.json (use the cceo-mcp-setup skill to add MCP servers)
   - .cceo/resources.yaml (copy from the .example and edit; gitignored)
   - Credentials of any kind
@@ -43,6 +66,7 @@ EOF
 }
 
 FORCE=0
+GLOBAL=0
 TARGET=""
 
 for arg in "$@"; do
@@ -53,6 +77,9 @@ for arg in "$@"; do
             ;;
         --force)
             FORCE=1
+            ;;
+        --global)
+            GLOBAL=1
             ;;
         -*)
             echo "install.sh: unknown option: $arg" >&2
@@ -69,7 +96,14 @@ for arg in "$@"; do
     esac
 done
 
-if [ -z "$TARGET" ]; then
+if [ "$GLOBAL" -eq 1 ]; then
+    if [ -n "$TARGET" ]; then
+        echo "install.sh: cannot combine --global with an explicit TARGET_DIR" >&2
+        exit 2
+    fi
+    TARGET="$HOME/.claude"
+    mkdir -p "$TARGET"
+elif [ -z "$TARGET" ]; then
     TARGET="$PWD"
 fi
 
@@ -77,7 +111,7 @@ SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 if [ ! -d "$SOURCE_DIR/.claude/agents" ]; then
     echo "install.sh: source layout missing — expected $SOURCE_DIR/.claude/agents/" >&2
-    echo "Are you running install.sh from the CCEO repo root?" >&2
+    echo "Are you running install.sh from the autonomous-engineer repo root?" >&2
     exit 1
 fi
 
@@ -88,62 +122,97 @@ fi
 
 # Detect existing CCEO install in the target.
 EXISTING=0
-if [ -d "$TARGET/.claude/agents" ]; then
+if [ -d "$TARGET/agents" ] && [ "$GLOBAL" -eq 1 ]; then
+    if ls "$TARGET/agents/"cceo-*.md >/dev/null 2>&1; then
+        EXISTING=1
+    fi
+elif [ -d "$TARGET/.claude/agents" ]; then
     if ls "$TARGET/.claude/agents/"cceo-*.md >/dev/null 2>&1; then
         EXISTING=1
     fi
 fi
 
 if [ "$EXISTING" -eq 1 ] && [ "$FORCE" -ne 1 ]; then
-    echo "install.sh: CCEO files already exist in $TARGET/.claude/agents/" >&2
+    echo "install.sh: CCEO files already exist in $TARGET" >&2
     echo "Re-run with --force to overwrite." >&2
     exit 1
 fi
 
-echo "CCEO → installing into: $TARGET"
+if [ "$GLOBAL" -eq 1 ]; then
+    AGENTS_DIR="$TARGET/agents"
+    COMMANDS_DIR="$TARGET/commands"
+    SKILLS_DIR="$TARGET/skills"
+    echo "Autonomous Engineer → installing GLOBALLY into: $TARGET"
+else
+    AGENTS_DIR="$TARGET/.claude/agents"
+    COMMANDS_DIR="$TARGET/.claude/commands"
+    SKILLS_DIR="$TARGET/.claude/skills"
+    echo "Autonomous Engineer → installing into PROJECT: $TARGET"
+fi
 
-mkdir -p "$TARGET/.claude/agents" \
-         "$TARGET/.claude/commands" \
-         "$TARGET/.claude/skills" \
-         "$TARGET/.cceo"
+mkdir -p "$AGENTS_DIR" "$COMMANDS_DIR" "$SKILLS_DIR"
 
 # Agents
 for f in "$SOURCE_DIR/.claude/agents/"cceo-*.md; do
     [ -e "$f" ] || continue
-    cp "$f" "$TARGET/.claude/agents/$(basename "$f")"
+    cp "$f" "$AGENTS_DIR/$(basename "$f")"
 done
 
 # Commands
 for f in "$SOURCE_DIR/.claude/commands/"*.md; do
     [ -e "$f" ] || continue
-    cp "$f" "$TARGET/.claude/commands/$(basename "$f")"
+    cp "$f" "$COMMANDS_DIR/$(basename "$f")"
 done
 
 # Skills (each lives in its own directory)
 for d in "$SOURCE_DIR/.claude/skills/"cceo-*/; do
     [ -d "$d" ] || continue
     name="$(basename "$d")"
-    mkdir -p "$TARGET/.claude/skills/$name"
+    mkdir -p "$SKILLS_DIR/$name"
     for f in "$d"*; do
         [ -e "$f" ] || continue
-        cp "$f" "$TARGET/.claude/skills/$name/$(basename "$f")"
+        cp "$f" "$SKILLS_DIR/$name/$(basename "$f")"
     done
 done
 
-# CLAUDE.md — never overwrite the host project's CLAUDE.md silently.
-if [ -f "$TARGET/CLAUDE.md" ] && [ "$FORCE" -ne 1 ]; then
-    cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.cceo.md"
-    echo "Existing CLAUDE.md preserved. CCEO rules written to CLAUDE.cceo.md — merge manually."
-else
-    cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
+if [ "$GLOBAL" -eq 0 ]; then
+    mkdir -p "$TARGET/.cceo"
+
+    # CLAUDE.md — never overwrite the host project's CLAUDE.md silently.
+    if [ -f "$TARGET/CLAUDE.md" ] && [ "$FORCE" -ne 1 ]; then
+        cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.cceo.md"
+        echo "Existing CLAUDE.md preserved. CCEO rules written to CLAUDE.cceo.md — merge manually."
+    else
+        cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
+    fi
+
+    # Resources example
+    cp "$SOURCE_DIR/.cceo/resources.yaml.example" "$TARGET/.cceo/resources.yaml.example"
 fi
 
-# Resources example
-cp "$SOURCE_DIR/.cceo/resources.yaml.example" "$TARGET/.cceo/resources.yaml.example"
+if [ "$GLOBAL" -eq 1 ]; then
+    cat <<EOF
 
-cat <<EOF
+Autonomous Engineer installed globally.
 
-CCEO installed.
+The 15 agents, 9 commands, and 9 skills are now available in every
+Claude Code session, regardless of working directory.
+
+Next steps:
+  1. (Per project) Add CLAUDE.md and resources.yaml to each project that
+     should run CCEO end-to-end:
+        sh $SOURCE_DIR/install.sh /path/to/your-project
+     This adds the CLAUDE.md rules and the .cceo/resources.yaml.example
+     template without re-installing the global agents.
+  2. (Per project) cp .cceo/resources.yaml.example .cceo/resources.yaml
+     and edit with real values (the live file is gitignored).
+  3. Restart Claude Code so it picks up the new agents/commands/skills.
+  4. Try it:  /ticket <YOUR-TICKET-ID> --base <BRANCH>
+EOF
+else
+    cat <<EOF
+
+Autonomous Engineer installed.
 
 Next steps:
   1. Open this project in Claude Code.
@@ -154,3 +223,4 @@ Next steps:
 
 If your project already had a CLAUDE.md, see CLAUDE.cceo.md for the CCEO rules to merge in.
 EOF
+fi
