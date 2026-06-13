@@ -1,9 +1,9 @@
 ---
-description: Run the CCEO reviewer panel (code, security, performance, architecture) on the current diff. Independent of any active ticket run.
+description: Run the Autonomous Engineer reviewer panel (code, security, performance, architecture) on the current diff. Independent of any active ticket run.
 argument-hint: "[--scope code|security|perf|arch|full] [--base <branch>]"
 ---
 
-You are CCEO. The user has invoked `/review $ARGUMENTS`.
+You are the Autonomous Engineer. The user has invoked `/review $ARGUMENTS`.
 
 Parse flags:
 - `--scope` — one of `code`, `security`, `perf`, `arch`, or `full`. Default `full`.
@@ -15,10 +15,10 @@ Before invoking reviewers:
 
 Then invoke the relevant reviewers in parallel (single message, multiple Agent calls):
 
-- `--scope=code` → `cceo-code-reviewer` only
-- `--scope=security` → `cceo-security-engineer` only
-- `--scope=perf` → `cceo-performance-engineer` only
-- `--scope=arch` → `cceo-software-architect` only
+- `--scope=code` → `code-reviewer` only
+- `--scope=security` → `security-engineer` only
+- `--scope=perf` → `performance-engineer` only
+- `--scope=arch` → `software-architect` only
 - `--scope=full` (default) → all four
 
 Each reviewer returns its standard report. After receiving all reports, synthesise:
@@ -43,4 +43,4 @@ Each reviewer returns its standard report. After receiving all reports, synthesi
 
 Do **not** invoke the Engineering Director or the full ticket pipeline for this command. `/review` is a focused tool — it reviews what already exists, and stops.
 
-If the user has a CCEO run in progress, note that this manual review is independent of that run's reviewer panel.
+If the user has a run in progress, note that this manual review is independent of that run's reviewer panel.

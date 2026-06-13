@@ -1,9 +1,9 @@
 ---
-description: Run the CCEO QA Engineer (plus the Communications Engineer if the journey involves email/OTP/links) against the current change. Independent of any active ticket run.
+description: Run the QA Engineer (plus the Communications Engineer if the journey involves email/OTP/links) against the current change. Independent of any active ticket run.
 argument-hint: "[--journey <name>] [--env <key>] [--account <key>]"
 ---
 
-You are CCEO. The user has invoked `/qa $ARGUMENTS`.
+You are the Autonomous Engineer. The user has invoked `/qa $ARGUMENTS`.
 
 Parse flags:
 - `--journey <name>` — short name for the journey to run (e.g. `register`, `checkout`, `invite-flow`). If omitted, ask the user for one before proceeding.
@@ -12,9 +12,9 @@ Parse flags:
 
 Process:
 
-1. **Invoke `cceo-qa-environment-engineer`** with `purpose=validate` to confirm or select environment, tenant, and account. If flags override the manager's defaults, pass them through.
-2. **Invoke `cceo-qa-engineer`** with the journey name and the environment selection. Pass an empty `validation_plan` if there isn't one from an active run — the Validator will derive a sensible journey from the name.
-3. **If the journey touches email / OTP / magic-link / invite / push:** invoke `cceo-qa-communications-engineer` in parallel to capture the corresponding artefacts.
+1. **Invoke `qa-environment-engineer`** with `purpose=validate` to confirm or select environment, tenant, and account. If flags override the manager's defaults, pass them through.
+2. **Invoke `qa-engineer`** with the journey name and the environment selection. Pass an empty `validation_plan` if there isn't one from an active run — the Validator will derive a sensible journey from the name.
+3. **If the journey touches email / OTP / magic-link / invite / push:** invoke `qa-communications-engineer` in parallel to capture the corresponding artefacts.
 4. Synthesise the Validator's report (and Comms report, if present) into a single summary:
 
 ```
@@ -38,4 +38,4 @@ Process:
 
 Do **not** invoke implementers or reviewers. `/qa` is QA-only. If the journey reveals a code issue, surface it as a finding — don't fix it.
 
-If `.cceo/resources.yaml` is missing, point the user at `/setup`.
+If `.ae/resources.yaml` is missing, point the user at `/setup`.

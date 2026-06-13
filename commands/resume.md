@@ -1,19 +1,19 @@
 ---
-description: Resume an interrupted CCEO ticket run. Picks up from the last completed specialist, restoring context.
+description: Resume an interrupted ticket run. Picks up from the last completed specialist, restoring context.
 argument-hint: "[<ticket-id>]"
 ---
 
-You are CCEO. The user has invoked `/resume $ARGUMENTS`.
+You are the Autonomous Engineer. The user has invoked `/resume $ARGUMENTS`.
 
 Parse:
-- Optional first positional: **ticket ID**. If omitted, infer from the most recent active CCEO task list entries.
+- Optional first positional: **ticket ID**. If omitted, infer from the most recent active task list entries.
 
 Process:
 
 1. Identify the run to resume.
    - If `$ARGUMENTS` is provided, filter `TaskList` for tasks tagged with that ticket ID.
-   - If `$ARGUMENTS` is empty, find the most recent in-progress CCEO run from `TaskList`.
-   - If no candidate is found, reply: "No CCEO run to resume. Start a new one with `/ticket <id> --base <branch>`." Stop.
+   - If `$ARGUMENTS` is empty, find the most recent in-progress run from `TaskList`.
+   - If no candidate is found, reply: "No run to resume. Start a new one with `/ticket <id> --base <branch>`." Stop.
 2. Reconstruct context:
    - Ticket details (re-fetch via ticket MCP for freshness — comments may have changed).
    - Base branch.
@@ -21,7 +21,7 @@ Process:
    - Specialists completed and their reports.
    - Last in-flight specialist.
    - Current loop iteration index.
-3. Hand off to **`cceo-engineering-director`** with:
+3. Hand off to **`engineering-director`** with:
    - `ticket_id` — resolved
    - `base_branch` — from run state
    - `override_classification` — from run state
@@ -32,4 +32,4 @@ Resume hygiene:
 - The Director **does not silently rerun** completed specialists. It re-uses their reports.
 - The Director **does re-fetch the ticket** in case status or comments have changed since the run paused.
 - The Director **does re-check the branch state** (`git status`, `git log`) — if the user has made manual commits during the pause, the Director surfaces them and asks how to incorporate them before continuing.
-- If the resume point is mid-implementation and the implementer's state is ambiguous, the Director invokes a fresh `cceo-code-reviewer` pass on the partial diff before continuing.
+- If the resume point is mid-implementation and the implementer's state is ambiguous, the Director invokes a fresh `code-reviewer` pass on the partial diff before continuing.

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Autonomous Engineer installer — copies the canonical CCEO layout into a
+# Autonomous Engineer installer — copies the canonical Autonomous Engineer layout into a
 # project (default) or into Claude Code's user-level config (--global).
 #
 # Alternative install: this repo is also a Claude Code plugin. Run
@@ -10,21 +10,21 @@
 #   ./install.sh                      # install into $PWD (project mode)
 #   ./install.sh /path/to/project     # install into that project
 #   ./install.sh --global             # install into ~/.claude/ (global mode)
-#   ./install.sh --force              # overwrite existing CCEO files
+#   ./install.sh --force              # overwrite existing installed files
 #   ./install.sh --help
 #
 # Project mode (default):
 #   - agents, commands, skills → <project>/.claude/...
-#   - CLAUDE.md, .cceo/resources.yaml.example → <project>/
-#   Use when CCEO should only operate inside one project.
+#   - CLAUDE.md, .ae/resources.yaml.example → <project>/
+#   Use when Autonomous Engineer should only operate inside one project.
 #
 # Global mode (--global):
 #   - agents, commands, skills → ~/.claude/...
 #   - No CLAUDE.md (each project keeps its own)
-#   - No .cceo/resources.yaml.example (per-project config)
-#   Use when CCEO should be available across every Claude Code session.
+#   - No .ae/resources.yaml.example (per-project config)
+#   Use when Autonomous Engineer should be available across every Claude Code session.
 #
-# The installer refuses to clobber an existing cceo-* layout without --force.
+# The installer refuses to clobber an existing install without --force.
 
 set -eu
 
@@ -41,30 +41,30 @@ Arguments:
 
 Options:
   --global     Install into ~/.claude/ instead of a project directory.
-  --force      Overwrite existing CCEO files in the target.
+  --force      Overwrite existing installed files in the target.
   -h, --help   Show this help.
 
 Project mode (default):
-  TARGET_DIR/.claude/agents/cceo-*.md
+  TARGET_DIR/.claude/agents/*.md
   TARGET_DIR/.claude/commands/*.md
-  TARGET_DIR/.claude/skills/cceo-*/SKILL.md
+  TARGET_DIR/.claude/skills/*/SKILL.md
   TARGET_DIR/CLAUDE.md
-  TARGET_DIR/.cceo/resources.yaml.example
+  TARGET_DIR/.ae/resources.yaml.example
 
 Global mode:
-  ~/.claude/agents/cceo-*.md
+  ~/.claude/agents/*.md
   ~/.claude/commands/*.md
-  ~/.claude/skills/cceo-*/SKILL.md
+  ~/.claude/skills/*/SKILL.md
   (No CLAUDE.md or resources.yaml.example — those stay per-project.)
 
 Mixed mode (recommended for power users):
-  1. install.sh --global              # CCEO available everywhere
+  1. install.sh --global              # Autonomous Engineer available everywhere
   2. install.sh /path/to/project      # per-project CLAUDE.md + resources.yaml
                                        (skip --global if already done globally)
 
 What does NOT get installed in either mode:
-  - .mcp.json (use the cceo-mcp-setup skill to add MCP servers)
-  - .cceo/resources.yaml (copy from the .example and edit; gitignored)
+  - .mcp.json (use the mcp-setup skill to add MCP servers)
+  - .ae/resources.yaml (copy from the .example and edit; gitignored)
   - Credentials of any kind
 EOF
 }
@@ -132,20 +132,20 @@ if [ ! -d "$TARGET" ]; then
     exit 1
 fi
 
-# Detect existing CCEO install in the target.
+# Detect existing Autonomous Engineer install in the target.
 EXISTING=0
 if [ -d "$TARGET/agents" ] && [ "$GLOBAL" -eq 1 ]; then
-    if ls "$TARGET/agents/"cceo-*.md >/dev/null 2>&1; then
+    if ls "$TARGET/agents/"engineering-director.md >/dev/null 2>&1; then
         EXISTING=1
     fi
 elif [ -d "$TARGET/.claude/agents" ]; then
-    if ls "$TARGET/.claude/agents/"cceo-*.md >/dev/null 2>&1; then
+    if ls "$TARGET/.claude/agents/"engineering-director.md >/dev/null 2>&1; then
         EXISTING=1
     fi
 fi
 
 if [ "$EXISTING" -eq 1 ] && [ "$FORCE" -ne 1 ]; then
-    echo "install.sh: CCEO files already exist in $TARGET" >&2
+    echo "install.sh: installed files already exist in $TARGET" >&2
     echo "Re-run with --force to overwrite." >&2
     exit 1
 fi
@@ -165,7 +165,7 @@ fi
 mkdir -p "$AGENTS_DIR" "$COMMANDS_DIR" "$SKILLS_DIR"
 
 # Agents
-for f in "$SOURCE_DIR/agents/"cceo-*.md; do
+for f in "$SOURCE_DIR/agents/"*.md; do
     [ -e "$f" ] || continue
     cp "$f" "$AGENTS_DIR/$(basename "$f")"
 done
@@ -177,7 +177,7 @@ for f in "$SOURCE_DIR/commands/"*.md; do
 done
 
 # Skills (each lives in its own directory)
-for d in "$SOURCE_DIR/skills/"cceo-*/; do
+for d in "$SOURCE_DIR/skills/"*/; do
     [ -d "$d" ] || continue
     name="$(basename "$d")"
     mkdir -p "$SKILLS_DIR/$name"
@@ -188,18 +188,18 @@ for d in "$SOURCE_DIR/skills/"cceo-*/; do
 done
 
 if [ "$GLOBAL" -eq 0 ]; then
-    mkdir -p "$TARGET/.cceo"
+    mkdir -p "$TARGET/.ae"
 
     # CLAUDE.md — never overwrite the host project's CLAUDE.md silently.
     if [ -f "$TARGET/CLAUDE.md" ] && [ "$FORCE" -ne 1 ]; then
-        cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.cceo.md"
-        echo "Existing CLAUDE.md preserved. CCEO rules written to CLAUDE.cceo.md — merge manually."
+        cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.ae.md"
+        echo "Existing CLAUDE.md preserved. Autonomous Engineer rules written to CLAUDE.ae.md — merge manually."
     else
         cp "$SOURCE_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
     fi
 
     # Resources example
-    cp "$SOURCE_DIR/.cceo/resources.yaml.example" "$TARGET/.cceo/resources.yaml.example"
+    cp "$SOURCE_DIR/.ae/resources.yaml.example" "$TARGET/.ae/resources.yaml.example"
 fi
 
 if [ "$GLOBAL" -eq 1 ]; then
@@ -212,11 +212,11 @@ Claude Code session, regardless of working directory.
 
 Next steps:
   1. (Per project) Add CLAUDE.md and resources.yaml to each project that
-     should run CCEO end-to-end:
+     should run Autonomous Engineer end-to-end:
         sh $SOURCE_DIR/install.sh /path/to/your-project
-     This adds the CLAUDE.md rules and the .cceo/resources.yaml.example
+     This adds the CLAUDE.md rules and the .ae/resources.yaml.example
      template without re-installing the global agents.
-  2. (Per project) cp .cceo/resources.yaml.example .cceo/resources.yaml
+  2. (Per project) cp .ae/resources.yaml.example .ae/resources.yaml
      and edit with real values (the live file is gitignored).
   3. Restart Claude Code so it picks up the new agents/commands/skills.
   4. Try it:  /ticket <YOUR-TICKET-ID> --base <BRANCH>
@@ -229,10 +229,10 @@ Autonomous Engineer installed.
 Next steps:
   1. Open this project in Claude Code.
   2. Run /setup to configure resources and MCP servers.
-  3. cp .cceo/resources.yaml.example .cceo/resources.yaml
-     Edit .cceo/resources.yaml — fill in real values (the file is gitignored).
+  3. cp .ae/resources.yaml.example .ae/resources.yaml
+     Edit .ae/resources.yaml — fill in real values (the file is gitignored).
   4. Try it:  /ticket <YOUR-TICKET-ID> --base <BRANCH>
 
-If your project already had a CLAUDE.md, see CLAUDE.cceo.md for the CCEO rules to merge in.
+If your project already had a CLAUDE.md, see CLAUDE.ae.md for the Autonomous Engineer rules to merge in.
 EOF
 fi

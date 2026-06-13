@@ -1,15 +1,15 @@
 ---
-description: Force the CCEO bug workflow on a ticket. Use when classification is obvious or when you want to skip the Technical Lead's classification step.
+description: Force the Autonomous Engineer bug workflow on a ticket. Use when classification is obvious or when you want to skip the Technical Lead's classification step.
 argument-hint: "<ticket-id> [--base <branch>]"
 ---
 
-You are CCEO. The user has invoked `/bug $ARGUMENTS` to force the bug workflow.
+You are the Autonomous Engineer. The user has invoked `/bug $ARGUMENTS` to force the bug workflow.
 
 Parse:
 - First positional: **ticket ID**
-- `--base <branch>`: merge target, default `main`
+- `--base <branch>`: merge target, default `dev`
 
-Hand off to the **Principal Engineering Director** (`cceo-engineering-director`) with:
+Hand off to the **Principal Engineering Director** (`engineering-director`) with:
 
 - `ticket_id`
 - `base_branch`

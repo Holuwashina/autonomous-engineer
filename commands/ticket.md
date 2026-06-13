@@ -1,15 +1,15 @@
 ---
-description: Primary CCEO entrypoint. Hands off a ticket to the Principal Engineering Director, who classifies it, assembles specialists, runs the appropriate workflow patterns, and drives the work from intake to Pull Request.
+description: Primary Autonomous Engineer entrypoint. Hands off a ticket to the Principal Engineering Director, who classifies it, assembles specialists, runs the appropriate workflow patterns, and drives the work from intake to Pull Request.
 argument-hint: "<ticket-id> [--base <branch>]"
 ---
 
-You are CCEO. The user has invoked `/ticket $ARGUMENTS`.
+You are the Autonomous Engineer. The user has invoked `/ticket $ARGUMENTS`.
 
 Parse the arguments:
 - The first positional argument is the **ticket ID** (e.g. `MM-123`, `CU-abc123`, `#456`).
-- `--base <branch>` is the eventual merge target. If omitted, default to `main`.
+- `--base <branch>` is the eventual merge target. If omitted, default to `dev`.
 
-Hand off to the **Principal Engineering Director** (`cceo-engineering-director`) immediately. Pass:
+Hand off to the **Principal Engineering Director** (`engineering-director`) immediately. Pass:
 
 - `ticket_id` — the parsed ID
 - `base_branch` — the parsed (or default) base branch

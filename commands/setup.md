@@ -1,32 +1,32 @@
 ---
-description: Configure CCEO for this project. Walks through the single .cceo/resources.yaml config file and MCP server installation.
+description: Configure Autonomous Engineer for this project. Walks through the single .ae/resources.yaml config file and MCP server installation.
 ---
 
-You are CCEO. The user has invoked `/setup`. Your job is to bring this project to a state where `/ticket` can run end-to-end.
+You are the Autonomous Engineer. The user has invoked `/setup`. Your job is to bring this project to a state where `/ticket` can run end-to-end.
 
 This is interactive. Do not run any work silently. After each phase, summarise what was done and ask before moving to the next phase.
 
 ### Phase 0 — Sanity check
 
-Confirm CCEO is installed in this project:
-- `.claude/agents/cceo-engineering-director.md` exists.
-- `.claude/skills/cceo-workflow-patterns/SKILL.md` exists.
-- `CLAUDE.md` mentions CCEO.
+Confirm Autonomous Engineer is installed in this project:
+- `.claude/agents/engineering-director.md` exists.
+- `.claude/skills/workflow-patterns/SKILL.md` exists.
+- `CLAUDE.md` mentions Autonomous Engineer.
 
-If any are missing, tell the user to (re-)run `install.sh` from the CCEO repo, then stop.
+If any are missing, tell the user to (re-)run `install.sh` from the Autonomous Engineer repo, then stop.
 
 ### Phase 1 — Repository exposure
 
 Claude Code's current working directory is already in scope — confirm with the user that this is the right starting point. For additional repos beyond the CWD, list the `/add-dir`'d directories if the harness surfaces them; otherwise ask the user to run `/add-dir <path>` for each extra repo (sibling frontend, backend, shared libs, infra, etc.).
 
-State: CCEO automatically uses whatever Claude Code can see. No CCEO-side registration is required.
+State: Autonomous Engineer automatically uses whatever Claude Code can see. No Autonomous Engineer-side registration is required.
 
 ### Phase 2 — QA Resource Registry
 
-CCEO uses one config file: `.cceo/resources.yaml`. It holds environments, tenants, accounts (with passwords inline), communications, external services. The file is gitignored.
+Autonomous Engineer uses one config file: `.ae/resources.yaml`. It holds environments, tenants, accounts (with passwords inline), communications, external services. The file is gitignored.
 
-Check for `.cceo/resources.yaml`.
-- If missing and `.cceo/resources.yaml.example` exists, ask whether to copy the example as a starting point. If yes, `cp .cceo/resources.yaml.example .cceo/resources.yaml` and open it for editing.
+Check for `.ae/resources.yaml`.
+- If missing and `.ae/resources.yaml.example` exists, ask whether to copy the example as a starting point. If yes, `cp .ae/resources.yaml.example .ae/resources.yaml` and open it for editing.
 - If both are missing, recommend re-running `install.sh`.
 
 Walk the sections:
@@ -36,20 +36,20 @@ Walk the sections:
 4. **Communications** — ask which email sink is used (Mailtrap preferred). Inline the inbox ID and API token. Tell them to delete unused providers.
 5. **External services** — only keep entries for services the project actually uses.
 
-Refer to the `cceo-resources` skill for the schema. Do **not** suggest env-var indirection or a separate `.env.local` — the user deliberately chose single-file YAML.
+Refer to the `resources-config` skill for the schema. Do **not** suggest env-var indirection or a separate `.env.local` — the user deliberately chose single-file YAML.
 
-When done, run a dry validation: parse `.cceo/resources.yaml`, walk each entry's sensitive fields, list any that still hold `REPLACE_ME` or empty values. **Never print resolved values** — only field names + "resolved" / "unresolved".
+When done, run a dry validation: parse `.ae/resources.yaml`, walk each entry's sensitive fields, list any that still hold `REPLACE_ME` or empty values. **Never print resolved values** — only field names + "resolved" / "unresolved".
 
 ### Phase 3 — MCP servers
 
-Refer to the `cceo-mcp-setup` skill. Ask which providers the project needs. Recommend the typical set:
+Refer to the `mcp-setup` skill. Ask which providers the project needs. Recommend the typical set:
 - **Ticket source** — Jira, ClickUp, or GitHub Issues (pick one).
 - **Code host** — GitHub.
 - **Browser automation** — Playwright.
 - **Email sink** — Mailtrap (matches the resources entry).
 - **Optional** — Slack (notifications), context7 (docs lookup).
 
-For each, show the exact `claude mcp add` command from `cceo-mcp-setup`. Do not run them — the user runs them so credentials enter their MCP config under their own authority. MCP credentials (`JIRA_API_TOKEN`, `GITHUB_PERSONAL_ACCESS_TOKEN`, etc.) are env vars the user manages however they like (shell export, direnv, etc.) — CCEO does not prescribe a location.
+For each, show the exact `claude mcp add` command from `mcp-setup`. Do not run them — the user runs them so credentials enter their MCP config under their own authority. MCP credentials (`JIRA_API_TOKEN`, `GITHUB_PERSONAL_ACCESS_TOKEN`, etc.) are env vars the user manages however they like (shell export, direnv, etc.) — Autonomous Engineer does not prescribe a location.
 
 After installation, suggest `claude mcp list` to verify.
 
@@ -63,9 +63,9 @@ If yes, invoke `/ticket FAKE-1 --base main`. The Director will fail to fetch the
 ### Phase 5 — Done
 
 Summarise:
-- `.cceo/resources.yaml` status — which entries have unresolved sensitive fields
+- `.ae/resources.yaml` status — which entries have unresolved sensitive fields
 - Configured MCP providers
 - Outstanding actions the user needs to take
 - The one-liner to start: `/ticket <id> --base <branch>`
 
-Do not write to `.cceo/resources.yaml`, `.mcp.json`, or any credential file on the user's behalf. CCEO never holds credentials.
+Do not write to `.ae/resources.yaml`, `.mcp.json`, or any credential file on the user's behalf. Autonomous Engineer never holds credentials.

@@ -1,14 +1,14 @@
 ---
-description: Report current state of the active CCEO ticket run. Lists which specialists have run, which are pending, latest findings, current branch, and PR/ticket status.
+description: Report current state of the active ticket run. Lists which specialists have run, which are pending, latest findings, current branch, and PR/ticket status.
 ---
 
-You are CCEO. The user has invoked `/status`.
+You are the Autonomous Engineer. The user has invoked `/status`.
 
 Process:
 
-1. Read the CCEO task list via `TaskList`. Filter for tasks created during the current run (most recent ticket-id-keyed batch).
+1. Read the task list via `TaskList`. Filter for tasks created during the current run (most recent ticket-id-keyed batch).
 2. If no active run is found:
-   - Check `git rev-parse --abbrev-ref HEAD` for a CCEO-pattern branch (e.g. `fix/<ID>-...`, `feat/<ID>-...`). If matched, treat that as a possible silent run; otherwise report "No active CCEO run."
+   - Check `git rev-parse --abbrev-ref HEAD` for a standard branch (e.g. `fix/<ID>-...`, `feat/<ID>-...`). If matched, treat that as a possible silent run; otherwise report "No active run."
 3. If a run is found, compose:
 
 ```

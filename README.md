@@ -148,9 +148,9 @@ sh ~/autonomous-engineer/install.sh --global
 
 ```bash
 cd <your-project>
-mkdir -p .cceo
-cp ~/.autonomous-engineer/.cceo/resources.yaml.example .cceo/resources.yaml
-$EDITOR .cceo/resources.yaml        # fill in real values
+mkdir -p .autonomous-engineer
+cp ~/.autonomous-engineer/.ae/resources.yaml.example .ae/resources.yaml
+$EDITOR .ae/resources.yaml        # fill in real values
 
 # Minimum MCP — needed for QA reproduction / validation:
 claude mcp add playwright --command npx --args "@playwright/mcp"
@@ -179,22 +179,22 @@ The plugin manifest at `.claude-plugin/plugin.json` makes this repo installable 
 
 Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and automatically exposes the 15 agents, 9 commands, and 9 skills in every session. Updates with `/plugin update autonomous-engineer`.
 
-CLAUDE.md and `.cceo/resources.yaml.example` ship in the plugin tree but Claude Code does **not** auto-copy them into your project — they're per-project files. See [Configure](#configure) for the one-line copy.
+CLAUDE.md and `.ae/resources.yaml.example` ship in the plugin tree but Claude Code does **not** auto-copy them into your project — they're per-project files. See [Configure](#configure) for the one-line copy.
 
 ### Shell install — global
 
-Makes CCEO available in **every** Claude Code session, like the plugin route but without the plugin manifest involvement.
+Makes Autonomous Engineer available in **every** Claude Code session, like the plugin route but without the plugin manifest involvement.
 
 ```bash
 git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-engineer
 sh ~/autonomous-engineer/install.sh --global
 ```
 
-Installs to `~/.claude/agents/cceo-*`, `~/.claude/commands/*`, `~/.claude/skills/cceo-*/`. No `CLAUDE.md` or `resources.yaml.example` are written — those stay per-project.
+Installs to `~/.claude/agents/autonomous-engineer-*`, `~/.claude/commands/*`, `~/.claude/skills/autonomous-engineer-*/`. No `CLAUDE.md` or `resources.yaml.example` are written — those stay per-project.
 
 ### Shell install — project
 
-Scopes CCEO to a single project. Best when you want it only for this codebase.
+Scopes Autonomous Engineer to a single project. Best when you want it only for this codebase.
 
 ```bash
 git clone https://github.com/Holuwashina/autonomous-engineer.git
@@ -202,22 +202,22 @@ cd <your-project>
 sh /path/to/autonomous-engineer/install.sh
 ```
 
-Installs to `<project>/.claude/agents/cceo-*`, `<project>/.claude/commands/*`, `<project>/.claude/skills/cceo-*/`, plus `<project>/CLAUDE.md` and `<project>/.cceo/resources.yaml.example`.
+Installs to `<project>/.claude/agents/autonomous-engineer-*`, `<project>/.claude/commands/*`, `<project>/.claude/skills/autonomous-engineer-*/`, plus `<project>/CLAUDE.md` and `<project>/.ae/resources.yaml.example`.
 
 ### Flags (shell installs)
 
 | Flag | Effect |
 |---|---|
 | `--global` | Install into `~/.claude/` instead of a project. |
-| `--force` | Overwrite an existing CCEO install in the target. |
+| `--force` | Overwrite an existing Autonomous Engineer install in the target. |
 | `--help` | Print usage. |
 
-If the target project already has a `CLAUDE.md`, the installer writes ours to `CLAUDE.cceo.md` for manual merge.
+If the target project already has a `CLAUDE.md`, the installer writes ours to `CLAUDE.ae.md` for manual merge.
 
 ### What does NOT get installed (any mode)
 
 - `.mcp.json` — you add MCP servers under your own credentials via `claude mcp add`
-- `.cceo/resources.yaml` — copy the `.example` and edit; the live file is gitignored
+- `.ae/resources.yaml` — copy the `.example` and edit; the live file is gitignored
 
 ---
 
@@ -226,8 +226,8 @@ If the target project already has a `CLAUDE.md`, the installer writes ours to `C
 See **[SETUP.md](SETUP.md)** for the full walkthrough. The short version:
 
 1. **Expose repositories.** Claude Code's current working directory is already in scope. For additional repos, run `/add-dir <path>` for each one (frontend, backend, shared libs, infra). The Solutions Architect surveys all of them.
-2. **Configure resources.** `cp .cceo/resources.yaml.example .cceo/resources.yaml`, then edit. Environments, tenants, accounts (with passwords), communications, external services. All inline. The live file is gitignored.
-3. **Add MCP servers.** Run `/setup` and follow the prompts, or read the `cceo-mcp-setup` skill. Typical set: Jira / ClickUp / GitHub Issues (ticket source) · GitHub (code host + PR) · Playwright (browser automation) · Mailtrap or Maildrop (email validation, optional).
+2. **Configure resources.** `cp .ae/resources.yaml.example .ae/resources.yaml`, then edit. Environments, tenants, accounts (with passwords), communications, external services. All inline. The live file is gitignored.
+3. **Add MCP servers.** Run `/setup` and follow the prompts, or read the `mcp-setup` skill. Typical set: Jira / ClickUp / GitHub Issues (ticket source) · GitHub (code host + PR) · Playwright (browser automation) · Mailtrap or Maildrop (email validation, optional).
 4. **Confirm.** `/setup` walks you through verification.
 
 ---
@@ -268,21 +268,21 @@ The Engineering Director will reply with a seven-section ready message and pause
 
 | Tier | Agent | Role |
 |---|---|---|
-| Coordinator | `cceo-engineering-director` | Owns every run; delegates, synthesises, declares completion |
-| Intake | `cceo-technical-lead` | Classifies the ticket |
-| Intake | `cceo-solutions-architect` | Maps affected repos + blast radius |
-| QA | `cceo-qa-environment-engineer` | Picks environment / tenant / account from `resources.yaml` |
-| QA | `cceo-qa-investigation-engineer` | Playwright reproduction of bugs |
-| QA | `cceo-qa-engineer` | Playwright validation of fixes / features |
-| QA | `cceo-qa-communications-engineer` | Email / OTP / magic-link validation (opt-in) |
-| Build | `cceo-software-engineer` | Bug root-cause + fix + regression test |
-| Build | `cceo-product-engineer` | Feature acceptance criteria + plan |
-| Build | `cceo-fullstack-engineer` | Feature implementation |
-| Review | `cceo-code-reviewer` | Staff-level diff review |
-| Review | `cceo-security-engineer` | OWASP / authz / data exposure (mandatory for auth/payments) |
-| Review | `cceo-performance-engineer` | Hot paths, N+1, payload, bundle |
-| Review | `cceo-software-architect` | Boundaries, contracts, abstraction quality |
-| Close-out | `cceo-engineering-manager` | PR preparation + ticket update |
+| Coordinator | `engineering-director` | Owns every run; delegates, synthesises, declares completion |
+| Intake | `technical-lead` | Classifies the ticket |
+| Intake | `solutions-architect` | Maps affected repos + blast radius |
+| QA | `qa-environment-engineer` | Picks environment / tenant / account from `resources.yaml` |
+| QA | `qa-investigation-engineer` | Playwright reproduction of bugs |
+| QA | `qa-engineer` | Playwright validation of fixes / features |
+| QA | `qa-communications-engineer` | Email / OTP / magic-link validation (opt-in) |
+| Build | `software-engineer` | Bug root-cause + fix + regression test |
+| Build | `product-engineer` | Feature acceptance criteria + plan |
+| Build | `fullstack-engineer` | Feature implementation |
+| Review | `code-reviewer` | Staff-level diff review |
+| Review | `security-engineer` | OWASP / authz / data exposure (mandatory for auth/payments) |
+| Review | `performance-engineer` | Hot paths, N+1, payload, bundle |
+| Review | `software-architect` | Boundaries, contracts, abstraction quality |
+| Close-out | `engineering-manager` | PR preparation + ticket update |
 
 ---
 
@@ -299,7 +299,7 @@ The Director composes these — most runs use two or three. Never all six.
 | 5 | Tournament | Multiple reviewers on the same artefact (the reviewer panel is one) |
 | 6 | Loop-Until-Done | Default close-out — implement → validate → review → iterate |
 
-Detail: [`.claude/skills/cceo-workflow-patterns/SKILL.md`](.claude/skills/cceo-workflow-patterns/SKILL.md).
+Detail: [`.claude/skills/workflow-patterns/SKILL.md`](.claude/skills/workflow-patterns/SKILL.md).
 
 ---
 

@@ -12,7 +12,7 @@ This is the canonical walkthrough. The `/setup` slash command runs an interactiv
 2. [Choose install mode](#2-choose-install-mode)
 3. [Install](#3-install)
 4. [Expose your repositories](#4-expose-your-repositories)
-5. [Configure `.cceo/resources.yaml`](#5-configure-cceoresourcesyaml)
+5. [Configure `.ae/resources.yaml`](#5-configure-autonomous-engineerresourcesyaml)
 6. [Add MCP servers](#6-add-mcp-servers)
 7. [Smoke test](#7-smoke-test)
 8. [Troubleshooting](#8-troubleshooting)
@@ -23,7 +23,7 @@ This is the canonical walkthrough. The `/setup` slash command runs an interactiv
 
 | Tool | Why | Check |
 |---|---|---|
-| [Claude Code CLI](https://claude.com/claude-code) | The runtime CCEO operates on | `claude --version` |
+| [Claude Code CLI](https://claude.com/claude-code) | The runtime Autonomous Engineer operates on | `claude --version` |
 | `git` | Branching, commits, PR scaffolding | `git --version` |
 | `gh` CLI (optional but recommended) | PR opening when GitHub MCP isn't used | `gh --version` |
 | `ruby` or Python with PyYAML | YAML parsing in validation helpers (system Ruby works on macOS) | `ruby -ryaml -e 'puts YAML::VERSION'` |
@@ -37,8 +37,8 @@ Optional MCP-related dependencies are installed per provider in step 5 — you d
 | Mode | When | What lands where |
 |---|---|---|
 | **Plugin** (recommended) | You want Claude Code's plugin system to manage the install + updates. | `~/.claude/plugins/autonomous-engineer/` — Claude Code auto-exposes everything. |
-| **Shell — global** (`--global`) | You want CCEO available in every Claude Code session without using the plugin system. | `~/.claude/agents/`, `~/.claude/commands/`, `~/.claude/skills/`. No CLAUDE.md or resources.yaml (those stay per-project). |
-| **Shell — project** (default) | You want CCEO only inside this one codebase. | `<project>/.claude/...` + `<project>/CLAUDE.md` + `<project>/.cceo/resources.yaml.example` |
+| **Shell — global** (`--global`) | You want Autonomous Engineer available in every Claude Code session without using the plugin system. | `~/.claude/agents/`, `~/.claude/commands/`, `~/.claude/skills/`. No CLAUDE.md or resources.yaml (those stay per-project). |
+| **Shell — project** (default) | You want Autonomous Engineer only inside this one codebase. | `<project>/.claude/...` + `<project>/CLAUDE.md` + `<project>/.ae/resources.yaml.example` |
 
 The plugin path is the cleanest: one install, one update command, no shell needed. The shell paths exist for users who want offline setup, CI/CD integration, or per-project scoping without plugin involvement.
 
@@ -64,13 +64,13 @@ After install, jump to [§4 Expose your repositories](#4-expose-your-repositorie
 
 ```bash
 cd ~/path/to/your-project
-mkdir -p .cceo
-cp ~/.claude/plugins/autonomous-engineer/.cceo/resources.yaml.example .cceo/resources.yaml.example
-cp .cceo/resources.yaml.example .cceo/resources.yaml
-$EDITOR .cceo/resources.yaml
+mkdir -p .autonomous-engineer
+cp ~/.claude/plugins/autonomous-engineer/.ae/resources.yaml.example .ae/resources.yaml.example
+cp .ae/resources.yaml.example .ae/resources.yaml
+$EDITOR .ae/resources.yaml
 ```
 
-Optional — drop the CCEO `CLAUDE.md` rules into your project so non-`/ticket` work follows the same iron rules:
+Optional — drop the Autonomous Engineer `CLAUDE.md` rules into your project so non-`/ticket` work follows the same iron rules:
 
 ```bash
 cp ~/.claude/plugins/autonomous-engineer/CLAUDE.md ./CLAUDE.md
@@ -93,18 +93,18 @@ sh ~/autonomous-engineer/install.sh
 ```
 
 Installs into:
-- `<project>/.claude/agents/cceo-*`
+- `<project>/.claude/agents/autonomous-engineer-*`
 - `<project>/.claude/commands/*`
-- `<project>/.claude/skills/cceo-*/`
-- `<project>/CLAUDE.md` (or `CLAUDE.cceo.md` if one already exists)
-- `<project>/.cceo/resources.yaml.example`
+- `<project>/.claude/skills/autonomous-engineer-*/`
+- `<project>/CLAUDE.md` (or `CLAUDE.ae.md` if one already exists)
+- `<project>/.ae/resources.yaml.example`
 
 Verify:
 
 ```bash
-ls .claude/agents/cceo-*.md | wc -l           # → 15
+ls .claude/agents/autonomous-engineer-*.md | wc -l           # → 15
 ls .claude/commands/*.md | wc -l              # → 9
-ls .claude/skills/cceo-*/SKILL.md | wc -l     # → 9
+ls .claude/skills/autonomous-engineer-*/SKILL.md | wc -l     # → 9
 ```
 
 ### Global mode
@@ -114,18 +114,18 @@ sh ~/autonomous-engineer/install.sh --global
 ```
 
 Installs into:
-- `~/.claude/agents/cceo-*`
+- `~/.claude/agents/autonomous-engineer-*`
 - `~/.claude/commands/*`
-- `~/.claude/skills/cceo-*/`
+- `~/.claude/skills/autonomous-engineer-*/`
 
-Does **not** touch `CLAUDE.md` or `.cceo/` (those live per-project).
+Does **not** touch `CLAUDE.md` or `.ae/` (those live per-project).
 
 Verify:
 
 ```bash
-ls ~/.claude/agents/cceo-*.md | wc -l         # → 15
+ls ~/.claude/agents/autonomous-engineer-*.md | wc -l         # → 15
 ls ~/.claude/commands/*.md | wc -l            # → 9 (or more, if you have other commands)
-ls ~/.claude/skills/cceo-*/SKILL.md | wc -l   # → 9
+ls ~/.claude/skills/autonomous-engineer-*/SKILL.md | wc -l   # → 9
 ```
 
 **After a global install, restart Claude Code** so it re-scans `~/.claude/`.
@@ -133,7 +133,7 @@ ls ~/.claude/skills/cceo-*/SKILL.md | wc -l   # → 9
 ### Both (mixed install — recommended)
 
 ```bash
-# Once — makes CCEO available everywhere
+# Once — makes Autonomous Engineer available everywhere
 sh ~/autonomous-engineer/install.sh --global
 
 # Per project — adds CLAUDE.md + resources.yaml.example
@@ -146,7 +146,7 @@ cd ~/project-b && sh ~/autonomous-engineer/install.sh
 | Flag | Effect |
 |---|---|
 | `--global` | Install into `~/.claude/` instead of a project. |
-| `--force` | Overwrite an existing CCEO install in the target. |
+| `--force` | Overwrite an existing Autonomous Engineer install in the target. |
 | `--help` | Print usage. |
 
 ---
@@ -163,19 +163,19 @@ For additional repos (sibling frontend, backend, shared libs, infra), use `/add-
 /add-dir ../shared-types
 ```
 
-The Solutions Architect (`cceo-solutions-architect`) surveys all of them automatically. No CCEO-side registration is required.
+The Solutions Architect (`solutions-architect`) surveys all of them automatically. No Autonomous Engineer-side registration is required.
 
 > **Tip:** monorepos with multiple packages under one root only need the root directory — Claude Code already sees the whole tree.
 
 ---
 
-## 5. Configure `.cceo/resources.yaml`
+## 5. Configure `.ae/resources.yaml`
 
 Copy the example, then edit:
 
 ```bash
-cp .cceo/resources.yaml.example .cceo/resources.yaml
-$EDITOR .cceo/resources.yaml
+cp .ae/resources.yaml.example .ae/resources.yaml
+$EDITOR .ae/resources.yaml
 ```
 
 The file is **gitignored** — secrets stay local.
@@ -208,7 +208,7 @@ accounts:
 Dry-parse to catch typos:
 
 ```bash
-ruby -ryaml -e 'pp YAML.load_file(".cceo/resources.yaml")' | head
+ruby -ryaml -e 'pp YAML.load_file(".ae/resources.yaml")' | head
 ```
 
 ---
@@ -311,7 +311,7 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 - Restart Claude Code so it re-scans `.claude/commands/`.
 - Confirm files: `ls .claude/commands/ticket.md` returns a real file.
-- Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see all 15 `cceo-*`.
+- Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see all 15 `autonomous-engineer-*`.
 
 ### "Cannot fetch ticket — MCP missing"
 
@@ -319,9 +319,9 @@ The Director will reply with the seven-section ready message. **No code changes 
 - If absent, re-run the `claude mcp add ...` command from §5.
 - Restart Claude Code after adding an MCP.
 
-### "`.cceo/resources.yaml` not found"
+### "`.ae/resources.yaml` not found"
 
-- Did you `cp .cceo/resources.yaml.example .cceo/resources.yaml`?
+- Did you `cp .ae/resources.yaml.example .ae/resources.yaml`?
 - The file is gitignored, so a fresh clone won't have it.
 
 ### "Account not selectable — no admin role found"
@@ -332,7 +332,7 @@ The Director will reply with the seven-section ready message. **No code changes 
 ### Director keeps looping
 
 - 3 iterations is the cap. After that it escalates.
-- If escalation isn't happening, check that `cceo-engineering-director.md` is unmodified (specifically the Loop-Until-Done section).
+- If escalation isn't happening, check that `engineering-director.md` is unmodified (specifically the Loop-Until-Done section).
 
 ### Playwright says "no browser available"
 
@@ -346,18 +346,18 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 ### CLAUDE.md got overwritten
 
-- The installer writes CCEO's CLAUDE.md to `CLAUDE.cceo.md` when one already exists in the target — unless you passed `--force`. Merge the two manually.
+- The installer writes Autonomous Engineer's CLAUDE.md to `CLAUDE.ae.md` when one already exists in the target — unless you passed `--force`. Merge the two manually.
 
 ---
 
 ## What's next
 
-Once `/ticket FAKE-1 --base main` produces a ready message, you're configured. The `/setup` skill from inside Claude Code can re-walk this any time, and the `cceo-mcp-setup` skill is the canonical reference for adding new providers later.
+Once `/ticket FAKE-1 --base main` produces a ready message, you're configured. The `/setup` skill from inside Claude Code can re-walk this any time, and the `mcp-setup` skill is the canonical reference for adding new providers later.
 
 For deeper reading, see:
 
 - [`README.md`](README.md) — architecture diagram + overview
 - [`CLAUDE.md`](CLAUDE.md) — iron rules the org operates under
-- [`.claude/skills/cceo-workflow-patterns/SKILL.md`](.claude/skills/cceo-workflow-patterns/SKILL.md) — the six patterns the Director composes
-- [`.claude/skills/cceo-bug-workflow/SKILL.md`](.claude/skills/cceo-bug-workflow/SKILL.md) — full bug pipeline
-- [`.claude/skills/cceo-feature-workflow/SKILL.md`](.claude/skills/cceo-feature-workflow/SKILL.md) — full feature pipeline
+- [`.claude/skills/workflow-patterns/SKILL.md`](.claude/skills/workflow-patterns/SKILL.md) — the six patterns the Director composes
+- [`.claude/skills/bug-workflow/SKILL.md`](.claude/skills/bug-workflow/SKILL.md) — full bug pipeline
+- [`.claude/skills/feature-workflow/SKILL.md`](.claude/skills/feature-workflow/SKILL.md) — full feature pipeline

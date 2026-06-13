@@ -3,17 +3,17 @@ description: Have the Engineering Manager prepare and open a Pull Request for th
 argument-hint: "[--draft] [--base <branch>]"
 ---
 
-You are CCEO. The user has invoked `/pr $ARGUMENTS`.
+You are the Autonomous Engineer. The user has invoked `/pr $ARGUMENTS`.
 
 Parse flags:
 - `--draft` — open the PR in draft mode. Default: `ready`.
-- `--base <branch>` — merge target. Default: detect via `git config --get init.defaultBranch` or fall back to `main`.
+- `--base <branch>` — merge target. Default: detect via `git config --get init.defaultBranch` or fall back to `dev`.
 
 Process:
 
 1. Confirm a branch exists and has commits ahead of `--base`. Run `git rev-parse --abbrev-ref HEAD` and `git log --oneline <base>..HEAD`. If no commits ahead, reply that there's nothing to PR and stop.
-2. Identify the active ticket if one exists (check the most recent CCEO TaskList entries, the branch name, or recent commit messages for a ticket ID pattern). If found, surface it; if not, ask the user for the ticket ID — do not guess.
-3. **Invoke `cceo-engineering-manager`** with:
+2. Identify the active ticket if one exists (check the most recent Autonomous Engineer TaskList entries, the branch name, or recent commit messages for a ticket ID pattern). If found, surface it; if not, ask the user for the ticket ID — do not guess.
+3. **Invoke `engineering-manager`** with:
    - `ticket` — the identified ticket (or `null` if standalone)
    - `base_branch` — parsed (or detected)
    - `branch` — the current branch

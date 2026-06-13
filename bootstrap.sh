@@ -54,17 +54,17 @@ Next steps:
      resources template:
 
        cd <your-project>
-       mkdir -p .cceo
-       cp $INSTALL_DIR/.cceo/resources.yaml.example .cceo/resources.yaml.example
-       cp .cceo/resources.yaml.example .cceo/resources.yaml
-       \$EDITOR .cceo/resources.yaml
+       mkdir -p .ae
+       cp $INSTALL_DIR/.ae/resources.yaml.example .ae/resources.yaml.example
+       cp .ae/resources.yaml.example .ae/resources.yaml
+       \$EDITOR .ae/resources.yaml
 
   3. Wire MCP servers. At minimum:
 
        claude mcp add playwright --command npx --args "@playwright/mcp"
 
      For ticket source + others, see:
-     $INSTALL_DIR/skills/cceo-mcp-setup/SKILL.md
+     $INSTALL_DIR/skills/mcp-setup/SKILL.md
 
   4. Restart Claude Code AGAIN after MCP installs, then:
 
