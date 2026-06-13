@@ -43,65 +43,77 @@ If every rung fails the Director emits the "Intake blocked" message with the exa
 
 ### Reconnect protocol (rung 2)
 
-When a claude.ai connector is configured for the user but disconnected for this session, the Director invokes the same OAuth flow the user originally completed and **opens the browser for them** — not a "go reconnect at the URL" punt.
+The reconnect path differs by connector type. Identify which kind of MCP failed first, then follow the matching protocol.
 
-1. **Detect the disconnect.** Either rung 1 returns "MCP server `claude.ai <Provider>` is not connected", or the session emits a `MCP server disconnected` system reminder for the provider's deferred tools.
-2. **Probe for auth methods.** Try `ToolSearch` for `mcp__claude_ai_<Provider>__authenticate`. If absent (the whole connector is gone, not just disconnected), drop to the "Connector entirely absent" path below.
-3. **Start auth.** Call `mcp__claude_ai_<Provider>__authenticate`. It returns either a URL the user must visit or a token-paste prompt.
-4. **Auto-open the URL in the browser.** Use Bash with platform detection:
+#### Connector type detection
+
+| Tool name pattern | Connector kind | Reauth path |
+|---|---|---|
+| `mcp__claude_ai_<Provider>__*` | **claude.ai-hosted** | User must run `/mcp` inside Claude Code (or visit claude.ai/settings/connectors). No programmatic OAuth from the Director. |
+| `mcp__<provider>__*` (no `claude_ai_` prefix) | **CLI-installed** (`claude mcp add ...`) | If the MCP exposes `__authenticate` / `__complete_authentication` tools, the Director can drive the OAuth flow directly (see below). Otherwise the user has to re-run `claude mcp add` with a fresh token. |
+
+#### Path A — claude.ai-hosted connector
+
+These are gated behind `/mcp` (a Claude Code slash command, user-input only) — neither the Director nor any subagent can trigger them. The `__authenticate` tool returns a stub message pointing at `/mcp`; there's no OAuth URL to open. There's also no `claude mcp` CLI subcommand to force reauth (only `add`/`get`/`list`/`remove`/`reset-project-choices`/`serve` exist).
+
+The Director's job here is to surface the fix clearly and auto-open the settings page as a backup, then stop:
+
+1. **Detect the disconnect.** Either rung 1 returns "MCP server `claude.ai <Provider>` is not connected", or the session emits a `MCP server disconnected` system reminder for the provider's deferred tools, or only `__authenticate` / `__complete_authentication` are reachable (a "needs reauth" state — the connector is alive at the CLI level but the OAuth token has expired).
+2. **Auto-open the connectors settings page** as a visual backup (in case `/mcp` itself fails or the user prefers the web flow):
 
    ```bash
-   URL="<the URL the connector returned>"
-   if command -v open >/dev/null 2>&1; then open "$URL"        # macOS
-   elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$URL"  # Linux
-   elif command -v start >/dev/null 2>&1; then start "$URL"   # Windows / WSL
+   if command -v open >/dev/null 2>&1; then open https://claude.ai/settings/connectors        # macOS
+   elif command -v xdg-open >/dev/null 2>&1; then xdg-open https://claude.ai/settings/connectors  # Linux
+   elif command -v start >/dev/null 2>&1; then start https://claude.ai/settings/connectors   # Windows / WSL
+   fi
+   ```
+3. **Surface the in-CLI fix as the recommended path** — `/mcp` is faster than the browser flow because it doesn't require leaving the conversation:
+
+   ```
+   Engineering Director — <Provider> needs reauth
+
+   The claude.ai <Provider> connector is registered but its tool surface
+   isn't reachable from this session. Fastest fix: type /mcp here, select
+   "claude.ai <Provider>", and reauthorize — you'll stay in this run.
+
+   (I also opened https://claude.ai/settings/connectors in your browser
+   as a backup if /mcp doesn't work for you.)
+
+   Reply when you've reauthorized and I'll retry the fetch.
+   ```
+4. **Wait.** When the user reports back, retry rung 1 from inside the same conversation. If the deferred-tools surface didn't re-sync (which it sometimes doesn't until the next session start), tell the user to relaunch Claude Code — but only after they've reauthorized via `/mcp` or the web.
+
+#### Path B — CLI-installed MCP with auth methods
+
+For MCPs added via `claude mcp add` that expose programmatic auth tools, the Director can drive the OAuth flow itself:
+
+1. **Probe for auth methods.** Try `ToolSearch` for `mcp__<provider>__authenticate`. If absent, skip to rung 3 (different CLI-installed MCP) or rung 5 (inline-paste).
+2. **Start auth.** Call `mcp__<provider>__authenticate`. It returns either a URL the user must visit or a token-paste prompt.
+3. **Auto-open the URL in the browser.** Use Bash with platform detection:
+
+   ```bash
+   URL="<the URL the auth call returned>"
+   if command -v open >/dev/null 2>&1; then open "$URL"
+   elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$URL"
+   elif command -v start >/dev/null 2>&1; then start "$URL"
    else echo "Open this URL manually: $URL"
    fi
    ```
-
-   Then surface a short status to the user so they know what just happened:
+4. **Surface status:**
 
    ```
    Engineering Director — Reconnecting <Provider>
 
-   The <Provider> connector dropped mid-session. I opened the authorization
-   page in your browser — sign in and approve. If the browser didn't open:
+   I opened the authorization page in your browser — sign in and approve.
+   If the browser didn't open:
      <URL>
 
-   I'll resume the fetch as soon as the connector reports authorized.
+   I'll resume the fetch as soon as auth completes.
    ```
+5. **Complete auth.** Call `mcp__<provider>__complete_authentication` with whatever payload the start step returned. Some connectors auto-complete; others need a code.
+6. **Retry rung 1.** If it still fails, log the failure and drop to rung 3 / 5.
 
-5. **Complete auth.** Once the user authorizes, call `mcp__claude_ai_<Provider>__complete_authentication` with whatever payload the start step returned. Some connectors auto-complete; others need a code.
-6. **Retry rung 1.** If it still fails, log the failure and drop to rung 3.
-
-The reconnect is logged as a single `[INFO] [intake] [director] Reconnected <Provider> via claude.ai OAuth` line so the audit trail shows the healing without dumping the URL into the log.
-
-### When the connector is entirely absent
-
-Some sessions (headless / cron / CI; or the connector was revoked) genuinely lack the claude.ai connector surface — auth methods aren't even in the deferred list. The Director still auto-opens the browser, but to the connectors settings page rather than a connector-specific OAuth URL:
-
-```bash
-if command -v open >/dev/null 2>&1; then open https://claude.ai/settings/connectors
-elif command -v xdg-open >/dev/null 2>&1; then xdg-open https://claude.ai/settings/connectors
-elif command -v start >/dev/null 2>&1; then start https://claude.ai/settings/connectors
-fi
-```
-
-Then surface:
-
-```
-Engineering Director — <Provider> connector unavailable
-
-The <Provider> connector isn't reachable from this session at all (not just
-disconnected — the auth methods are also absent, which usually means the
-connector was never set up or was revoked). I opened your connectors page
-in the browser — connect <Provider>, then restart Claude Code so the new
-MCP tools surface, then re-run /ticket.
-
-If that's not possible (headless / cron / CI), I'll fall through to rungs
-3–4 (CLI-installed MCP, provider CLI) and then to inline-paste as a final
-fallback.
-```
+The reconnect is logged as a single `[INFO] [intake] [director] Reconnected <Provider> via <kind> reauth` line so the audit trail shows the healing without dumping the URL into the log.
 
 ## Ticket ID conventions
 

@@ -29,29 +29,33 @@ Fetch the ticket via the appropriate MCP server. Use the `ticket-protocol` skill
 
 **Tool surface gotcha.** Subagent tool wildcards in this agent's frontmatter target specific provider patterns (`mcp__*clickup*`, `mcp__*ClickUp*`, `mcp__*jira*`, etc.) — *not* a bare `mcp__*`. A bare wildcard is too broad and silently fails to expose claude.ai-hosted MCPs like `mcp__claude_ai_ClickUp__*`. The current pattern set covers both casing conventions for the canonical providers. If a new provider isn't matched, ask the user to verify the tool name (`mcp__<provider>__<tool>`) so the frontmatter pattern can be widened in a follow-up edit.
 
-**Auto-healing fetch.** When a fetch fails or the expected MCP appears disconnected, walk the fallback chain from `ticket-protocol` — do **not** stop at the first miss. Order: claude.ai connector → claude.ai connector re-auth (`__authenticate` / `__complete_authentication`) → CLI-installed MCP (`mcp__<provider>__*`) → provider CLI (`gh issue view` for GitHub) → inline-paste prompt. Skip the env-token / raw-API rung; this team only uses connector-managed auth.
+**Auto-healing fetch.** When a fetch fails or the expected MCP appears disconnected, walk the fallback chain from `ticket-protocol` — do **not** stop at the first miss. Order: claude.ai connector → connector reauth (path differs by connector kind, see below) → CLI-installed MCP (`mcp__<provider>__*`) → provider CLI (`gh issue view` for GitHub) → inline-paste prompt. Skip the env-token / raw-API rung; this team only uses connector-managed auth.
 
-The claude.ai connector's deferred tools need `ToolSearch` to load — that's why this agent has `ToolSearch` in its tool list. When re-auth is needed mid-run, call `mcp__claude_ai_<Provider>__authenticate`, **auto-open the returned URL in the user's browser** via Bash (`open` on macOS, `xdg-open` on Linux, `start` on Windows), then call `__complete_authentication` once the user has authorized. When the connector is entirely absent from the deferred surface, auto-open `https://claude.ai/settings/connectors` instead. Never punt with a "go reconnect at the URL" message without first attempting the open. The `ticket-protocol` skill has the exact step list and the platform-detection Bash snippet — copy it.
+**Identify the connector kind before reauthing.** `claude.ai`-hosted connectors (tool pattern `mcp__claude_ai_<Provider>__*`) and CLI-installed MCPs (`mcp__<provider>__*`) reconnect differently:
 
-Only after every healing step has failed (including the auto-open) do you fall back to the intake-blocked message — and even then, the browser has already been opened, so the message is informational, not action-requesting:
+- **claude.ai-hosted:** the `__authenticate` tool is a stub that returns `"Ask the user to run /mcp"` — no OAuth URL, no programmatic flow. The `claude` CLI has no reauth subcommand either (only `add`/`get`/`list`/`remove`). The Director's job is to **auto-open `https://claude.ai/settings/connectors`** as a visual backup *and* tell the user to type `/mcp` in the CLI (faster — stays in the run). Then wait for them to reauthorize.
+- **CLI-installed with auth methods:** the Director CAN drive OAuth itself. Call `mcp__<provider>__authenticate`, auto-open the returned URL (`open` / `xdg-open` / `start` by platform), call `__complete_authentication`, retry.
+
+The deferred tools for both kinds need `ToolSearch` to load — that's why this agent has `ToolSearch` in its tool list. The `ticket-protocol` skill has both step-by-step protocols and the platform-detection Bash snippet — copy them from there.
+
+Only after every healing step has failed do you fall back to the intake-blocked message. For claude.ai-hosted connectors the browser is already open and the user has been told to `/mcp` — the message confirms what to do:
 
 ```
-Engineering Director — Intake blocked, browser opened
+Engineering Director — Intake blocked
 
-I tried every healing step and none worked:
-  - claude.ai <Provider> connector: <result>
-  - claude.ai <Provider> re-auth: <result>
-  - CLI-installed MCP: <result>
-  - Provider CLI: <result>
+The claude.ai <Provider> connector needs reauth and I can't trigger it
+programmatically (slash commands are user-only). I opened your connectors
+page in the browser as a backup, but the in-CLI fix is faster:
 
-I opened your connectors page (https://claude.ai/settings/connectors) so
-you can reconnect <Provider>. Once it's reconnected, restart Claude Code
-and re-run /ticket — the new auto-healing flow will keep the next run on
-the rails even if it drops mid-session.
+  Type /mcp here → pick "claude.ai <Provider>" → reauthorize.
 
-If that's not possible right now, paste the ticket inline (title,
-description, acceptance criteria, status, labels, relevant comments)
-and I'll re-run intake against that.
+Then re-run /ticket (or /resume if a run dir is reserved). If /mcp doesn't
+re-sync the tool surface, exit Claude Code and relaunch — the deferred-tool
+surface only re-syncs at session start.
+
+If you'd rather not reauthorize right now, paste the ticket inline (title,
+description, acceptance criteria, status, labels, relevant comments) and
+I'll run intake against that.
 ```
 
 Per the iron rules, never improvise the ready message from a guessed ticket — the seven sections must be evidence-backed.
