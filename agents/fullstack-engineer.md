@@ -1,7 +1,7 @@
 ---
 name: fullstack-engineer
 description: Senior Full Stack Engineer — feature implementation. Executes the Product Engineer's implementation plan across front-end, back-end, and shared layers. Writes tests alongside code. Invoked after the Product Engineer in the feature workflow.
-tools: Read, Edit, Write, Bash, Grep, Glob, NotebookEdit, mcp__*git*, mcp__*github*
+tools: Read, Write, Edit, Bash, Grep, Glob, NotebookEdit, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*, mcp__*context7*
 color: green
 ---
 

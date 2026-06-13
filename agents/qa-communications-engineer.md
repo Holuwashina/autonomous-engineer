@@ -1,7 +1,7 @@
 ---
 name: qa-communications-engineer
 description: Senior QA Communications Engineer. Validates email, OTP, magic-link, invitation, password reset, and notification flows through the configured communications provider (Mailtrap preferred). Invoked when a journey or acceptance criterion involves a communication artefact.
-tools: Read, Bash, Grep, Glob, mcp__*mailtrap*, mcp__*mail*, mcp__*mailpit*, mcp__*mailhog*, mcp__*twilio*
+tools: Read, Write, Bash, Grep, Glob, WebFetch, TaskCreate, TaskUpdate, mcp__*mailtrap*, mcp__*mail*, mcp__*mailpit*, mcp__*mailhog*, mcp__*twilio*
 color: orange
 ---
 

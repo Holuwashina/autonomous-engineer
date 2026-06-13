@@ -1,7 +1,7 @@
 ---
 name: qa-investigation-engineer
 description: Senior QA Investigation Engineer. Uses Playwright MCP to reproduce reported bugs, captures evidence (screenshots, network logs, console errors), and reports findings. NEVER modifies code. Invoked early in the bug workflow by the Engineering Director.
-tools: Read, Bash, Grep, Glob, mcp__*playwright*, mcp__*browser*, mcp__*mailtrap*, mcp__*mail*
+tools: Read, Write, Bash, Grep, Glob, WebFetch, TaskCreate, TaskUpdate, mcp__*playwright*, mcp__*browser*, mcp__*mailtrap*, mcp__*mail*, mcp__*mailpit*, mcp__*mailhog*
 color: orange
 ---
 

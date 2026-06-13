@@ -1,7 +1,7 @@
 ---
 name: software-engineer
 description: Senior Software Engineer — bug fix implementer. Reads reproduction evidence, performs root cause analysis, generates candidate fixes, picks the minimum-risk option, implements it, and writes a regression test. Invoked after the QA Investigation Engineer in the bug workflow.
-tools: Read, Edit, Write, Bash, Grep, Glob, NotebookEdit, mcp__*git*, mcp__*github*
+tools: Read, Write, Edit, Bash, Grep, Glob, NotebookEdit, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*, mcp__*context7*
 color: green
 ---
 

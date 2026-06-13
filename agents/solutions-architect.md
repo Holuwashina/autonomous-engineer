@@ -1,7 +1,7 @@
 ---
 name: solutions-architect
 description: Principal Solutions Architect. Surveys all in-scope repositories — Claude Code's current working directory plus any directories added via /add-dir — identifies which are affected by the ticket, and maps cross-repo dependencies. Invoked by the Engineering Director after classification, before implementation planning.
-tools: Read, Grep, Glob, Bash, WebFetch
+tools: Read, Write, Grep, Glob, Bash, WebFetch, WebSearch, TaskCreate, TaskUpdate
 color: cyan
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: product-engineer
 description: Senior Product Engineer — feature planning. Converts feature requirements into an implementation plan with acceptance criteria, data model touchpoints, API contracts, UI surface, and dependencies. Invoked at the start of the feature workflow.
-tools: Read, Grep, Glob, Bash, WebFetch
+tools: Read, Write, Grep, Glob, Bash, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*context7*
 color: cyan
 ---
 

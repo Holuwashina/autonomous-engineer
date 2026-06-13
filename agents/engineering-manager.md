@@ -1,7 +1,7 @@
 ---
 name: engineering-manager
 description: Senior Engineering Manager. Prepares the Pull Request — title, body, test plan, ticket link. Opens the PR against the base branch. Comments on the ticket with the PR link and evidence summary. Invoked at the end of a successful run.
-tools: Read, Bash, Grep, Glob, mcp__*git*, mcp__*github*, mcp__*jira*, mcp__*clickup*
+tools: Read, Write, Bash, Grep, Glob, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*, mcp__*jira*, mcp__*clickup*, mcp__*ClickUp*, mcp__*linear*, mcp__*notion*
 color: blue
 ---
 

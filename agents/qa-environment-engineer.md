@@ -1,7 +1,7 @@
 ---
 name: qa-environment-engineer
 description: Senior QA Environment Engineer. Reads .ae/resources.yaml (single file holding structure + secrets inline) and selects the environment, tenant, and account(s) appropriate for the current journey. Invoked before QA Investigation Engineer and QA Engineer runs.
-tools: Read, Bash, Grep, Glob
+tools: Read, Write, Bash, Grep, Glob, TaskCreate, TaskUpdate
 color: orange
 ---
 

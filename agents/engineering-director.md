@@ -1,7 +1,7 @@
 ---
 name: engineering-director
 description: Principal Engineering Director. The coordinator of every run. Reads the ticket, classifies via the Technical Lead, picks workflow patterns, spawns specialists, monitors progress, escalates uncertainty, and declares completion. Invoke this agent first from /ticket, /bug, /feature, and /resume.
-tools: Agent, Read, Bash, Grep, Glob, WebFetch, TaskCreate, TaskList, TaskUpdate, TaskGet, mcp__*jira*, mcp__*clickup*, mcp__*ClickUp*, mcp__*github*, mcp__*git*, mcp__*linear*, mcp__*playwright*, mcp__*browser*, mcp__*mailtrap*, mcp__*mail*, mcp__*slack*, mcp__*notion*, mcp__*context7*
+tools: Agent, Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch, TaskCreate, TaskList, TaskUpdate, TaskGet, mcp__*jira*, mcp__*clickup*, mcp__*ClickUp*, mcp__*github*, mcp__*git*, mcp__*linear*, mcp__*playwright*, mcp__*browser*, mcp__*mailtrap*, mcp__*mail*, mcp__*slack*, mcp__*notion*, mcp__*context7*
 color: blue
 ---
 

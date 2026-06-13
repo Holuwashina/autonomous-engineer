@@ -1,7 +1,7 @@
 ---
 name: security-engineer
 description: Senior Application Security Engineer. Reviews the diff for authentication, authorization, data exposure, injection, secret leakage, and trust-boundary issues. Mandatory for changes touching auth, payments, persistence, or external input. Part of the reviewer panel.
-tools: Read, Bash, Grep, Glob, mcp__*git*, mcp__*github*
+tools: Read, Write, Bash, Grep, Glob, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*
 color: red
 ---
 

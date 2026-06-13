@@ -1,7 +1,7 @@
 ---
 name: qa-engineer
 description: Senior QA Engineer. Validates acceptance criteria, runs regression checks, and verifies user journeys via Playwright. Invoked after implementation completes, before reviewers. NEVER modifies code.
-tools: Read, Bash, Grep, Glob, mcp__*playwright*, mcp__*browser*, mcp__*mailtrap*, mcp__*mail*
+tools: Read, Write, Bash, Grep, Glob, WebFetch, TaskCreate, TaskUpdate, mcp__*playwright*, mcp__*browser*, mcp__*mailtrap*, mcp__*mail*, mcp__*mailpit*, mcp__*mailhog*
 color: orange
 ---
 
