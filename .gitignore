@@ -1,0 +1,10 @@
+# CCEO — never commit live resource definitions or local Claude overrides
+.cceo/resources.yaml
+.cceo/resources.*.yaml
+!.cceo/resources.yaml.example
+
+.claude/settings.local.json
+.mcp.json
+
+# macOS noise
+.DS_Store

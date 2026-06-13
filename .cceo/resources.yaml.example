@@ -1,0 +1,163 @@
+# CCEO QA Resource Registry
+#
+# Single source of truth for environments, tenants, accounts, browsers,
+# communications, and external services CCEO uses for QA work.
+#
+# Usage:
+#   cp .cceo/resources.yaml.example .cceo/resources.yaml
+#   # edit .cceo/resources.yaml, filling in real values for passwords/tokens
+#
+# .cceo/resources.yaml is gitignored — secrets live there, never in this
+# .example file. The .example is the schema reference + scaffolding template.
+#
+# Conventions:
+#   - Every entry has a stable `key` (snake_case, unique within its section).
+#   - Test-fixture data (emails, slugs, subdomains, inbox IDs) is inline.
+#   - Secret fields are inline too — passwords, API tokens, OAuth secrets.
+#     Replace the REPLACE_ME placeholders in your live .cceo/resources.yaml.
+#   - Delete sections your project doesn't use (e.g. tenants for single-tenant
+#     apps, external_services for projects without third-party integrations).
+
+# ---------------------------------------------------------------------------
+environments:
+  - key: local
+    base_url: http://localhost:3000
+    notes: Default development server. Used by QA Reproducer when reproducing locally.
+
+  - key: development
+    base_url: https://dev.example.com
+    notes: Shared dev environment; safe to write to. Resets nightly.
+
+  - key: staging
+    base_url: https://staging.example.com
+    notes: Production-like. Use for acceptance + regression validation before PR.
+
+  - key: production_readonly
+    base_url: https://example.com
+    write: false
+    notes: Read-only. Never run mutating tests here.
+
+# ---------------------------------------------------------------------------
+# Drop this section entirely if your application is single-tenant.
+tenants:
+  - key: acme
+    slug: acme
+    display_name: Acme Corp
+    subdomain: acme.example.com
+    notes: Primary multi-tenant fixture.
+
+  - key: beta
+    slug: beta
+    display_name: Beta Industries
+    subdomain: beta.example.com
+    notes: Used for cross-tenant isolation checks.
+
+  - key: demo
+    slug: demo
+    display_name: Demo Tenant
+    subdomain: demo.example.com
+    notes: Resettable fixture for screenshot capture.
+
+# ---------------------------------------------------------------------------
+accounts:
+  - key: admin_acme
+    tenant: acme
+    role: admin
+    email: admin@acme.test
+    password: REPLACE_ME
+    notes: Full-privilege admin on the Acme tenant.
+
+  - key: manager_acme
+    tenant: acme
+    role: manager
+    email: manager@acme.test
+    password: REPLACE_ME
+
+  - key: user_acme
+    tenant: acme
+    role: user
+    email: user@acme.test
+    password: REPLACE_ME
+
+  - key: customer_acme
+    tenant: acme
+    role: customer
+    email: customer@acme.test
+    password: REPLACE_ME
+
+  - key: admin_beta
+    tenant: beta
+    role: admin
+    email: admin@beta.test
+    password: REPLACE_ME
+    notes: For cross-tenant isolation tests.
+
+  - key: guest
+    role: guest
+    notes: Unauthenticated identity. No credentials required.
+
+# ---------------------------------------------------------------------------
+browsers:
+  - key: playwright_chromium
+    engine: chromium
+    headless: true
+    viewport: { width: 1440, height: 900 }
+    notes: Default browser. Used by QA Reproducer and QA Validator via the Playwright MCP.
+
+  - key: playwright_mobile
+    engine: chromium
+    device: "iPhone 14 Pro"
+    headless: true
+    notes: Mobile journey checks.
+
+# ---------------------------------------------------------------------------
+communications:
+  - key: mailtrap
+    kind: email
+    provider: mailtrap
+    inbox_id: 1234567
+    api_token: REPLACE_ME
+    notes: Preferred. Used by QA Communications Engineer for email/OTP/magic-link validation.
+
+  - key: mailpit
+    kind: email
+    provider: mailpit
+    api_url: http://localhost:8025
+    notes: Local Mailpit instance for self-hosted dev. No secret required.
+
+  - key: mailhog
+    kind: email
+    provider: mailhog
+    api_url: http://localhost:8025
+
+  - key: twilio_test
+    kind: sms
+    provider: twilio
+    account_sid: REPLACE_ME
+    auth_token: REPLACE_ME
+    notes: SMS / OTP delivery in the Twilio sandbox.
+
+# ---------------------------------------------------------------------------
+external_services:
+  - key: stripe_sandbox
+    kind: payments
+    api_key: REPLACE_ME
+    notes: Use test card 4242 4242 4242 4242 for happy path; 4000 0000 0000 9995 for decline.
+
+  - key: oauth_google
+    kind: oauth
+    provider: google
+    client_id: REPLACE_ME
+    client_secret: REPLACE_ME
+
+  - key: s3_sandbox
+    kind: storage
+    region: us-east-1
+    bucket: cceo-test-bucket
+    access_key_id: REPLACE_ME
+    secret_access_key: REPLACE_ME
+
+  - key: maps_api
+    kind: maps
+    provider: google
+    api_key: REPLACE_ME
