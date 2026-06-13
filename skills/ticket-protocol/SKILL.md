@@ -25,7 +25,48 @@ If none are present, ask the user to paste the ticket description and treat it a
 
 Subagent frontmatter `tools:` fields use wildcard patterns. A bare `mcp__*` is too broad — Claude Code's tool resolver does NOT expand it as a glob in subagent surfaces, so subagents declared with `mcp__*` silently miss claude.ai-hosted MCPs. The Director and Technical Lead agents enumerate explicit substring patterns (`mcp__*clickup*, mcp__*ClickUp*, mcp__*jira*, ...`) to cover both casing conventions.
 
-If a user reports a ticket-fetch failure for a provider not in the explicit list, the fix is a one-line edit to the agent's `tools:` field — add `mcp__*<provider-substring>*` (case-sensitive both ways if needed). The fallback path the Director offers (fetch from top-level session and re-hand-off) works without an edit but is less ergonomic than a clean intake.
+If a user reports a ticket-fetch failure for a provider not in the explicit list, the fix is a one-line edit to the agent's `tools:` field — add `mcp__*<provider-substring>*` (case-sensitive both ways if needed).
+
+## Fetch fallback chain (auto-healing)
+
+The Director never stops at the first miss. The chain is fixed and ordered. **The env-token / raw-API rung is intentionally absent** — this team uses connector-managed OAuth only; do not curl `https://api.<provider>.com` with a personal token even when one is available.
+
+| Rung | What | When it runs |
+|---|---|---|
+| 1 | **claude.ai connector tools** (`mcp__claude_ai_<Provider>__*`) | First. Cheapest. Use `ToolSearch` to load the schema if it's deferred, then call the task-fetch tool. |
+| 2 | **claude.ai connector re-auth** (`__authenticate` / `__complete_authentication`) | When rung 1 returns "MCP server X is not connected" *and* the connector's auth methods are still in the deferred-tools surface. |
+| 3 | **CLI-installed MCP** (`mcp__<provider>__*`) | When the user has set up the provider via `claude mcp add` instead of (or in addition to) the claude.ai connector. |
+| 4 | **Provider CLI** | `gh issue view <id>` for GitHub. ClickUp / Jira / Linear have no first-party CLI worth depending on — skip to rung 5. |
+| 5 | **Inline-paste prompt** | Last resort. Ask the user to paste title + description + acceptance + status + relevant comments. |
+
+If every rung fails the Director emits the "Intake blocked" message with the exact failure of each rung listed in the `Reason:` line. Silent stalls are forbidden.
+
+### Reconnect protocol (rung 2)
+
+When a claude.ai connector is configured for the user but disconnected for this session, the Director invokes the same OAuth flow the user originally completed — not a "go reconnect at the URL" punt.
+
+1. **Detect the disconnect.** Either rung 1 returns "MCP server `claude.ai <Provider>` is not connected", or the session emits a `MCP server disconnected` system reminder for the provider's deferred tools.
+2. **Probe for auth methods.** Try `ToolSearch` for `mcp__claude_ai_<Provider>__authenticate`. If absent (the whole connector is gone, not just disconnected), skip to rung 3.
+3. **Start auth.** Call `mcp__claude_ai_<Provider>__authenticate`. It returns either a URL the user must visit or a token-paste prompt.
+4. **Surface the URL.** Render it as a clickable line — one short sentence, no decoration:
+
+   ```
+   Engineering Director — Reconnecting <Provider>
+
+   The <Provider> connector dropped mid-session. Click to reauthorize:
+     <URL>
+
+   I'll resume the fetch as soon as the connector reports authorized.
+   ```
+
+5. **Complete auth.** Once the user authorizes, call `mcp__claude_ai_<Provider>__complete_authentication` with whatever payload the start step returned. Some connectors auto-complete; others need a code.
+6. **Retry rung 1.** If it still fails, log the failure and drop to rung 3.
+
+The reconnect is logged as a single `[INFO] [intake] [director] Reconnected <Provider> via claude.ai OAuth` line so the audit trail shows the healing without dumping the URL into the log.
+
+### When the connector is entirely absent
+
+Some sessions (headless / cron / CI) genuinely lack the claude.ai connector surface — auth methods aren't even in the deferred list. That's not a failure mode the Director can heal mid-run. Skip rungs 1–2, attempt rungs 3–4, and if those fail too, emit the intake-blocked message with rung 5's paste option as the recommended unblock.
 
 ## Ticket ID conventions
 
