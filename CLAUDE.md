@@ -59,17 +59,15 @@ Autonomous Engineer does not ship a `.mcp.json`. The `mcp-setup` skill documents
 
 ## Specialists
 
-The full roster lives in `.claude/agents/autonomous-engineer-*.md`. The Director is the only agent that delegates; all others execute their scoped task and return structured findings. Always read the agent file before invoking it the first time in a run, so the contract is clear.
+The full roster lives in `.claude/agents/*.md`. The Director is the only agent that delegates; all others execute their scoped task and return structured findings. Always read the agent file before invoking it the first time in a run, so the contract is clear.
 
 Routine roles:
 - **Director** — coordinates the run
 - **Technical Lead** — classifies the ticket
 - **Solutions Architect** — surveys repos and impact
-- **QA Investigation Engineer** — reproduces bugs via Playwright; never edits code
-- **Software Engineer** — root-causes and fixes bugs
+- **Software Engineer** — implements bug fixes and features end-to-end (modes: `bug` / `feature`)
 - **Product Engineer** — turns feature requirements into a plan
-- **Full Stack Engineer** — implements features
-- **QA Engineer** — verifies acceptance and regressions
+- **QA Engineer** — full QA cycle: reproduces bugs, validates fixes / features (modes: `reproduce` / `validate` / `comms_only`); never edits code
 - **QA Environment Engineer** — selects environment / tenant / account
 - **QA Communications Engineer** — validates email / OTP / magic links
 - **Code Reviewer**, **Security Engineer**, **Performance Engineer**, **Software Architect** — the reviewer panel

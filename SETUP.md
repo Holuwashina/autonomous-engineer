@@ -102,7 +102,7 @@ Installs into:
 Verify:
 
 ```bash
-ls .claude/agents/*.md | wc -l                # → 15
+ls .claude/agents/*.md | wc -l                # → 13
 ls .claude/commands/*.md | wc -l              # → 10
 ls .claude/skills/*/SKILL.md | wc -l          # → 10
 ```
@@ -123,7 +123,7 @@ Does **not** touch `CLAUDE.md` or `.ae/` (those live per-project).
 Verify:
 
 ```bash
-ls ~/.claude/agents/*.md | wc -l              # → 15 (or more, if you have other agents)
+ls ~/.claude/agents/*.md | wc -l              # → 13 (or more, if you have other agents)
 ls ~/.claude/commands/*.md | wc -l            # → 10 (or more, if you have other commands)
 ls ~/.claude/skills/*/SKILL.md | wc -l        # → 10 (or more, if you have other skills)
 ```
@@ -311,7 +311,7 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 - Restart Claude Code so it re-scans `.claude/commands/`.
 - Confirm files: `ls .claude/commands/ticket.md` returns a real file.
-- Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see all 15 `autonomous-engineer-*`.
+- Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see all 13 Autonomous Engineer specialists (`engineering-director`, `technical-lead`, `solutions-architect`, `qa-environment-engineer`, `qa-engineer`, `qa-communications-engineer`, `product-engineer`, `software-engineer`, `code-reviewer`, `security-engineer`, `performance-engineer`, `software-architect`, `engineering-manager`).
 
 ### "Cannot fetch ticket — MCP missing"
 

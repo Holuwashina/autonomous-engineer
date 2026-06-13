@@ -16,7 +16,7 @@ Hand off to the **Principal Engineering Director** (`engineering-director`) with
 - `override_classification` = `feature`
 - `resume_context` = none
 
-The Director still delivers the seven-section ready message — but Classification reads `feature (user-forced)` and the Director proceeds straight to the feature pipeline (Solutions Architect → Product Engineer → Full Stack Engineer → Validator → Comms Engineer if needed → reviewer panel → Loop-Until-Done → Engineering Manager).
+The Director still delivers the seven-section ready message — but Classification reads `feature (user-forced)` and the Director proceeds straight to the feature pipeline (Solutions Architect → Product Engineer → Software Engineer in `feature` mode → QA Engineer in `validate` mode → Comms Engineer if needed → reviewer panel → Loop-Until-Done → Engineering Manager).
 
 If the user wants enhancement-level scope rather than a new feature, they should say so in the ticket — the Product Engineer will scope accordingly.
 

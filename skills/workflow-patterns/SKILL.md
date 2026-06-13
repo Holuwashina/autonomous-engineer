@@ -25,7 +25,7 @@ Skip when the work is exploratory, ambiguous, or risky.
 
 Use when independent work streams must complete before the next phase can start, **and** synthesis across results is genuinely useful (not when work can pipeline through).
 
-**Example composition:** Solutions Architect maps repos → Director fans out to Product Engineer (plan per repo) → synthesises into a single plan → hands to Full Stack Engineer.
+**Example composition:** Solutions Architect maps repos → Director fans out to Product Engineer (plan per repo) → synthesises into a single plan → hands to Software Engineer (`mode=feature`).
 
 Prefer **pipelining** when results don't need to be synthesised — that is, when each specialist's output can flow directly into the next without combining across siblings.
 

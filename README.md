@@ -12,7 +12,7 @@ Drop a ticket ID. Get a Pull Request.
 /ticket MM-123 --base develop
 ```
 
-Behind that one command, a coordinated team of 15 specialist subagents — Engineering Director, Technical Lead, QA Investigation Engineer, Software Engineer, security / perf / architecture reviewers, Engineering Manager — read the ticket, classify it, reproduce the bug or plan the feature, implement it, validate with Playwright, run a four-reviewer panel, iterate until clean, then open a Pull Request and update the originating ticket.
+Behind that one command, a coordinated team of 13 specialist subagents — Engineering Director, Technical Lead, QA Engineer, Software Engineer, security / perf / architecture reviewers, Engineering Manager — read the ticket, classify it, reproduce the bug or plan the feature, implement it, validate with Playwright, run a four-reviewer panel, iterate until clean, then open a Pull Request and update the originating ticket.
 
 No separate orchestrator. No parallel AI runtime. Just Claude Code's native primitives — subagents, slash commands, skills, MCP servers — composed into a senior engineering organization.
 
@@ -69,13 +69,13 @@ flowchart TD
 
     subgraph bug["🐛 Bug pipeline"]
         direction TB
-        env1["QA Environment Engineer"] --> repro["QA Investigation Engineer<br/>Playwright + evidence"]
-        repro --> swe["Software Engineer<br/>root cause + minimum-risk fix<br/>+ regression test"]
+        env1["QA Environment Engineer"] --> repro["QA Engineer<br/>(reproduce mode)<br/>Playwright + evidence"]
+        repro --> swe["Software Engineer<br/>(bug mode)<br/>root cause + minimum-risk fix<br/>+ regression test"]
     end
 
     subgraph feat["✨ Feature pipeline"]
         direction TB
-        prod["Product Engineer<br/>acceptance criteria + plan"] --> fs["Full Stack Engineer<br/>implement + tests"]
+        prod["Product Engineer<br/>acceptance criteria + plan"] --> fs["Software Engineer<br/>(feature mode)<br/>implement + tests"]
     end
 
     bug --> val
@@ -175,7 +175,7 @@ The plugin manifest at `.claude-plugin/plugin.json` makes this repo installable 
 /plugin install https://github.com/Holuwashina/autonomous-engineer.git
 ```
 
-Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and automatically exposes the 15 agents, 10 commands, and 10 skills in every session. Updates with `/plugin update autonomous-engineer`.
+Claude Code clones the repo into `~/.claude/plugins/autonomous-engineer/` and automatically exposes the 13 agents, 10 commands, and 10 skills in every session. Updates with `/plugin update autonomous-engineer`.
 
 CLAUDE.md and `.ae/resources.yaml.example` ship in the plugin tree but Claude Code does **not** auto-copy them into your project — they're per-project files. See [Configure](#configure) for the one-line copy.
 
@@ -262,7 +262,7 @@ The Engineering Director will reply with a seven-section ready message and pause
 
 ## Specialists
 
-15 named subagents, each with a tight scope:
+13 named subagents, each with a tight scope:
 
 | Tier | Agent | Role |
 |---|---|---|
@@ -270,12 +270,10 @@ The Engineering Director will reply with a seven-section ready message and pause
 | Intake | `technical-lead` | Classifies the ticket |
 | Intake | `solutions-architect` | Maps affected repos + blast radius |
 | QA | `qa-environment-engineer` | Picks environment / tenant / account from `resources.yaml` |
-| QA | `qa-investigation-engineer` | Playwright reproduction of bugs |
-| QA | `qa-engineer` | Playwright validation of fixes / features |
+| QA | `qa-engineer` | Full QA cycle — reproduces bugs, validates fixes / features (modes: `reproduce` / `validate` / `comms_only`) |
 | QA | `qa-communications-engineer` | Email / OTP / magic-link validation (opt-in) |
-| Build | `software-engineer` | Bug root-cause + fix + regression test |
 | Build | `product-engineer` | Feature acceptance criteria + plan |
-| Build | `fullstack-engineer` | Feature implementation |
+| Build | `software-engineer` | Implements bug fixes and features end-to-end (modes: `bug` / `feature`) |
 | Review | `code-reviewer` | Staff-level diff review |
 | Review | `security-engineer` | OWASP / authz / data exposure (mandatory for auth/payments) |
 | Review | `performance-engineer` | Hot paths, N+1, payload, bundle |
@@ -303,7 +301,7 @@ Detail: [`.claude/skills/workflow-patterns/SKILL.md`](.claude/skills/workflow-pa
 
 ## Memory
 
-The reviewer panel (`code-reviewer`, `security-engineer`, `performance-engineer`, `software-architect`) and the QA agents (`qa-engineer`, `qa-investigation-engineer`, `qa-environment-engineer`, `qa-communications-engineer`) declare `memory: project` in their frontmatter. Each gets a persistent directory at `.claude/agent-memory/<agent-name>/` in the host project — a `MEMORY.md` index loaded automatically at spawn, plus on-demand topic files. Per Claude Code's docs-standard memory primitive: read/write tools are auto-enabled, and the directory is tracked in version control so the team shares accumulated knowledge across runs (recurring N+1 patterns, project-specific auth quirks, flaky journeys to retry, etc.).
+The reviewer panel (`code-reviewer`, `security-engineer`, `performance-engineer`, `software-architect`) and the QA agents (`qa-engineer`, `qa-environment-engineer`, `qa-communications-engineer`) declare `memory: project` in their frontmatter. Each gets a persistent directory at `.claude/agent-memory/<agent-name>/` in the host project — a `MEMORY.md` index loaded automatically at spawn, plus on-demand topic files. Per Claude Code's docs-standard memory primitive: read/write tools are auto-enabled, and the directory is tracked in version control so the team shares accumulated knowledge across runs (recurring N+1 patterns, project-specific auth quirks, flaky journeys to retry, etc.).
 
 Coordination and implementation agents (Director, Technical Lead, Solutions Architect, Product Engineer, Software Engineer, Engineering Manager) do **not** currently accumulate memory — they re-derive context per run from the ticket, repo, and prior specialist returns.
 

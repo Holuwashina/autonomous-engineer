@@ -27,7 +27,7 @@ The end-to-end pipeline for any ticket classified as a bug.
 - Output: environment / tenant / account selection.
 
 ### 5. Reproduction
-- Invoke `qa-investigation-engineer` with the env-manager selection and the ticket's reproduction steps.
+- Invoke `qa-engineer` with `mode=reproduce`, passing the env-manager selection and the ticket's reproduction steps.
 - Outcome:
   - `reproduced` → proceed to root cause.
   - `not_reproduced` → comment the attempted journey + evidence on the ticket; Director stops and asks user for clearer repro steps. **Do not proceed to fix code.**
@@ -105,7 +105,7 @@ The Director must fan out concurrent specialists in a **single response** with m
 | 1. Intake | SEQUENTIAL | (Director only) | One ticket fetch. |
 | 2–3. Classification + Repo mapping | **PARALLEL** | `technical-lead` ‖ `solutions-architect` | Classification doesn't depend on the repo map; Architect doesn't need classification to enumerate repos. Fan out together at execution start. |
 | 4. Env selection | SEQUENTIAL | `qa-environment-engineer` | Needs classification verdict. |
-| 5. Reproduction | SEQUENTIAL | `qa-investigation-engineer` (+ `qa-communications-engineer` only if email-touching) | Needs env. Comms only if journey involves a message — parallel with Reproducer when both are needed. |
+| 5. Reproduction | SEQUENTIAL | `qa-engineer` (`mode=reproduce`) (+ `qa-communications-engineer` only if email-touching) | Needs env. Comms only if journey involves a message — parallel with Reproducer when both are needed. |
 | 6. Root cause | SEQUENTIAL | `software-engineer` | Needs reproduction evidence. |
 | 7. Adversarial verification (optional) | **PARALLEL** | second `software-engineer` instance | Skeptic runs simultaneously with main engineer's confirmation pass; fanout of 2. |
 | 8. Implementation | SEQUENTIAL | `software-engineer` | Single-engineer single-fix. |

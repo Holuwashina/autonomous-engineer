@@ -29,7 +29,7 @@ The end-to-end pipeline for any ticket classified as `feature` or `enhancement`.
 If the Product Engineer flags that acceptance criteria were derived (not explicit in the ticket), the Director pauses and asks the user to confirm before implementation begins.
 
 ### 5. Implementation
-- Invoke `fullstack-engineer` with the plan.
+- Invoke `software-engineer` with `mode=feature` and the plan.
 - The engineer executes step-by-step:
   - Branch off `base_branch`.
   - For each step: read affected files → modify → write tests → run tests → commit.
@@ -54,7 +54,7 @@ If the Product Engineer flags that acceptance criteria were derived (not explici
 
 ### 9. Loop-Until-Done
 - If any reviewer or the validator returns blocking findings:
-  - Re-invoke `fullstack-engineer` with the specific findings.
+  - Re-invoke `software-engineer` (still `mode=feature`) with the specific findings.
   - Re-run validator (full or targeted).
   - Re-run reviewer panel.
 - Stop conditions:
@@ -79,14 +79,14 @@ The Director must fan out concurrent specialists in a **single response** with m
 | 1. Intake | SEQUENTIAL | (Director only) | One ticket fetch. |
 | 2–3. Classification + Repo mapping | **PARALLEL** | `technical-lead` ‖ `solutions-architect` | Independent; fan out at execution start. |
 | 4. Feature planning | SEQUENTIAL | `product-engineer` | Needs classification verdict and repo map. |
-| 5. Implementation | SEQUENTIAL | `fullstack-engineer` | Single coherent diff, one engineer. |
+| 5. Implementation | SEQUENTIAL | `software-engineer` (`mode=feature`) | Single coherent diff, one engineer. |
 | 6. Env selection for validation | SEQUENTIAL | `qa-environment-engineer` | Needs implementation complete. |
 | 7. Validation | SEQUENTIAL | `qa-engineer` (+ `qa-communications-engineer` in **parallel** when the feature acceptance criteria reference a message) | Validator drives the journey; Comms runs alongside if the journey involves email/OTP/links. |
 | 8. Reviewer panel | **PARALLEL** | `code-reviewer` ‖ `security-engineer` ‖ `performance-engineer` ‖ `software-architect` | Independent perspectives. Always parallel — never serial. |
 | 9. Loop iteration | SEQUENTIAL | implementer → validator → reviewers (panel still parallel inside) | Iteration is serial; the reviewer fan-out inside each iteration is parallel. |
 | 10. PR + ticket close-out | SEQUENTIAL | `engineering-manager` | One agent, single push. |
 
-**Multi-repo plan note:** if the Product Engineer's plan touches ≥2 repos with independent work streams, the Director may fan out parallel Full Stack Engineer instances per repo at Phase 5 — but only when the streams have no shared types or contracts that need to land first. When in doubt, serialize.
+**Multi-repo plan note:** if the Product Engineer's plan touches ≥2 repos with independent work streams, the Director may fan out parallel `software-engineer` (`mode=feature`) instances per repo at Phase 5 — but only when the streams have no shared types or contracts that need to land first. When in doubt, serialize.
 
 **Logging the fanout:** before parallel specialists, emit a `[PARALLEL]` log line listing them:
 ```
@@ -100,7 +100,7 @@ After both return, log each return separately (with its `specialists/NN-<name>.j
 
 - **Acceptance criteria must be explicit.** If derived from the description, confirm with the user before implementing.
 - **Always plan migrations as discrete steps** ahead of code that depends on them.
-- **Always reuse existing primitives.** The Product Engineer names them; the Full Stack Engineer uses them.
+- **Always reuse existing primitives.** The Product Engineer names them; the Software Engineer uses them.
 - **Always validate cross-role / cross-tenant** in multi-tenant codebases when the feature touches authorization or visible UI.
 - **Always run the full reviewer panel** for auth, payments, persistence, trust boundaries, public API additions.
 - **Communications (email / OTP / magic-link / invite / push) are opt-in.** Invoke `qa-communications-engineer` and the configured email sink (maildrop / Mailtrap / etc.) **only when the feature's acceptance criteria reference a message** (e.g. "user receives a verification email"). Features in unrelated surfaces (reports, dashboards, settings UI, internal APIs) do not trigger any comms call.

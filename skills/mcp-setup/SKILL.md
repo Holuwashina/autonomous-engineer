@@ -19,7 +19,7 @@ The commands here are the canonical packages **as of the most recent skill updat
 
 ## After every install
 
-**Restart Claude Code.** New MCP tools do not surface in a running session — the runtime only scans the MCP registry at startup. Skip the restart and the QA Investigation Engineer will report "no Playwright MCP available" even though you just installed it.
+**Restart Claude Code.** New MCP tools do not surface in a running session — the runtime only scans the MCP registry at startup. Skip the restart and the QA Engineer will report "no Playwright MCP available" even though you just installed it.
 
 ```
 claude mcp list      # confirm registration
@@ -93,7 +93,7 @@ claude mcp add playwright --command npx --args "@playwright/mcp"
 
 > ⚠️ The pattern `@modelcontextprotocol/server-playwright` does NOT exist as a published package. Use `@playwright/mcp` (Microsoft's official). If you see the wrong name elsewhere, it's stale.
 
-This brings up a Chromium-driven MCP that the QA Investigation Engineer and QA Engineer drive. No credentials required for the server itself. After install, you may also need to run `npx playwright install` once to fetch the browser binaries.
+This brings up a Chromium-driven MCP that the QA Engineer drives (in both `reproduce` and `validate` modes). No credentials required for the server itself. After install, you may also need to run `npx playwright install` once to fetch the browser binaries.
 
 ---
 
@@ -147,7 +147,7 @@ Autonomous Engineer uses Slack only when the user explicitly wires it into a wor
 
 For most runs the **minimum** is:
 
-1. **Playwright MCP** — bug repro + acceptance validation need it. Without it the QA Investigation Engineer blocks every bug run.
+1. **Playwright MCP** — bug repro + acceptance validation need it. Without it the QA Engineer blocks every bug run.
 2. **A ticket source** — Jira MCP, GitHub MCP, or claude.ai-hosted ClickUp. Without one, the Director asks the user to paste ticket descriptions.
 
 GitHub MCP, Mailtrap MCP, Slack MCP, Git MCP — all skippable for most projects. The Engineering Manager falls back to `gh` CLI; Mailtrap and Maildrop both work without MCPs (HTTP + Bash); Slack is opt-in.
@@ -168,7 +168,7 @@ Autonomous Engineer degrades gracefully when a provider is missing:
 |---|---|
 | Ticket source | Director asks the user to paste the ticket description. |
 | GitHub | Engineering Manager uses `gh` CLI via Bash. |
-| Playwright | QA Investigation Engineer / Validator surface a blocker; Director drops to manual validation steps or escalates. |
+| Playwright | QA Engineer surfaces a blocker (in either `reproduce` or `validate` mode); Director drops to manual validation steps or escalates. |
 | Mailtrap | QA Communications Engineer surfaces a blocker; email journeys become manual checkpoints (unless you configured maildrop, which needs no MCP). |
 
 ## Anti-patterns

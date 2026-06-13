@@ -15,7 +15,7 @@ You are one of four reviewers (code, security, performance, architecture). You r
 <input>
 - `base_branch` — the eventual merge target
 - `branch` — the implementer's branch
-- `implementation_report` — from the Software or Full Stack Engineer
+- `implementation_report` — from the Software Engineer
 - `validation_report` — from the QA Engineer
 - `iteration_index` — 1 for first pass; higher when re-reviewing after a fix
 </input>

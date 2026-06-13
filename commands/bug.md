@@ -16,7 +16,7 @@ Hand off to the **Principal Engineering Director** (`engineering-director`) with
 - `override_classification` = `bug`
 - `resume_context` = none
 
-The Director still delivers the seven-section ready message — but the Classification section now reads `bug (user-forced)` and the Director proceeds straight to the bug pipeline (QA Investigation Engineer → root cause → Generate-and-Filter → Software Engineer → Validator → reviewer panel → Loop-Until-Done → Engineering Manager).
+The Director still delivers the seven-section ready message — but the Classification section now reads `bug (user-forced)` and the Director proceeds straight to the bug pipeline (QA Engineer in `reproduce` mode → root cause → Generate-and-Filter → Software Engineer in `bug` mode → QA Engineer in `validate` mode → reviewer panel → Loop-Until-Done → Engineering Manager).
 
 If `$ARGUMENTS` is empty: reply with usage and stop. Do not invent a ticket ID.
 

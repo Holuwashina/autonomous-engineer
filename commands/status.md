@@ -23,8 +23,8 @@ Process:
 |---|---|---|
 | Technical Lead | <complete / skipped / pending> | <one line> |
 | Solutions Architect | <…> | <…> |
-| QA Investigation Engineer / Product Engineer | <…> | <…> |
-| Software Engineer / Full Stack Engineer | <…> | <…> |
+| Product Engineer (feature path) | <…> | <…> |
+| Software Engineer (`bug` or `feature` mode) | <…> | <…> |
 | QA Engineer | <…> | <…> |
 | QA Communications Engineer | <…> | <…> |
 | Code Reviewer | <…> | <…> |
