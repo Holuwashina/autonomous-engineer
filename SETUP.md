@@ -197,7 +197,7 @@ The file is **gitignored** — secrets stay local.
 accounts:
   - key: admin_tenant_a       # stable identifier other entries reference
     tenant: tenant_a          # FK into the tenants list (omit if single-tenant)
-    role: admin               # used by the QA Env Manager to pick by role
+    role: admin               # used by the QA Environment Engineer to pick by role
     email: admin@acme.test    # inline
     password: hunter2         # inline; the file is gitignored
     notes: Optional.
@@ -259,7 +259,7 @@ claude mcp add mailtrap --command npx --args mailtrap-mcp \
 ```
 
 **Maildrop** (public, no auth — the example resources.yaml is pre-configured for this):
-No MCP needed. The QA Comms Engineer hits `https://api.maildrop.cc/graphql` directly via Bash.
+No MCP needed. The QA Communications Engineer hits `https://api.maildrop.cc/graphql` directly via Bash.
 
 ### Optional
 
@@ -326,7 +326,7 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 ### "Account not selectable — no admin role found"
 
-- Confirm your accounts include `role:` fields. The QA Env Manager picks by role.
+- Confirm your accounts include `role:` fields. The QA Environment Engineer picks by role.
 - Confirm the role names you use in the file match the ones in the journey (admin / manager / user / customer / guest).
 
 ### Director keeps looping

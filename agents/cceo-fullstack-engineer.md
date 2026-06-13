@@ -70,7 +70,7 @@ For each criterion from the plan:
 - Migration written? <yes/no — path>
 - Feature flag wired? <yes/no — name>
 
-### Hand-off to QA Validator
+### Hand-off to QA Engineer
 <one paragraph — what the Validator should focus on, including any environment or seed data prerequisites>
 ```
 </output_format>

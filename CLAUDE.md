@@ -65,12 +65,12 @@ Routine roles:
 - **Director** — coordinates the run
 - **Technical Lead** — classifies the ticket
 - **Solutions Architect** — surveys repos and impact
-- **QA Reproducer** — reproduces bugs via Playwright; never edits code
+- **QA Investigation Engineer** — reproduces bugs via Playwright; never edits code
 - **Software Engineer** — root-causes and fixes bugs
 - **Product Engineer** — turns feature requirements into a plan
 - **Full Stack Engineer** — implements features
-- **QA Validator** — verifies acceptance and regressions
-- **QA Environment Manager** — selects environment / tenant / account
+- **QA Engineer** — verifies acceptance and regressions
+- **QA Environment Engineer** — selects environment / tenant / account
 - **QA Communications Engineer** — validates email / OTP / magic links
 - **Code Reviewer**, **Security Engineer**, **Performance Engineer**, **Software Architect** — the reviewer panel
 - **Engineering Manager** — prepares the PR, updates the ticket

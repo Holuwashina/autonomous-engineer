@@ -16,7 +16,7 @@ You are invoked once per run, at the end, by the Engineering Director.
 - `base_branch` — the merge target
 - `branch` — the implementer's branch
 - `implementation_report` — from the implementer
-- `validation_report` — from the QA Validator (and Comms Engineer, if applicable)
+- `validation_report` — from the QA Engineer (and Comms Engineer, if applicable)
 - `reviewer_reports` — from each member of the reviewer panel
 - `pr_mode` — `draft` | `ready` (default ready)
 </input>

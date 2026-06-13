@@ -23,10 +23,10 @@ Process:
 |---|---|---|
 | Technical Lead | <complete / skipped / pending> | <one line> |
 | Solutions Architect | <…> | <…> |
-| QA Reproducer / Product Engineer | <…> | <…> |
+| QA Investigation Engineer / Product Engineer | <…> | <…> |
 | Software Engineer / Full Stack Engineer | <…> | <…> |
-| QA Validator | <…> | <…> |
-| QA Comms Engineer | <…> | <…> |
+| QA Engineer | <…> | <…> |
+| QA Communications Engineer | <…> | <…> |
 | Code Reviewer | <…> | <…> |
 | Security Engineer | <…> | <…> |
 | Performance Engineer | <…> | <…> |

@@ -23,11 +23,11 @@ The end-to-end pipeline for any ticket classified as a bug.
 - Output: which repos are affected, cross-repo couplings, blast radius signals.
 
 ### 4. Environment selection
-- Invoke `cceo-qa-env-manager` with `purpose=reproduce`.
+- Invoke `cceo-qa-environment-engineer` with `purpose=reproduce`.
 - Output: environment / tenant / account selection.
 
 ### 5. Reproduction
-- Invoke `cceo-qa-reproducer` with the env-manager selection and the ticket's reproduction steps.
+- Invoke `cceo-qa-investigation-engineer` with the env-manager selection and the ticket's reproduction steps.
 - Outcome:
   - `reproduced` → proceed to root cause.
   - `not_reproduced` → comment the attempted journey + evidence on the ticket; Director stops and asks user for clearer repro steps. **Do not proceed to fix code.**
@@ -66,12 +66,12 @@ The Director **may not** ask the user mid-run for permission to skip reproductio
 - Runs the test suite; quotes results verbatim.
 
 ### 9. Validation
-- Invoke `cceo-qa-env-manager` with `purpose=validate` (often a different environment than reproduction).
-- Invoke `cceo-qa-validator` with the validation plan derived from the reproduction:
+- Invoke `cceo-qa-environment-engineer` with `purpose=validate` (often a different environment than reproduction).
+- Invoke `cceo-qa-engineer` with the validation plan derived from the reproduction:
   - Primary journey: the original repro should now succeed.
   - Edge cases: surrounding cases that could have been affected.
   - Regression spot-checks: adjacent flows.
-- Invoke `cceo-qa-comms` if the journey touches communications.
+- Invoke `cceo-qa-communications-engineer` if the journey touches communications.
 
 ### 10. Reviewer panel (Tournament)
 - All four reviewers run in parallel: `cceo-code-reviewer`, `cceo-security-engineer`, `cceo-performance-engineer`, `cceo-software-architect`.
@@ -104,12 +104,12 @@ The Director must fan out concurrent specialists in a **single response** with m
 |---|---|---|---|
 | 1. Intake | SEQUENTIAL | (Director only) | One ticket fetch. |
 | 2–3. Classification + Repo mapping | **PARALLEL** | `cceo-technical-lead` ‖ `cceo-solutions-architect` | Classification doesn't depend on the repo map; Architect doesn't need classification to enumerate repos. Fan out together at execution start. |
-| 4. Env selection | SEQUENTIAL | `cceo-qa-env-manager` | Needs classification verdict. |
-| 5. Reproduction | SEQUENTIAL | `cceo-qa-reproducer` (+ `cceo-qa-comms` only if email-touching) | Needs env. Comms only if journey involves a message — parallel with Reproducer when both are needed. |
+| 4. Env selection | SEQUENTIAL | `cceo-qa-environment-engineer` | Needs classification verdict. |
+| 5. Reproduction | SEQUENTIAL | `cceo-qa-investigation-engineer` (+ `cceo-qa-communications-engineer` only if email-touching) | Needs env. Comms only if journey involves a message — parallel with Reproducer when both are needed. |
 | 6. Root cause | SEQUENTIAL | `cceo-software-engineer` | Needs reproduction evidence. |
 | 7. Adversarial verification (optional) | **PARALLEL** | second `cceo-software-engineer` instance | Skeptic runs simultaneously with main engineer's confirmation pass; fanout of 2. |
 | 8. Implementation | SEQUENTIAL | `cceo-software-engineer` | Single-engineer single-fix. |
-| 9. Validation | SEQUENTIAL | `cceo-qa-validator` (+ `cceo-qa-comms` only if email-touching) | Validator drives the journey end-to-end. Comms in parallel when applicable. |
+| 9. Validation | SEQUENTIAL | `cceo-qa-engineer` (+ `cceo-qa-communications-engineer` only if email-touching) | Validator drives the journey end-to-end. Comms in parallel when applicable. |
 | 10. Reviewer panel | **PARALLEL** | `cceo-code-reviewer` ‖ `cceo-security-engineer` ‖ `cceo-performance-engineer` ‖ `cceo-software-architect` | Independent perspectives. Always parallel — never serial. |
 | 11. Loop iteration | SEQUENTIAL | implementer → validator → reviewers (panel still parallel inside) | Iteration is serial; the reviewer fan-out inside each iteration is parallel. |
 | 12. PR + ticket close-out | SEQUENTIAL | `cceo-engineering-manager` | One agent, single push. |
@@ -130,7 +130,7 @@ After both return, log each return separately (with its `specialists/NN-<name>.j
 - **Skip reviewers** only for trivial fixes (typo in user-facing string, comment). Document the skip.
 - **Always include the security reviewer** for fixes touching auth, sessions, payments, persistence, file upload, external API, environment.
 - **Always include a regression test** unless the codebase lacks any test infrastructure (then document the manual verification step).
-- **Communications (email / OTP / magic-link / invite / push) are opt-in.** Invoke `cceo-qa-comms` and the configured email sink (maildrop / Mailtrap / etc.) **only when the bug's reproduction journey actually sends or depends on a message**. Bugs in unrelated surfaces (UI rendering, server errors, validation, etc.) do not trigger any comms call. If you find yourself about to poll an inbox for a bug that has nothing to do with email — stop.
+- **Communications (email / OTP / magic-link / invite / push) are opt-in.** Invoke `cceo-qa-communications-engineer` and the configured email sink (maildrop / Mailtrap / etc.) **only when the bug's reproduction journey actually sends or depends on a message**. Bugs in unrelated surfaces (UI rendering, server errors, validation, etc.) do not trigger any comms call. If you find yourself about to poll an inbox for a bug that has nothing to do with email — stop.
 
 ## Common failure modes
 

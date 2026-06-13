@@ -38,15 +38,15 @@ If the Product Engineer flags that acceptance criteria were derived (not explici
   - Self-review the diff.
 
 ### 6. Environment selection for validation
-- Invoke `cceo-qa-env-manager` with `purpose=validate`.
+- Invoke `cceo-qa-environment-engineer` with `purpose=validate`.
 - Output: environment / tenant(s) / account(s) for the validation pass.
 
 ### 7. Validation
-- Invoke `cceo-qa-validator` with the plan's validation strategy:
+- Invoke `cceo-qa-engineer` with the plan's validation strategy:
   - Primary journey per acceptance criterion.
   - Edge cases per the plan.
   - Cross-role / cross-tenant checks (use `cceo-multi-tenant` for multi-tenant apps).
-- Invoke `cceo-qa-comms` if the feature touches email / OTP / magic-link / invitation / push.
+- Invoke `cceo-qa-communications-engineer` if the feature touches email / OTP / magic-link / invitation / push.
 
 ### 8. Reviewer panel (Tournament)
 - All four reviewers in parallel: `cceo-code-reviewer`, `cceo-security-engineer`, `cceo-performance-engineer`, `cceo-software-architect`.
@@ -80,8 +80,8 @@ The Director must fan out concurrent specialists in a **single response** with m
 | 2–3. Classification + Repo mapping | **PARALLEL** | `cceo-technical-lead` ‖ `cceo-solutions-architect` | Independent; fan out at execution start. |
 | 4. Feature planning | SEQUENTIAL | `cceo-product-engineer` | Needs classification verdict and repo map. |
 | 5. Implementation | SEQUENTIAL | `cceo-fullstack-engineer` | Single coherent diff, one engineer. |
-| 6. Env selection for validation | SEQUENTIAL | `cceo-qa-env-manager` | Needs implementation complete. |
-| 7. Validation | SEQUENTIAL | `cceo-qa-validator` (+ `cceo-qa-comms` in **parallel** when the feature acceptance criteria reference a message) | Validator drives the journey; Comms runs alongside if the journey involves email/OTP/links. |
+| 6. Env selection for validation | SEQUENTIAL | `cceo-qa-environment-engineer` | Needs implementation complete. |
+| 7. Validation | SEQUENTIAL | `cceo-qa-engineer` (+ `cceo-qa-communications-engineer` in **parallel** when the feature acceptance criteria reference a message) | Validator drives the journey; Comms runs alongside if the journey involves email/OTP/links. |
 | 8. Reviewer panel | **PARALLEL** | `cceo-code-reviewer` ‖ `cceo-security-engineer` ‖ `cceo-performance-engineer` ‖ `cceo-software-architect` | Independent perspectives. Always parallel — never serial. |
 | 9. Loop iteration | SEQUENTIAL | implementer → validator → reviewers (panel still parallel inside) | Iteration is serial; the reviewer fan-out inside each iteration is parallel. |
 | 10. PR + ticket close-out | SEQUENTIAL | `cceo-engineering-manager` | One agent, single push. |
@@ -103,7 +103,7 @@ After both return, log each return separately (with its `specialists/NN-<name>.j
 - **Always reuse existing primitives.** The Product Engineer names them; the Full Stack Engineer uses them.
 - **Always validate cross-role / cross-tenant** in multi-tenant codebases when the feature touches authorization or visible UI.
 - **Always run the full reviewer panel** for auth, payments, persistence, trust boundaries, public API additions.
-- **Communications (email / OTP / magic-link / invite / push) are opt-in.** Invoke `cceo-qa-comms` and the configured email sink (maildrop / Mailtrap / etc.) **only when the feature's acceptance criteria reference a message** (e.g. "user receives a verification email"). Features in unrelated surfaces (reports, dashboards, settings UI, internal APIs) do not trigger any comms call.
+- **Communications (email / OTP / magic-link / invite / push) are opt-in.** Invoke `cceo-qa-communications-engineer` and the configured email sink (maildrop / Mailtrap / etc.) **only when the feature's acceptance criteria reference a message** (e.g. "user receives a verification email"). Features in unrelated surfaces (reports, dashboards, settings UI, internal APIs) do not trigger any comms call.
 
 ## Common failure modes
 

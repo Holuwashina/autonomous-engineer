@@ -1,6 +1,6 @@
 ---
 name: cceo-multi-tenant
-description: Multi-tenant detection, isolation testing, and cross-tenant + cross-role validation patterns for CCEO QA specialists. Used by the QA Validator when the application supports multiple tenants.
+description: Multi-tenant detection, isolation testing, and cross-tenant + cross-role validation patterns for CCEO QA specialists. Used by the QA Engineer when the application supports multiple tenants.
 ---
 
 # Multi-Tenant Validation
@@ -16,7 +16,7 @@ The Solutions Architect identifies multi-tenancy by:
 - A tenant selector in the UI
 - `.cceo/resources.yaml` includes a `tenants` section
 
-If multi-tenancy is detected, the QA Validator runs the multi-tenant scenarios below in addition to the normal validation plan.
+If multi-tenancy is detected, the QA Engineer runs the multi-tenant scenarios below in addition to the normal validation plan.
 
 ## Required scenarios
 
@@ -35,7 +35,7 @@ Outbound emails / notifications scoped correctly:
 - Action in tenant A produces a message to a user in tenant A.
 - No message lands in a tenant-B inbox / address.
 
-The QA Comms Engineer runs this in coordination with the Validator.
+The QA Communications Engineer runs this in coordination with the Validator.
 
 ### 4. Branding / theming
 If the app themes per tenant, confirm:
@@ -59,7 +59,7 @@ UI-hidden alone is **not** sufficient. The server must enforce.
 
 ## Required accounts
 
-The QA Environment Manager pre-selects:
+The QA Environment Engineer pre-selects:
 - Primary tenant: primary role + at least one above + one below.
 - Secondary tenant: a primary-role account for cross-tenant isolation tests.
 

@@ -1,6 +1,6 @@
 ---
 name: cceo-resources
-description: How to read and interpret .cceo/resources.yaml — the single CCEO config file holding environments, tenants, accounts, browsers, communications, and external services (with their secrets inline). Used by the QA Environment Manager and any agent that needs to know what resources are available.
+description: How to read and interpret .cceo/resources.yaml — the single CCEO config file holding environments, tenants, accounts, browsers, communications, and external services (with their secrets inline). Used by the QA Environment Engineer and any agent that needs to know what resources are available.
 ---
 
 # CCEO Resources
@@ -59,7 +59,7 @@ Treat any field whose name contains `password`, `token`, `secret`, `key`, or `si
 
 ## Reading the file
 
-Pseudocode for the QA Environment Manager:
+Pseudocode for the QA Environment Engineer:
 
 ```python
 data = yaml.safe_load(open(".cceo/resources.yaml").read())
@@ -113,7 +113,7 @@ No env-var resolution, no `${...}` expansion, no `fields_from_env` walk. The YAM
 
 ## Reporting
 
-The QA Environment Manager emits a selection payload (see `cceo-qa-env-manager` output format) that other agents consume directly. The payload includes `unresolved_fields` — entries where a sensitive field still holds `REPLACE_ME` or is empty. Downstream agents check this and stop if anything is unresolved.
+The QA Environment Engineer emits a selection payload (see `cceo-qa-environment-engineer` output format) that other agents consume directly. The payload includes `unresolved_fields` — entries where a sensitive field still holds `REPLACE_ME` or is empty. Downstream agents check this and stop if anything is unresolved.
 
 Never print the value of a sensitive field. Only "resolved" or "unresolved".
 

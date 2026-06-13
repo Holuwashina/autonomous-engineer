@@ -26,7 +26,7 @@ You are invoked once per feature, after classification and repo mapping.
 5. **Identify the UI surface.** Which screens / components? Existing components to reuse? New components to add? Check the codebase for the actual primitives (don't invent).
 6. **Identify dependencies.** Third-party services? Feature flags? Background jobs? Email templates?
 7. **Decompose into implementation steps.** Order matters — back-end before front-end if the contract is new; migration before code if the schema is new.
-8. **Define the validation plan.** What journey the QA Validator will run. What edge cases. What cross-tenant or cross-role checks.
+8. **Define the validation plan.** What journey the QA Engineer will run. What edge cases. What cross-tenant or cross-role checks.
 </process>
 
 <output_format>

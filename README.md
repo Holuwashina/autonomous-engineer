@@ -12,7 +12,7 @@ Drop a ticket ID. Get a Pull Request.
 /ticket MM-123 --base develop
 ```
 
-Behind that one command, a coordinated team of 15 specialist subagents — Engineering Director, Technical Lead, QA Reproducer, Software Engineer, security / perf / architecture reviewers, Engineering Manager — read the ticket, classify it, reproduce the bug or plan the feature, implement it, validate with Playwright, run a four-reviewer panel, iterate until clean, then open a Pull Request and update the originating ticket.
+Behind that one command, a coordinated team of 15 specialist subagents — Engineering Director, Technical Lead, QA Investigation Engineer, Software Engineer, security / perf / architecture reviewers, Engineering Manager — read the ticket, classify it, reproduce the bug or plan the feature, implement it, validate with Playwright, run a four-reviewer panel, iterate until clean, then open a Pull Request and update the originating ticket.
 
 No separate orchestrator. No parallel AI runtime. Just Claude Code's native primitives — subagents, slash commands, skills, MCP servers — composed into a senior engineering organization.
 
@@ -46,7 +46,7 @@ When you run `/ticket <id>`, the Engineering Director:
 5. **Branches to the appropriate pipeline:**
    - **Bug:** environment selection → Playwright reproduction → root-cause + Generate-and-Filter fixes → implementation with regression test.
    - **Feature:** acceptance criteria → ordered plan → end-to-end implementation with tests.
-6. **Validates** via Playwright (QA Validator); polls maildrop / Mailtrap **only if the journey involves email**.
+6. **Validates** via Playwright (QA Engineer); polls maildrop / Mailtrap **only if the journey involves email**.
 7. **Runs the reviewer panel** — code, security, performance, architecture — in parallel.
 8. **Loops** until all reviewers approve and the validator passes, capped at 3 iterations (then escalates).
 9. **Opens a Pull Request** with a structured body — summary, ticket link, acceptance criteria checklist, reviewer verdicts, test plan for the human reviewer, follow-ups (Engineering Manager).
@@ -69,7 +69,7 @@ flowchart TD
 
     subgraph bug["🐛 Bug pipeline"]
         direction TB
-        env1["QA Env Manager"] --> repro["QA Reproducer<br/>Playwright + evidence"]
+        env1["QA Environment Engineer"] --> repro["QA Investigation Engineer<br/>Playwright + evidence"]
         repro --> swe["Software Engineer<br/>root cause + minimum-risk fix<br/>+ regression test"]
     end
 
@@ -81,7 +81,7 @@ flowchart TD
     bug --> val
     feat --> val
 
-    val["QA Validator<br/>+ QA Comms if email/OTP"]
+    val["QA Engineer<br/>+ QA Communications if email/OTP"]
     val --> panel
 
     subgraph panel["⚖️  Reviewer Panel — parallel (Tournament)"]
@@ -254,7 +254,7 @@ The Engineering Director will reply with a seven-section ready message and pause
 | `/bug` | `<id> [--base <branch>]` | Force bug workflow |
 | `/feature` | `<id> [--base <branch>]` | Force feature workflow |
 | `/review` | `[--scope code\|security\|perf\|arch\|full]` | Run the reviewer panel on the current diff |
-| `/qa` | `[--journey <name>]` | Run QA Validator (+ Comms if relevant) on the current change |
+| `/qa` | `[--journey <name>]` | Run QA Engineer (+ Comms if relevant) on the current change |
 | `/pr` | `[--draft] [--base <branch>]` | Engineering Manager prepares + opens the PR |
 | `/status` | _(none)_ | Report current state of the active ticket run |
 | `/resume` | `[<id>]` | Resume an interrupted run |
@@ -271,10 +271,10 @@ The Engineering Director will reply with a seven-section ready message and pause
 | Coordinator | `cceo-engineering-director` | Owns every run; delegates, synthesises, declares completion |
 | Intake | `cceo-technical-lead` | Classifies the ticket |
 | Intake | `cceo-solutions-architect` | Maps affected repos + blast radius |
-| QA | `cceo-qa-env-manager` | Picks environment / tenant / account from `resources.yaml` |
-| QA | `cceo-qa-reproducer` | Playwright reproduction of bugs |
-| QA | `cceo-qa-validator` | Playwright validation of fixes / features |
-| QA | `cceo-qa-comms` | Email / OTP / magic-link validation (opt-in) |
+| QA | `cceo-qa-environment-engineer` | Picks environment / tenant / account from `resources.yaml` |
+| QA | `cceo-qa-investigation-engineer` | Playwright reproduction of bugs |
+| QA | `cceo-qa-engineer` | Playwright validation of fixes / features |
+| QA | `cceo-qa-communications-engineer` | Email / OTP / magic-link validation (opt-in) |
 | Build | `cceo-software-engineer` | Bug root-cause + fix + regression test |
 | Build | `cceo-product-engineer` | Feature acceptance criteria + plan |
 | Build | `cceo-fullstack-engineer` | Feature implementation |
