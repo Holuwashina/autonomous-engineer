@@ -61,11 +61,11 @@ case "${1:-}" in
       [ -e "$t.bak" ] && mv "$t.bak" "$t"
     done
 
-    # 3) The pipeline must have added its own test(s) covering the acceptance behaviour.
+    # 3) The pipeline must have added its own test(s). Count it()/test() cases in
+    #    the fixture's own test files (NOT comments); baseline has exactly 3.
+    test_count="$(grep -rhoE "\b(it|test)\(" "$FIX"/src/*.test.ts 2>/dev/null | wc -l | tr -d ' ')"
     added_test="FAIL"
-    if grep -qrE "applyFixedDiscount|17\.99|rounds|Unauthorized|manager role|role !== |toThrow" "$FIX/src"; then
-      added_test="PASS"
-    fi
+    if [ "${test_count:-0}" -gt 3 ]; then added_test="PASS"; fi
 
     echo "  pipeline tests pass : $own_tests"
     echo "  type-check passes   : $typecheck"
