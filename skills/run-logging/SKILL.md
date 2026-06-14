@@ -1,11 +1,11 @@
 ---
 name: run-logging
-description: How Autonomous Engineer writes a structured, grep-friendly audit log for every ticket run — file layout, line format, what every specialist must emit, how to tail it, and how /log surfaces it. Used by the Engineering Director and every specialist that returns to the Director.
+description: How Autonomous Engineer writes a structured, grep-friendly audit log for every ticket run — file layout, line format, what every specialist must emit, how to tail it, and how /log surfaces it. Used by the Orchestrator and every specialist that returns to it.
 ---
 
 # Autonomous Engineer Run Logging
 
-Every run writes a structured audit trail to `.ae/runs/<run-id>/`. Engineers can grep it after the fact, attach it to incident reports, diff it across runs. Without this log, the only record of what was done is the chat scrollback — which is hard to share, hard to search, and disappears.
+Every run writes a structured audit trail to `.ae/runs/<run-id>/`. Engineers can grep it after the fact, attach it to incident reports, diff it across runs. Without this log, the only record of what was done is the chat scrollback — hard to share, hard to search, and it disappears.
 
 ## File layout
 
@@ -17,9 +17,10 @@ Every run writes a structured audit trail to `.ae/runs/<run-id>/`. Engineers can
         ├── ticket.md                       ← fetched ticket content (for re-runs)
         ├── ready-message.md                ← the seven-section ready message
         ├── specialists/
-        │   ├── 01-technical-lead.json      ← each specialist spawn's payload + return
-        │   ├── 02-solutions-architect.json
-        │   ├── 03-qa-env-manager.json
+        │   ├── 01-intake-analyst.json      ← each specialist spawn's payload + return
+        │   ├── 02-software-engineer.json
+        │   ├── 03-qa-engineer.json
+        │   ├── 04-reviewer-code.json
         │   └── ...
         ├── decisions.md                    ← scope checkpoints, user inputs, rationale
         └── final-summary.md                ← close-out (or escalation)
@@ -47,38 +48,33 @@ One event per line. Fields:
 |---|---|---|
 | Timestamp | ISO-8601 UTC, second precision | `2026-06-13T03:15:42Z` |
 | Level | `INFO` / `WARN` / `ERROR` / `DECIDE` / `PARALLEL` | `INFO` |
-| Phase | `intake` / `classify` / `arch` / `env` / `repro` / `rootcause` / `impl` / `validate` / `review` / `loop` / `pr` / `close` / `escalate` | `intake` |
-| Actor | Agent name without the `autonomous-engineer-` prefix | `director`, `technical-lead`, `qa-reproducer` |
+| Phase | `intake` / `plan` / `repro` / `impl` / `validate` / `review` / `loop` / `pr` / `close` / `escalate` | `intake` |
+| Actor | `orchestrator`, or a specialist name (`intake-analyst`, `software-engineer`, `qa-engineer`, `reviewer:<lens>`, `engineering-manager`) | `orchestrator` |
 | Message | Free-form, single line, ≤200 chars | `Fetched ticket 86exwk8yx (10 fields)` |
 
 Multi-line content (specialist returns, tracebacks) does not go in `run.log` — it goes in the corresponding `specialists/NN-<name>.json` file, and the log references that file:
 
 ```
-[2026-06-13T03:15:42Z] [INFO] [classify] [technical-lead] Returned bug (verdict + reasoning → specialists/01-technical-lead.json)
+[2026-06-13T03:15:42Z] [INFO] [intake] [intake-analyst] Returned bug, tier=T1 (verdict + repo map → specialists/01-intake-analyst.json)
 ```
 
 ## What every actor logs
 
-### Director (anchor of the log)
+### Orchestrator (anchor of the log)
 
-The Director opens and closes the run, and emits a line at every phase boundary.
+The Orchestrator (main loop) opens and closes the run and emits a line at every phase boundary.
 
 ```
-[T] [INFO]  [intake]    [director] Run started: ticket=86exwk8yx base=develop classification=auto
-[T] [INFO]  [intake]    [director] Fetched ticket (title: "Broken subscription email CTA")
-[T] [INFO]  [intake]    [director] Ready message delivered, awaiting user confirmation
-[T] [INFO]  [intake]    [director] User confirmed; entering execution
-[T] [PARALLEL] [classify] [director] Fanout: technical-lead || solutions-architect
-[T] [INFO]  [classify]  [director] technical-lead complete → bug (specialists/01-…)
-[T] [INFO]  [arch]      [director] solutions-architect complete → 1 repo, 0 coupling (specialists/02-…)
-[T] [INFO]  [env]       [director] Spawning qa-env-manager
-...
-[T] [DECIDE] [review]   [director] Scope Checkpoint: sibling broken links at lines 495/872 → recommend defer
-[T] [INFO]  [review]    [director] User accepted defer; opening follow-up ticket reference
-[T] [PARALLEL] [review] [director] Fanout: code-reviewer || security || performance || architect
-...
-[T] [INFO]  [pr]        [director] PR opened: <url>
-[T] [INFO]  [close]     [director] Run complete: PR <url>, ticket updated, 0 escalations
+[T] [INFO]  [intake]   [orchestrator] Run started: ticket=86exwk8yx base=dev classification=auto
+[T] [INFO]  [intake]   [orchestrator] Fetched ticket (title: "Broken subscription email CTA")
+[T] [INFO]  [intake]   [orchestrator] intake-analyst complete → bug, tier=T1 (specialists/01-…)
+[T] [INFO]  [intake]   [orchestrator] Ready message delivered, awaiting user confirmation
+[T] [INFO]  [intake]   [orchestrator] User confirmed; entering execution
+[T] [DECIDE] [review]  [orchestrator] Scope Checkpoint: sibling broken links at lines 495/872 → recommend defer
+[T] [INFO]  [review]   [orchestrator] User accepted defer; opening follow-up ticket reference
+[T] [PARALLEL] [review] [orchestrator] Fanout: reviewer:code || reviewer:security || reviewer:perf || reviewer:arch
+[T] [INFO]  [pr]       [orchestrator] PR opened: <url>
+[T] [INFO]  [close]    [orchestrator] Run complete: PR <url>, ticket updated, 0 escalations
 ```
 
 ### Specialists
@@ -98,12 +94,12 @@ If a specialist errors:
 ### Escalations
 
 ```
-[T] [ERROR] [escalate] [director] Loop did not converge after 3 iterations (findings → decisions.md)
+[T] [ERROR] [escalate] [orchestrator] Loop did not converge after cap (findings → decisions.md)
 ```
 
-## How to write the log (Director's bash helper)
+## How to write the log (Orchestrator's bash helper)
 
-The Director sets the run directory once at intake and emits lines via a small shell function. Run the setup once per run, then call `log` for every event.
+The Orchestrator sets the run directory once at intake and emits lines via a small shell function. Run the setup once per run, then call `log` for every event.
 
 ```bash
 RUN_ID="$(date -u +%Y-%m-%dT%H-%M-%SZ)-${TICKET_ID}"
@@ -117,7 +113,7 @@ log() {
     | tee -a "$RUN_DIR/run.log"
 }
 
-log INFO intake director "Run started: ticket=$TICKET_ID base=$BASE_BRANCH"
+log INFO intake orchestrator "Run started: ticket=$TICKET_ID base=$BASE_BRANCH"
 ```
 
 The `tee` means the user sees the line in the chat too — surfaces progress without extra reporting overhead.
@@ -125,17 +121,18 @@ The `tee` means the user sees the line in the chat too — surfaces progress wit
 ## How specialists write their JSON
 
 ```bash
-cat > "$RUN_DIR/specialists/01-technical-lead.json" <<'JSON'
+cat > "$RUN_DIR/specialists/01-intake-analyst.json" <<'JSON'
 {
-  "actor": "technical-lead",
+  "actor": "intake-analyst",
   "spawned_at": "2026-06-13T03:15:42Z",
   "returned_at": "2026-06-13T03:16:34Z",
   "input": { "ticket_id": "86exwk8yx" },
   "output": {
-    "verdict": "bug",
+    "classification": "bug",
+    "risk_tier": "T1",
     "confidence": "high",
     "reasoning": "...",
-    "signals": ["..."]
+    "repos": ["..."]
   }
 }
 JSON

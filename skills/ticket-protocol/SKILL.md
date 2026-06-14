@@ -1,6 +1,6 @@
 ---
 name: ticket-protocol
-description: How Autonomous Engineer interacts with ticket systems (Jira, ClickUp, GitHub Issues) — fetch, comment, transition, attach evidence. Provider-specific conventions for the Engineering Director and Engineering Manager.
+description: How Autonomous Engineer interacts with ticket systems (Jira, ClickUp, GitHub Issues) — fetch, comment, transition, attach evidence. Provider-specific conventions for the Orchestrator and Engineering Manager.
 ---
 
 # Ticket Protocol
@@ -21,15 +21,15 @@ Look at the runtime tool surface for any tool name matching these patterns. The 
 
 If none are present, ask the user to paste the ticket description and treat it as a free-form ticket — comments and transitions become no-ops.
 
-### Tool surface gotcha (subagents)
+### Tool surface note
 
-Subagent frontmatter `tools:` fields use wildcard patterns. A bare `mcp__*` is too broad — Claude Code's tool resolver does NOT expand it as a glob in subagent surfaces, so subagents declared with `mcp__*` silently miss claude.ai-hosted MCPs. The Director and Technical Lead agents enumerate explicit substring patterns (`mcp__*clickup*, mcp__*ClickUp*, mcp__*jira*, ...`) to cover both casing conventions.
+The Orchestrator runs in the **main session loop**, so it has the full tool surface natively — no frontmatter wildcards needed for ticket fetch at intake. The `engineering-manager` subagent, however, needs ticket-MCP tools for close-out (comment + transition); its frontmatter `tools:` enumerates explicit substring patterns (`mcp__*clickup*, mcp__*ClickUp*, mcp__*jira*, ...`) rather than a bare `mcp__*`, because Claude Code's resolver does NOT expand a bare `mcp__*` as a glob in subagent surfaces and would silently miss claude.ai-hosted MCPs.
 
-If a user reports a ticket-fetch failure for a provider not in the explicit list, the fix is a one-line edit to the agent's `tools:` field — add `mcp__*<provider-substring>*` (case-sensitive both ways if needed).
+If a user reports a ticket close-out failure for a provider not in the explicit list, the fix is a one-line edit to `engineering-manager.md`'s `tools:` field — add `mcp__*<provider-substring>*` (both casings if needed).
 
 ## Fetch fallback chain (auto-healing)
 
-The Director never stops at the first miss. The chain is fixed and ordered. **The env-token / raw-API rung is intentionally absent** — this team uses connector-managed OAuth only; do not curl `https://api.<provider>.com` with a personal token even when one is available.
+The Orchestrator never stops at the first miss. The chain is fixed and ordered. **The env-token / raw-API rung is intentionally absent** — this team uses connector-managed OAuth only; do not curl `https://api.<provider>.com` with a personal token even when one is available.
 
 | Rung | What | When it runs |
 |---|---|---|
@@ -39,7 +39,7 @@ The Director never stops at the first miss. The chain is fixed and ordered. **Th
 | 4 | **Provider CLI** | `gh issue view <id>` for GitHub. ClickUp / Jira / Linear have no first-party CLI worth depending on — skip to rung 5. |
 | 5 | **Inline-paste prompt** | Last resort. Ask the user to paste title + description + acceptance + status + relevant comments. |
 
-If every rung fails the Director emits the "Intake blocked" message with the exact failure of each rung listed in the `Reason:` line. Silent stalls are forbidden.
+If every rung fails the Orchestrator emits the "Intake blocked" message with the exact failure of each rung listed in the `Reason:` line. Silent stalls are forbidden.
 
 ### Reconnect protocol (rung 2)
 
@@ -49,14 +49,14 @@ The reconnect path differs by connector type. Identify which kind of MCP failed 
 
 | Tool name pattern | Connector kind | Reauth path |
 |---|---|---|
-| `mcp__claude_ai_<Provider>__*` | **claude.ai-hosted** | User must run `/mcp` inside Claude Code (or visit claude.ai/settings/connectors). No programmatic OAuth from the Director. |
-| `mcp__<provider>__*` (no `claude_ai_` prefix) | **CLI-installed** (`claude mcp add ...`) | If the MCP exposes `__authenticate` / `__complete_authentication` tools, the Director can drive the OAuth flow directly (see below). Otherwise the user has to re-run `claude mcp add` with a fresh token. |
+| `mcp__claude_ai_<Provider>__*` | **claude.ai-hosted** | User must run `/mcp` inside Claude Code (or visit claude.ai/settings/connectors). No programmatic OAuth from the Orchestrator. |
+| `mcp__<provider>__*` (no `claude_ai_` prefix) | **CLI-installed** (`claude mcp add ...`) | If the MCP exposes `__authenticate` / `__complete_authentication` tools, the Orchestrator can drive the OAuth flow directly (see below). Otherwise the user has to re-run `claude mcp add` with a fresh token. |
 
 #### Path A — claude.ai-hosted connector
 
-These are gated behind `/mcp` (a Claude Code slash command, user-input only) — neither the Director nor any subagent can trigger them. The `__authenticate` tool returns a stub message pointing at `/mcp`; there's no OAuth URL to open. There's also no `claude mcp` CLI subcommand to force reauth (only `add`/`get`/`list`/`remove`/`reset-project-choices`/`serve` exist).
+These are gated behind `/mcp` (a Claude Code slash command, user-input only) — neither the Orchestrator nor any subagent can trigger them. The `__authenticate` tool returns a stub message pointing at `/mcp`; there's no OAuth URL to open. There's also no `claude mcp` CLI subcommand to force reauth (only `add`/`get`/`list`/`remove`/`reset-project-choices`/`serve` exist).
 
-The Director's job here is to surface the fix clearly and auto-open the settings page as a backup, then stop:
+The Orchestrator's job here is to surface the fix clearly and auto-open the settings page as a backup, then stop:
 
 1. **Detect the disconnect.** Either rung 1 returns "MCP server `claude.ai <Provider>` is not connected", or the session emits a `MCP server disconnected` system reminder for the provider's deferred tools, or only `__authenticate` / `__complete_authentication` are reachable (a "needs reauth" state — the connector is alive at the CLI level but the OAuth token has expired).
 2. **Auto-open the connectors settings page** as a visual backup (in case `/mcp` itself fails or the user prefers the web flow):
@@ -70,7 +70,7 @@ The Director's job here is to surface the fix clearly and auto-open the settings
 3. **Surface the in-CLI fix as the recommended path** — `/mcp` is faster than the browser flow because it doesn't require leaving the conversation:
 
    ```
-   Engineering Director — <Provider> needs reauth
+   Orchestrator — <Provider> needs reauth
 
    The claude.ai <Provider> connector is registered but its tool surface
    isn't reachable from this session. Fastest fix: type /mcp here, select
@@ -85,7 +85,7 @@ The Director's job here is to surface the fix clearly and auto-open the settings
 
 #### Path B — CLI-installed MCP with auth methods
 
-For MCPs added via `claude mcp add` that expose programmatic auth tools, the Director can drive the OAuth flow itself:
+For MCPs added via `claude mcp add` that expose programmatic auth tools, the Orchestrator can drive the OAuth flow itself:
 
 1. **Probe for auth methods.** Try `ToolSearch` for `mcp__<provider>__authenticate`. If absent, skip to rung 3 (different CLI-installed MCP) or rung 5 (inline-paste).
 2. **Start auth.** Call `mcp__<provider>__authenticate`. It returns either a URL the user must visit or a token-paste prompt.
@@ -102,7 +102,7 @@ For MCPs added via `claude mcp add` that expose programmatic auth tools, the Dir
 4. **Surface status:**
 
    ```
-   Engineering Director — Reconnecting <Provider>
+   Orchestrator — Reconnecting <Provider>
 
    I opened the authorization page in your browser — sign in and approve.
    If the browser didn't open:
@@ -113,7 +113,7 @@ For MCPs added via `claude mcp add` that expose programmatic auth tools, the Dir
 5. **Complete auth.** Call `mcp__<provider>__complete_authentication` with whatever payload the start step returned. Some connectors auto-complete; others need a code.
 6. **Retry rung 1.** If it still fails, log the failure and drop to rung 3 / 5.
 
-The reconnect is logged as a single `[INFO] [intake] [director] Reconnected <Provider> via <kind> reauth` line so the audit trail shows the healing without dumping the URL into the log.
+The reconnect is logged as a single `[INFO] [intake] [orchestrator] Reconnected <Provider> via <kind> reauth` line so the audit trail shows the healing without dumping the URL into the log.
 
 ## Ticket ID conventions
 
@@ -135,7 +135,7 @@ If the user provides an ambiguous ID, ask before guessing.
 
 ### Mid-run (optional)
 
-For long-running multi-iteration runs, the Director may post a status comment after each major phase. Default behaviour is **no mid-run comments** — the close-out comment is sufficient. Mid-run comments only happen when:
+For long-running multi-iteration runs, the Orchestrator may post a status comment after each major phase. Default behaviour is **no mid-run comments** — the close-out comment is sufficient. Mid-run comments only happen when:
 - The run is paused waiting on the user (e.g. "reproduction failed — please confirm steps").
 - A reviewer raises a blocking finding the user might want visibility on.
 
@@ -154,11 +154,8 @@ Validation:
 - <acceptance criterion / repro> — <pass/fail> — <evidence link>
 - ...
 
-Reviewer panel:
-- Code: <verdict>
-- Security: <verdict>
-- Performance: <verdict>
-- Architecture: <verdict>
+Reviewer verdicts (lenses that ran):
+- <lens>: <verdict>
 
 Follow-ups (not in this PR):
 - <bullet, or "none">

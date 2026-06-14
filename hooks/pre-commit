@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+# Autonomous Engineer safety hook — pre-commit.
+# Deterministically enforces two iron rules that were previously prompt-only:
+#   1. No direct commits to a protected branch (work happens on feature branches).
+#   2. The secrets file (.ae/resources.yaml) is never committed.
+#
+# Protected branches are configurable:
+#   git config ae.protectedBranches "main master dev develop production release"
+#   or export AE_PROTECTED_BRANCHES="..."
+# Default list is used if neither is set.
+
+DEFAULT_PROTECTED="main master dev develop production release"
+PROTECTED="${AE_PROTECTED_BRANCHES:-$(git config --get ae.protectedBranches 2>/dev/null)}"
+[ -n "$PROTECTED" ] || PROTECTED="$DEFAULT_PROTECTED"
+
+# symbolic-ref works even on an unborn branch (before the first commit),
+# where rev-parse --abbrev-ref HEAD would wrongly return "HEAD".
+branch="$(git symbolic-ref --short -q HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+
+for p in $PROTECTED; do
+  if [ "$branch" = "$p" ]; then
+    echo "✗ Autonomous Engineer: direct commits to protected branch '$branch' are blocked." >&2
+    echo "  Start a feature branch first:  git switch -c fix/<ticket>-<slug>" >&2
+    echo "  (Override for one commit, discouraged: git commit --no-verify)" >&2
+    exit 1
+  fi
+done
+
+if git diff --cached --name-only | grep -qx ".ae/resources.yaml"; then
+  echo "✗ Autonomous Engineer: .ae/resources.yaml holds secrets and must not be committed." >&2
+  echo "  It should stay gitignored. Unstage it:  git restore --staged .ae/resources.yaml" >&2
+  exit 1
+fi
+
+exit 0

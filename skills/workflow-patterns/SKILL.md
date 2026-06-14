@@ -1,11 +1,11 @@
 ---
 name: workflow-patterns
-description: The six adaptive workflow patterns the Engineering Director composes when driving a run. Use this to decide which patterns fit a ticket, and how to compose them.
+description: The six adaptive workflow patterns the Orchestrator composes when driving a run. Use this to decide which patterns fit a ticket, and how to compose them.
 ---
 
 # Autonomous Engineer Workflow Patterns
 
-Six patterns. The Director **composes** them — most runs use two or three. Running all six is a smell.
+Six patterns. The Orchestrator **composes** them — most runs use two or three. Running all six is a smell.
 
 ## The patterns
 
@@ -25,7 +25,7 @@ Skip when the work is exploratory, ambiguous, or risky.
 
 Use when independent work streams must complete before the next phase can start, **and** synthesis across results is genuinely useful (not when work can pipeline through).
 
-**Example composition:** Solutions Architect maps repos → Director fans out to Product Engineer (plan per repo) → synthesises into a single plan → hands to Software Engineer (`mode=feature`).
+**Example composition:** Intake Analyst maps repos → Orchestrator fans out `software-engineer` (`mode=plan`) per repo → synthesises into a single plan → fans out `software-engineer` (`mode=feature`) per repo.
 
 Prefer **pipelining** when results don't need to be synthesised — that is, when each specialist's output can flow directly into the next without combining across siblings.
 
@@ -58,7 +58,7 @@ Document the alternatives even when not chosen — they become follow-ups.
 
 Use when stakes warrant consensus, or when a single reviewer's judgement is insufficient — typically the four-reviewer panel itself is a tournament.
 
-**Example composition:** Code / Security / Performance / Architecture reviewers all evaluate the diff → tournament verdict is the union of their findings. Any blocking finding from any reviewer requires resolution.
+**Example composition:** four independent `reviewer` instances (`lens=code` / `security` / `perf` / `arch`) evaluate the diff in parallel → tournament verdict is the union of their findings. Any blocking finding from any lens requires resolution.
 
 Don't substitute tournament for adversarial verification — tournaments evaluate, adversaries refute.
 
@@ -75,7 +75,7 @@ Use when the validator or reviewers may surface findings that need another imple
 
 ---
 
-## How the Director composes patterns
+## How the Orchestrator composes patterns
 
 ### Default pipelines (described in detail in `bug-workflow` and `feature-workflow`)
 

@@ -1,35 +1,17 @@
 ---
-description: Resume an interrupted ticket run. Picks up from the last completed specialist, restoring context.
+description: Resume an interrupted ticket run. Picks up from the last completed specialist, restoring context, as the Orchestrator.
 argument-hint: "[<ticket-id>]"
 ---
 
-You are the Autonomous Engineer. The user has invoked `/resume $ARGUMENTS`.
+You are the Autonomous Engineer. The user invoked `/resume $ARGUMENTS`.
 
-Parse:
-- Optional first positional: **ticket ID**. If omitted, infer from the most recent active task list entries.
+Parse: optional first positional → **ticket ID**. If omitted, infer from the most recent in-progress run in `TaskList`.
 
-Process:
+**Become the Orchestrator in THIS session.** Load the `orchestration` skill in resume mode — do not spawn a director subagent.
 
-1. Identify the run to resume.
-   - If `$ARGUMENTS` is provided, filter `TaskList` for tasks tagged with that ticket ID.
-   - If `$ARGUMENTS` is empty, find the most recent in-progress run from `TaskList`.
-   - If no candidate is found, reply: "No run to resume. Start a new one with `/ticket <id> --base <branch>`." Stop.
-2. Reconstruct context:
-   - Ticket details (re-fetch via ticket MCP for freshness — comments may have changed).
-   - Base branch.
-   - Classification.
-   - Specialists completed and their reports.
-   - Last in-flight specialist.
-   - Current loop iteration index.
-3. Hand off to **`engineering-director`** with:
-   - `ticket_id` — resolved
-   - `base_branch` — from run state
-   - `override_classification` — from run state
-   - `resume_context` — a structured summary of completed specialists, their reports, and the last in-flight step
-4. The Director re-issues a short status update (not the full seven-section ready message, since the run is mid-flight), confirms the resume point with the user, and continues.
+1. Identify the run: filter `TaskList` by the ticket ID, or take the most recent in-progress run. If none, reply `No run to resume. Start one with /ticket <id> --base <branch>.` and stop.
+2. Reconstruct context from `.ae/runs/<run-id>/` and the task list: ticket, base branch, classification + tier, specialists completed (reuse their `specialists/NN-*.json` reports — do **not** rerun them), last in-flight step, current loop iteration.
+3. Re-fetch the ticket (comments/status may have changed) and re-check branch state (`git status`, `git log`); surface any manual commits made during the pause and ask how to incorporate them.
+4. Re-issue a short status update (not the full ready message), confirm the resume point, and continue the tier-appropriate pipeline.
 
-Resume hygiene:
-- The Director **does not silently rerun** completed specialists. It re-uses their reports.
-- The Director **does re-fetch the ticket** in case status or comments have changed since the run paused.
-- The Director **does re-check the branch state** (`git status`, `git log`) — if the user has made manual commits during the pause, the Director surfaces them and asks how to incorporate them before continuing.
-- If the resume point is mid-implementation and the implementer's state is ambiguous, the Director invokes a fresh `code-reviewer` pass on the partial diff before continuing.
+Resume hygiene: never silently rerun completed specialists; always re-fetch the ticket and re-check the branch; if the resume point is mid-implementation and state is ambiguous, run a fresh `reviewer` (`code`) pass on the partial diff before continuing.

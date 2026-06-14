@@ -1,6 +1,6 @@
 ---
 name: progress-reporting
-description: How Autonomous Engineer specialists and the Engineering Director communicate progress to the user — the ready message format, phase reports, and the close-out summary. Used by every Autonomous Engineer agent that surfaces text to the user.
+description: How the Orchestrator and specialists communicate progress to the user — the ready message format, phase reports, and the close-out summary. Used by every Autonomous Engineer agent that surfaces text to the user.
 ---
 
 # Progress Reporting
@@ -9,10 +9,10 @@ Autonomous Engineer communicates the way a senior engineering team does on a sta
 
 ## The ready message (at run start)
 
-Every run begins with the Director's seven-section ready message. The format is fixed.
+Every run begins with the Orchestrator's ready message. The format is fixed.
 
 ```
-Engineering Director — Ready
+Orchestrator — Ready
 
 1. Understanding
 <one paragraph — what the ticket is asking for, in our words>
@@ -21,40 +21,40 @@ Engineering Director — Ready
 <bug | feature | enhancement | refactor | investigation>
 Reasoning: <one or two sentences>
 
-3. Specialists
+3. Risk tier
+<T0 | T1 | T2> — <the trigger that set it>
+
+4. Specialists
 - <agent-name> — <what they will do in this run>
 - ...
 
-4. Workflow
-- <pattern> — <why>
+5. Workflow
 - <pattern> — <why>
 
-5. Plan
+6. Plan
 1. <step>
 2. <step>
-3. <step>
 ...
+Estimated agent calls: <n>
 
-6. Risks
+7. Risks
 - <risk> — Mitigation: <approach>
-- ...
 
-7. Confidence
+8. Confidence
 - Overall: <high | medium | low>
 - <risk>: <high | medium | low>
-- ...
 
 Awaiting confirmation or redirection.
 ```
 
-The Director pauses here. No tool calls that mutate state. The user confirms or redirects.
+The Orchestrator pauses here. No tool calls that mutate state. The user confirms or redirects.
 
 ## Phase reports
 
-When a phase completes, the Director (not the specialist directly) reports it back to the user. Use this template:
+When a phase completes, the Orchestrator (not the specialist directly) reports it back. Use this template:
 
 ```
-Engineering Director — <phase name>
+Orchestrator — <phase name>
 
 Status: <one line>
 Evidence: <bullets, each citing file:line, a URL, or a verbatim quote>
@@ -62,22 +62,19 @@ Decision: <next step>
 Confidence: <high | medium | low>
 ```
 
-Specialists return structured output (per their `<output_format>`); the Director synthesises into the phase report. Do not paste the specialist's full output to the user — read it, decide, summarise.
+Specialists return structured output (per their `<output_format>`); the Orchestrator synthesises into the phase report. Do not paste a specialist's full output to the user — read it, decide, summarise.
 
 ## Specialist hand-offs (internal)
 
-Specialists return to the Director — not the user. The Director reads, synthesises, and reports. Internal hand-offs follow each agent's `<output_format>` exactly so the Director can rely on the shape.
+Specialists return to the Orchestrator — not the user. The Orchestrator reads, synthesises, and reports. Internal hand-offs follow each agent's `<output_format>` exactly so the Orchestrator can rely on the shape.
 
 ## Loop reports
 
-When Loop-Until-Done iterates:
-
 ```
-Engineering Director — Iteration <n>
+Orchestrator — Iteration <n>
 
 Blocking findings from previous iteration:
-- <reviewer | validator>: <finding> — `<file:line>`
-- ...
+- <reviewer:lens | validator>: <finding> — `<file:line>`
 
 Re-invoking: <specialist>
 Awaiting return.
@@ -86,36 +83,33 @@ Awaiting return.
 After convergence:
 
 ```
-Engineering Director — Convergence
+Orchestrator — Convergence
 
-Iterations: <n>
-All reviewers: approve (or approve_with_findings)
+Iterations: <n of cap>
+Reviewer lenses: approve (or approve_with_findings)
 Validator: pass
 ```
 
 ## Close-out
 
-When the Engineering Manager opens the PR and the Director declares completion:
+When the Engineering Manager opens the PR and the Orchestrator declares completion:
 
 ```
-Engineering Director — Completion
+Orchestrator — Completion
 
 Ticket: <id> — <title>
+Risk tier: <T0 | T1 | T2>
 PR: <url>
 Branch: <name> → <base>
 
 What was delivered:
 - <bullet>
-- ...
 
 Validation evidence:
 - <bullet>
 
-Reviewer panel verdicts:
-- Code: <verdict>
-- Security: <verdict>
-- Performance: <verdict>
-- Architecture: <verdict>
+Reviewer verdicts (lenses that ran):
+- <lens>: <verdict>
 
 Follow-ups (not in this PR):
 - <bullet, or "none">
@@ -125,10 +119,10 @@ Confidence (overall): <high | medium | low>
 
 ## Scope Checkpoint
 
-Distinct from Escalation. Used when a finding reveals work beyond the original ticket scope (sibling bug, role-policy question, refactor opportunity). The Director recommends a default and proceeds unless redirected.
+Distinct from Escalation. Used when a finding reveals work beyond the original ticket scope (sibling bug, role-policy question, refactor opportunity). The Orchestrator recommends a default and proceeds unless redirected.
 
 ```
-Engineering Director — Scope Checkpoint
+Orchestrator — Scope Checkpoint
 
 Finding: <one paragraph — what was discovered beyond the original ticket>
 
@@ -142,7 +136,7 @@ Recommended: <option N> — <one line reasoning>
 Proceeding with recommendation in N seconds unless redirected.
 ```
 
-The Director's default for Scope Checkpoints is **ship the in-scope fix; defer the rest to follow-ups** (matches the iron rule "match scope to request"). The user can override.
+The default for Scope Checkpoints is **ship the in-scope fix; defer the rest to follow-ups** (matches the iron rule "match scope to request"). The user can override.
 
 Scope Checkpoints are **not** for foreseeable workflow choices (skip reproduction, skip reviewers, etc.) — those belong in the ready message. If a Scope Checkpoint is being used to retroactively ask permission for something the ready message should have surfaced, that's a planning failure — re-issue the ready message instead.
 
@@ -151,22 +145,19 @@ Scope Checkpoints are **not** for foreseeable workflow choices (skip reproductio
 When confidence drops or the loop fails to converge:
 
 ```
-Engineering Director — Escalation
+Orchestrator — Escalation
 
 Reason: <one line>
 
 What we know:
 - <bullet — evidence>
-- ...
 
 What we tried:
 - <bullet>
-- ...
 
 Options for you:
 1. <option> — <trade-off>
 2. <option> — <trade-off>
-3. <option> — <trade-off>
 
 Recommended: <option> — <one line reasoning>
 
@@ -180,7 +171,7 @@ Pausing the run until you decide.
 3. **No filler.** Skip "Let me", "I'll now", "Great, I've finished" — go straight to the report.
 4. **No hype.** Skip "successfully", "smoothly", "delivered". State outcomes neutrally.
 5. **No emoji.** Ever.
-6. **Confidence is honest.** If you don't know, say "low" and explain why. Don't say "high" for politeness.
+6. **Confidence is honest.** If you don't know, say "low" and explain why.
 7. **One claim per bullet.** Don't compound.
 8. **Read before reporting.** Don't summarise a specialist's output without reading it in full.
 

@@ -1,46 +1,39 @@
 ---
-description: Run the Autonomous Engineer reviewer panel (code, security, performance, architecture) on the current diff. Independent of any active ticket run.
+description: Run the Autonomous Engineer reviewer on the current diff (code, security, performance, architecture lenses). Independent of any active ticket run.
 argument-hint: "[--scope code|security|perf|arch|full] [--base <branch>]"
 ---
 
-You are the Autonomous Engineer. The user has invoked `/review $ARGUMENTS`.
+You are the Autonomous Engineer. The user invoked `/review $ARGUMENTS`.
 
 Parse flags:
-- `--scope` — one of `code`, `security`, `perf`, `arch`, or `full`. Default `full`.
-- `--base <branch>` — what the current branch is being compared against. Default: detect via `git merge-base --fork-point` if available, else `main`.
+- `--scope` — `code`, `security`, `perf`, `arch`, or `full`. Default `full`.
+- `--base <branch>` — comparison target. Default: `git merge-base --fork-point` if available, else `dev`.
 
-Before invoking reviewers:
-1. Confirm a diff exists. Run `git status` and `git diff --stat <base>...HEAD`. If the diff is empty, reply that there's nothing to review and stop.
-2. Capture a short summary of changed files for the reviewer prompts.
+Before reviewing:
+1. Confirm a diff exists: `git status` and `git diff --stat <base>...HEAD`. If empty, say there's nothing to review and stop.
+2. Capture a short changed-files summary for the reviewer prompts.
 
-Then invoke the relevant reviewers in parallel (single message, multiple Agent calls):
+Then spawn the `reviewer` agent **once per required lens, all in a single message** (multiple `Agent` calls = real parallelism), each with its `lens`:
+- `--scope=code|security|perf|arch` → one `reviewer` with that `lens`.
+- `--scope=full` → four `reviewer` instances: `lens=code`, `security`, `perf`, `arch`.
 
-- `--scope=code` → `code-reviewer` only
-- `--scope=security` → `security-engineer` only
-- `--scope=perf` → `performance-engineer` only
-- `--scope=arch` → `software-architect` only
-- `--scope=full` (default) → all four
-
-Each reviewer returns its standard report. After receiving all reports, synthesise:
+After all return, synthesise:
 
 ```
-## Reviewer Panel Summary
+## Reviewer Summary
 
-| Reviewer | Verdict | Blocking findings |
+| Lens | Verdict | Blocking findings |
 |---|---|---|
-| Code | <approve/changes> | <count> |
-| Security | <verdict> | <count> |
-| Performance | <verdict> | <count> |
-| Architecture | <verdict> | <count> |
+| code | <approve / request_changes> | <count> |
+| security | <verdict> | <count> |
+| perf | <verdict> | <count> |
+| arch | <verdict> | <count> |
 
 ### Blocking findings (combined)
-- <reviewer>: <title> — `<file:line>`
-- ...
+- <lens>: <title> — `<file:line>`
 
 ### Recommended next step
-<one line — implementer iterates, ready for PR, escalate to user, etc.>
+<one line>
 ```
 
-Do **not** invoke the Engineering Director or the full ticket pipeline for this command. `/review` is a focused tool — it reviews what already exists, and stops.
-
-If the user has a run in progress, note that this manual review is independent of that run's reviewer panel.
+Do **not** run the full ticket pipeline. `/review` reviews what exists and stops. If a run is in progress, note this manual review is independent of it.

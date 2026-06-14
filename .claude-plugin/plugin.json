@@ -1,7 +1,7 @@
 {
   "name": "autonomous-engineer",
-  "description": "Autonomous engineering team for Claude Code. 13 specialist subagents (Engineering Director, Technical Lead, Solutions Architect, QA Engineer/Comms/Env-Manager, Software Engineer, Product Engineer, Code/Security/Performance/Architecture reviewers, Engineering Manager), 10 slash commands (/ticket, /bug, /feature, /review, /qa, /pr, /status, /resume, /setup, /log), and 10 skills covering the six workflow patterns, bug & feature pipelines, ticket and PR protocols, multi-tenant validation, MCP setup, run logging, and progress reporting. Takes a ticket from intake to Pull Request.",
-  "version": "1.0.0",
+  "description": "Autonomous engineering team for Claude Code. A main-loop Orchestrator coordinates 5 specialist subagents (Intake Analyst, Software Engineer, QA Engineer, lens-parameterized Reviewer, Engineering Manager), 11 slash commands (/ticket, /bug, /feature, /review, /qa, /pr, /status, /resume, /setup, /log, /selfcheck), and 11 skills covering orchestration, the six workflow patterns, tier-aware bug & feature pipelines, ticket and PR protocols, multi-tenant validation, MCP setup, run logging, and progress reporting. Routes every ticket to a risk tier (T0/T1/T2) so depth matches risk, and ships a golden-ticket eval (/selfcheck) so changes are measurable. Takes a ticket from intake to Pull Request.",
+  "version": "2.0.0",
   "author": {
     "name": "Holuwashina"
   },

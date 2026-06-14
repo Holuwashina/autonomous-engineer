@@ -9,7 +9,7 @@ Multi-tenant applications fail in ways single-tenant apps don't: data leaks, rol
 
 ## Detect multi-tenancy
 
-The Solutions Architect identifies multi-tenancy by:
+The Intake Analyst identifies multi-tenancy by:
 - A `tenants` table or equivalent in the schema
 - `tenant_id` / `org_id` / `workspace_id` columns on user-owned tables
 - Routing by subdomain or path prefix (`acme.example.com`, `example.com/acme`)
@@ -35,7 +35,7 @@ Outbound emails / notifications scoped correctly:
 - Action in tenant A produces a message to a user in tenant A.
 - No message lands in a tenant-B inbox / address.
 
-The QA Communications Engineer runs this in coordination with the Validator.
+The QA Engineer runs this inline as part of validation.
 
 ### 4. Branding / theming
 If the app themes per tenant, confirm:
@@ -59,7 +59,7 @@ UI-hidden alone is **not** sufficient. The server must enforce.
 
 ## Required accounts
 
-The QA Environment Engineer pre-selects:
+The QA Engineer pre-selects (Phase 0):
 - Primary tenant: primary role + at least one above + one below.
 - Secondary tenant: a primary-role account for cross-tenant isolation tests.
 
