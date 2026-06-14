@@ -32,6 +32,14 @@ Survey every repo in scope. Identify: which repos the change touches, cross-repo
 
 Use `grep`/`glob`/`read` judiciously. Do not read entire files when a signature or a few lines answer the question.
 
+### 4. Discover runnable services (for UI work)
+The user should not have to enumerate their services — **discover them yourself** from the in-scope repos (CWD + every `/add-dir`'d dir). For each repo that can run as a service, detect:
+- **What it is** — frontend / backend API / worker (from framework signals: Next/Vite/CRA/Angular → frontend; Express/Nest/FastAPI/Django/Rails → backend; queue/cron → worker).
+- **How to start it** — the dev/start command from `package.json` scripts (`dev` > `start` > `serve`), `Makefile`, `Procfile`, `docker-compose.yml`, `manage.py`, etc.
+- **Where it serves** — the port/URL from the framework default, config (vite/next config), `.env(.example)`, or compose ports → an `http://localhost:<port>` guess.
+
+The **frontend URL** is the only thing the user must supply (the env's `base_url`, the page the browser opens). Everything else — which repos exist and how to start them — you infer. Report the discovered set so QA can ask the user to start them; mark any field you couldn't determine as `unknown` (QA will ask the user for just that piece).
+
 </process>
 
 <output_format>
@@ -51,6 +59,11 @@ Use `grep`/`glob`/`read` judiciously. Do not read entire files when a signature 
 
 ### Multi-tenant
 <detected: yes/no — signals, or "n/a">
+
+### Services to run (discovered — for UI work)
+| Service | Repo / path | Detected start command | Detected URL |
+|---------|-------------|------------------------|--------------|
+<one row per runnable service; use "unknown" where undetected; "n/a" if no UI>
 
 ### Risks for the Orchestrator
 <bullets — what could make this harder than it looks>

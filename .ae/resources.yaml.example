@@ -21,27 +21,21 @@
 # ---------------------------------------------------------------------------
 environments:
   - key: local
+    # The ONE thing you must provide for UI work: the frontend URL the browser opens.
     base_url: http://localhost:3000
-    # Optional — the build/start command QA will ASK YOU to run before a browser
-    # run. QA never executes it; it surfaces it to you and waits until you confirm
-    # the app is up. Shown in the request so you know exactly what to run.
-    start_command: "npm run build && npm run dev"   # e.g. "pnpm dev", "make dev", "docker compose up -d"
-    ready_path: "/"                # path QA checks to confirm the app responds
-    # MULTI-REPO: if a browser journey needs more than one service running
-    # (frontend + backend API, workers, etc.), list every one here. QA will ask
-    # you to build & start EACH and will verify ALL are reachable before the
-    # browser run. `base_url` above is the URL the browser actually opens.
-    # (Expose the other repos to Claude Code with /add-dir so it can read them.)
-    services:
-      - key: frontend
-        base_url: http://localhost:3000
-        ready_path: "/"
-        start_command: "npm run dev"          # run inside the frontend repo
-      - key: backend_api
-        base_url: http://localhost:8080
-        ready_path: "/health"
-        start_command: "npm run start:dev"    # run inside the backend repo
-    notes: You build and start every service; QA waits for your go-ahead, verifies each, then drives the browser.
+    # That's it. AE auto-discovers the other repos/services (frontend + backend +
+    # workers) from the dirs in scope — expose them with /add-dir — and detects each
+    # one's start command + port itself, then ASKS you to build & start them before
+    # the browser run. You don't list services or commands here.
+    #
+    # `services:` below is an OPTIONAL override — only add it if auto-discovery gets
+    # a start command or port wrong and you want to pin it. Otherwise omit entirely.
+    # services:
+    #   - key: backend_api
+    #     base_url: http://localhost:8080
+    #     ready_path: "/health"
+    #     start_command: "npm run start:dev"
+    notes: Provide only base_url; AE finds the repos, asks you to start them, then drives the browser.
 
   - key: development
     base_url: https://dev.example.com
