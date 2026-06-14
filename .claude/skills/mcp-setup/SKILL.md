@@ -181,6 +181,16 @@ GitHub MCP, Mailtrap MCP, Slack MCP, Git MCP — all skippable for most projects
 
 ---
 
+## Subagent tool grants — the #1 "MCP not working in subagents" gotcha
+
+A connected MCP is available to the **main session** automatically, but a **subagent** only gets an MCP tool if its frontmatter `tools:` lists a matching grant. The matcher recognizes exact names and the **`mcp__<server>__*` suffix wildcard** — it does **not** expand mid-string patterns like `mcp__*playwright*`. So an agent whose `tools:` says `mcp__*playwright*` is handed **zero** Playwright tools and will `blocked` on every browser step, even though `claude mcp list` shows Playwright connected and a restart "should" have fixed it. It's a pattern mismatch, not a connection problem.
+
+Rules for any subagent that needs an MCP:
+- Grant with `mcp__<server>__*` (e.g. `mcp__playwright__*`, `mcp__chrome-devtools__*`).
+- A server can be CLI-installed (`mcp__clickup__*`) **or** claude.ai-hosted (`mcp__claude_ai_ClickUp__*`) — list **both** forms for ticket/code providers.
+- **Restart Claude Code after editing agent frontmatter** — subagent definitions load at startup, so an edit mid-session has no effect until you relaunch.
+- The bundled agents already use the correct forms: `qa-engineer` → `mcp__playwright__*`, `mcp__chrome-devtools__*`; `engineering-manager` → both CLI and claude.ai ticket/github forms.
+
 ## Verification
 
 After installing what you need:

@@ -23,9 +23,11 @@ If none are present, ask the user to paste the ticket description and treat it a
 
 ### Tool surface note
 
-The Orchestrator runs in the **main session loop**, so it has the full tool surface natively — no frontmatter wildcards needed for ticket fetch at intake. The `engineering-manager` subagent, however, needs ticket-MCP tools for close-out (comment + transition); its frontmatter `tools:` enumerates explicit substring patterns (`mcp__*clickup*, mcp__*ClickUp*, mcp__*jira*, ...`) rather than a bare `mcp__*`, because Claude Code's resolver does NOT expand a bare `mcp__*` as a glob in subagent surfaces and would silently miss claude.ai-hosted MCPs.
+The Orchestrator runs in the **main session loop**, so it has the full tool surface natively — no frontmatter grants needed for ticket fetch at intake. The `engineering-manager` subagent, however, needs ticket-MCP tools for close-out (comment + transition).
 
-If a user reports a ticket close-out failure for a provider not in the explicit list, the fix is a one-line edit to `engineering-manager.md`'s `tools:` field — add `mcp__*<provider-substring>*` (both casings if needed).
+**Critical: subagent `tools:` grants must use the `mcp__<server>__*` form — not mid-string wildcards.** Claude Code grants a subagent an MCP tool only when an entry matches `mcp__<server>__<tool>` (the `mcp__<server>__*` suffix wildcard is recognized). A mid-string pattern like `mcp__*clickup*` does **not** match and the subagent silently gets **none** of that server's tools — which looks like "MCP not propagating to subagents" even though the host shows it connected. Because a server can be CLI-installed (`mcp__clickup__*`) or claude.ai-hosted (`mcp__claude_ai_ClickUp__*`), list **both** forms. `engineering-manager.md` lists both for each provider.
+
+If a ticket close-out fails for a provider not in the list, add its two entries to `engineering-manager.md`'s `tools:` — `mcp__<server>__*` and `mcp__claude_ai_<Provider>__*` — then restart Claude Code (subagent frontmatter loads at startup).
 
 ## Fetch fallback chain (auto-healing)
 

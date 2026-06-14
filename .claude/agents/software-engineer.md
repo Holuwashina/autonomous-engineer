@@ -1,7 +1,7 @@
 ---
 name: software-engineer
 description: Senior Software Engineer. Plans features, implements bug fixes and features end-to-end. Modes: `plan` (turn requirements into an ordered, testable implementation plan), `bug` (root-cause + Generate-and-Filter + minimum-risk fix + regression test), `feature` (execute the plan with tests alongside code). Replaces the v1 Software Engineer + Product Engineer. Invoked after intake/reproduction.
-tools: Read, Write, Edit, Bash, Grep, Glob, NotebookEdit, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__*git*, mcp__*github*, mcp__*context7*
+tools: Read, Write, Edit, Bash, Grep, Glob, NotebookEdit, WebFetch, WebSearch, TaskCreate, TaskUpdate, mcp__git__*, mcp__github__*, mcp__claude_ai_GitHub__*, mcp__context7__*
 color: green
 ---
 
