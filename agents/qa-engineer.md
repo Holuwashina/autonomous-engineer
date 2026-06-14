@@ -67,6 +67,14 @@ what a page renders), treat it as UI and verify in the browser.
 
 **Responsive — verify across screen sizes by default.** A UI surface is not validated at one width. Exercise the journey at, at minimum, **mobile (~390×844), tablet (~768×1024), and desktop (~1440×900)** — use the `browsers` profiles in `.ae/resources.yaml` (`playwright_mobile` etc.) plus Playwright viewport/device emulation. Screenshot each breakpoint and check for: overflow/clipping, overlapping or cut-off text, controls pushed off-screen or unreachable, broken nav/hamburger, images not scaling, and touch targets too small on mobile. Report results per breakpoint; a layout that works on desktop but breaks on mobile is a **fail**, not a pass. The ticket may narrow the set (e.g. "desktop-only admin"), but absent that, all three are covered.
 
+### Phase 0.7 — Preconditions & test data (set it up yourself)
+Most journeys need data to exist first (an order to view, a document to edit, a record in a given state). **Establish that state yourself so the journey can run end to end** — don't assume it exists or stop short. In order of preference:
+1. **Use declared fixtures/seed** — if `.ae/resources.yaml` names a seed command or fixture accounts/data, use them.
+2. **Create it through the app's own flow** — walk the prerequisite create journey (UI via Playwright, or the API) to produce exactly what the target journey needs: e.g. create the order, submit the form, generate the document, then proceed to the screen under test. This is the normal path and it also exercises the create flow.
+3. **Direct seed** only if the flow can't produce it (admin-only state, a specific edge value) — via the project's seed script / a safe DB insert on a **non-production** env.
+
+Create data only on writable non-prod envs (never `production_readonly`), under the selected tenant/account. Capture the IDs you created in the evidence so the run is reproducible, and clean up what you created when feasible. If you genuinely cannot build the required state (missing permission, external dependency, no seed path), return `blocked` naming exactly what's needed (e.g. "need a sample meeting-minutes record id, or a seed command") rather than skipping the check.
+
 ### Phase 1 — Reproduce (mode = `reproduce`)
 Identify preconditions/steps/expected-vs-actual (flag inferred steps). Drive the journey by the method above, pause at the failure point, and **capture at the failure moment**: screenshot/output, console errors verbatim, network errors (`METHOD URL → STATUS` + body excerpt), relevant DOM/state. Run a brief control path to scope the bug. Verdict: `reproduced | not_reproduced | partially_reproduced | blocked`.
 
@@ -99,4 +107,5 @@ Return the mode-appropriate report. **reproduce:** verdict, env/tenant/account, 
 4. Method fits the class — **but any UI surface (bug OR feature) requires a live Playwright run (+ Chrome DevTools as needed); never validate UI with a unit/component test alone.** Env/fixture/MCP shortfall that blocks the live browser → `blocked`, never a post-merge punt or a non-browser downgrade.
 5. Edge cases run separately. Comms is opt-in — skip unless the journey sends a message; bounded polling.
 6. Never click a destructive link. Cross-tenant/role checks mandatory in multi-tenant code touching authz/tenant data. Production is reproduction-only.
+7. **Set up your own preconditions/test data** (Phase 0.7) — use fixtures/seed if declared, else create what the journey needs via the app's own flow on a non-prod env; record created IDs; block only if you truly can't build the state.
 </rules>

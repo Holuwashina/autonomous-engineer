@@ -35,6 +35,9 @@ environments:
     #     base_url: http://localhost:8080
     #     ready_path: "/health"
     #     start_command: "npm run start:dev"
+    # Optional — a seed command QA can run to set up test data before a journey.
+    # If omitted, QA creates needed data through the app's own create flow (UI/API).
+    # seed_command: "npm run seed:test"
     notes: Provide only base_url; AE finds the repos, asks you to start them, then drives the browser.
 
   - key: development
