@@ -83,7 +83,18 @@ The Orchestrator is the only node that delegates, and it is the **main loop** �
 
 ---
 
+## Requirements
+
+Any engineer can use this. The only hard requirements are **Claude Code** and
+**git**. Everything else degrades gracefully: no ticket connector → paste the bug
+description inline; no Playwright → reproduction falls back to unit/API/log
+evidence. It's repo- and language-agnostic.
+
 ## Quickstart
+
+One-time: clone AE somewhere stable (e.g. `git clone <repo> ~/.autonomous-engineer`).
+Per project: `sh ~/.autonomous-engineer/setup.sh` (or alias it to `ae-here`). AE
+installs locally and stays out of that repo's git — see below.
 
 ### A. Plugin install (recommended, from inside Claude Code)
 
@@ -113,8 +124,11 @@ sh /path/to/autonomous-engineer/setup.sh
 ```
 
 That installs the commands/agents/skills project-locally (no `~/.claude` writes),
-installs the safety git hooks, and creates the `dev` base branch — idempotent, safe
-to re-run. Then **open Claude Code in that folder** and finish config:
+installs the safety git hooks, creates the `dev` base branch, and **adds every AE
+file to the project's local git exclude** (`.git/info/exclude`) — so AE never shows
+up in `git status`, never gets committed, and never gets pushed to that repo. It
+rides along locally; the project's history stays clean. Idempotent, safe to re-run.
+Then **open Claude Code in that folder** and finish config:
 
 ```
 /ae-setup        ← run this INSIDE Claude Code, not in the terminal
