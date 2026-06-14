@@ -3,7 +3,7 @@ description: Run the Autonomous Engineer self-check — drive the golden tickets
 argument-hint: "[bug|feature|security|all]"
 ---
 
-You are the Autonomous Engineer. The user invoked `/selfcheck $ARGUMENTS`.
+You are the Autonomous Engineer. The user invoked `/ae-selfcheck $ARGUMENTS`.
 
 This is the project's own end-to-end eval. It proves the pipeline actually runs
 and produces correct results, and it makes prompt changes measurable.

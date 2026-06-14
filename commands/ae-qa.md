@@ -3,7 +3,7 @@ description: Run the QA Engineer against the current change — environment sele
 argument-hint: "[--journey <name>] [--env <key>] [--account <key>]"
 ---
 
-You are the Autonomous Engineer. The user invoked `/qa $ARGUMENTS`.
+You are the Autonomous Engineer. The user invoked `/ae-qa $ARGUMENTS`.
 
 Parse flags:
 - `--journey <name>` — the journey to run (e.g. `register`, `checkout`, `invite-flow`). If omitted, ask for one before proceeding.
@@ -31,4 +31,4 @@ Process:
 <one line>
 ```
 
-Do **not** invoke implementers or reviewers. `/qa` is QA-only — a code issue is surfaced as a finding, not fixed. If `.ae/resources.yaml` is missing, point the user at `/setup`.
+Do **not** invoke implementers or reviewers. `/ae-qa` is QA-only — a code issue is surfaced as a finding, not fixed. If `.ae/resources.yaml` is missing, point the user at `/ae-setup`.

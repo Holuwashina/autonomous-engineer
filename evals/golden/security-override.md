@@ -5,7 +5,7 @@
 **Expected risk tier:** T2 (authorization / trust boundary — security lens MANDATORY)
 **Target repo:** `evals/fixtures/ts-cart`
 
-## Description (give this to `/ticket`)
+## Description (give this to `/ae-ticket`)
 
 `applyManagerOverride(amount, percent, user)` is meant to be a privileged,
 manager-only discount that can exceed normal limits. In production we've found

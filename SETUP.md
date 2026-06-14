@@ -2,7 +2,7 @@
 
 Bring Autonomous Engineer up in a new project in under 10 minutes.
 
-This is the canonical walkthrough. The `/setup` slash command runs an interactive version of these same steps from inside Claude Code — use whichever you prefer.
+This is the canonical walkthrough. The `/ae-setup` slash command runs an interactive version of these same steps from inside Claude Code — use whichever you prefer.
 
 ## TL;DR — the fast path
 
@@ -14,9 +14,9 @@ sh /path/to/autonomous-engineer/setup.sh
 
 This installs commands/agents/skills project-locally (no `~/.claude` writes),
 installs the safety git hooks, and creates the `dev` base branch. Then **open
-Claude Code in that folder** and run `/setup` to finish (resources + MCP).
+Claude Code in that folder** and run `/ae-setup` to finish (resources + MCP).
 
-**The one rule:** slash commands (`/setup`, `/ticket`, `/selfcheck`) run *inside
+**The one rule:** slash commands (`/ae-setup`, `/ae-ticket`, `/ae-selfcheck`) run *inside
 Claude Code*; `sh …` and `git …` run in the *terminal*. Typing a `/command` at a
 shell prompt just gives `no such file or directory`. The detailed steps below are
 for when you want to do it by hand or troubleshoot.
@@ -87,7 +87,7 @@ cp .ae/resources.yaml.example .ae/resources.yaml
 $EDITOR .ae/resources.yaml
 ```
 
-Optional — drop the Autonomous Engineer `CLAUDE.md` rules into your project so non-`/ticket` work follows the same iron rules:
+Optional — drop the Autonomous Engineer `CLAUDE.md` rules into your project so non-`/ae-ticket` work follows the same iron rules:
 
 ```bash
 cp ~/.claude/plugins/autonomous-engineer/CLAUDE.md ./CLAUDE.md
@@ -119,9 +119,9 @@ Installs into:
 Verify:
 
 ```bash
-ls .claude/agents/*.md | wc -l                # → 13
-ls .claude/commands/*.md | wc -l              # → 10
-ls .claude/skills/*/SKILL.md | wc -l          # → 10
+ls .claude/agents/*.md | wc -l                # → 5
+ls .claude/commands/*.md | wc -l              # → (commands 8 / skills 11)
+ls .claude/skills/*/SKILL.md | wc -l          # → (commands 8 / skills 11)
 ```
 
 ### Global mode
@@ -140,9 +140,9 @@ Does **not** touch `CLAUDE.md` or `.ae/` (those live per-project).
 Verify:
 
 ```bash
-ls ~/.claude/agents/*.md | wc -l              # → 13 (or more, if you have other agents)
-ls ~/.claude/commands/*.md | wc -l            # → 10 (or more, if you have other commands)
-ls ~/.claude/skills/*/SKILL.md | wc -l        # → 10 (or more, if you have other skills)
+ls ~/.claude/agents/*.md | wc -l              # → 5 (or more, if you have other agents)
+ls ~/.claude/commands/*.md | wc -l            # → (commands 8 / skills 11) (or more, if you have other commands)
+ls ~/.claude/skills/*/SKILL.md | wc -l        # → (commands 8 / skills 11) (or more, if you have other skills)
 ```
 
 **After a global install, restart Claude Code** so it re-scans `~/.claude/`.
@@ -301,7 +301,7 @@ Restart Claude Code so the new tools surface.
 The cheapest end-to-end confidence check:
 
 ```
-/ticket FAKE-1 --base dev
+/ae-ticket FAKE-1 --base dev
 ```
 
 The Orchestrator will:
@@ -315,7 +315,7 @@ That confirms the wiring without mutating state. If you don't see the ready mess
 Then try a real ticket:
 
 ```
-/ticket <YOUR-REAL-TICKET-ID> --base develop
+/ae-ticket <YOUR-REAL-TICKET-ID> --base develop
 ```
 
 The Orchestrator will reply with the ready message (understanding, classification, risk tier, specialists, workflow, plan, risks, confidence). **No code changes happen until you confirm or redirect.**
@@ -324,10 +324,10 @@ The Orchestrator will reply with the ready message (understanding, classificatio
 
 ## 8. Troubleshooting
 
-### `/ticket` does nothing
+### `/ae-ticket` does nothing
 
 - Restart Claude Code so it re-scans `.claude/commands/`.
-- Confirm files: `ls .claude/commands/ticket.md` returns a real file.
+- Confirm files: `ls .claude/commands/ae-ticket.md` returns a real file.
 - Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see the 5 Autonomous Engineer specialists (`intake-analyst`, `software-engineer`, `qa-engineer`, `reviewer`, `engineering-manager`). The Orchestrator is the main session loop (the `orchestration` skill), not a listed agent.
 
 ### "Cannot fetch ticket — MCP missing"
@@ -369,7 +369,7 @@ The Orchestrator will reply with the ready message (understanding, classificatio
 
 ## What's next
 
-Once `/ticket FAKE-1 --base dev` produces a ready message, you're configured. The `/setup` skill from inside Claude Code can re-walk this any time, and the `mcp-setup` skill is the canonical reference for adding new providers later.
+Once `/ae-ticket FAKE-1 --base dev` produces a ready message, you're configured. The `/ae-setup` skill from inside Claude Code can re-walk this any time, and the `mcp-setup` skill is the canonical reference for adding new providers later.
 
 For deeper reading, see:
 
