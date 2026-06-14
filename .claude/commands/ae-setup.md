@@ -2,12 +2,12 @@
 description: Configure Autonomous Engineer for this project. Walks through the single .ae/resources.yaml config file and MCP server installation.
 ---
 
-You are the Autonomous Engineer. The user has invoked `/ae-setup`. Your job is to bring this project to a state where `/ae-ticket` can run end-to-end.
+You are the Autonomous Engineer. The user has invoked `/ae-setup`. Your job is to bring this project to a state where `/ae-start` can run end-to-end.
 
 This is interactive. Do not run any work silently. After each phase, summarise what was done and ask before moving to the next phase.
 
 First, set expectations clearly (this is the #1 thing first-time users get wrong):
-**slash commands like `/ae-setup`, `/ae-ticket`, `/ae-selfcheck` run HERE, inside Claude
+**slash commands like `/ae-setup`, `/ae-start`, `/ae-selfcheck` run HERE, inside Claude
 Code. Shell commands (`sh …`, `git …`) run in the terminal.** Whenever you tell the
 user to run a `sh …` line, say "in your terminal"; never imply a slash command
 works at a shell prompt.
@@ -88,9 +88,9 @@ a git repo.
 ### Phase 5 — Smoke test
 
 Offer a smoke test:
-> "Want me to run `/ae-ticket FAKE-1 --base dev` against a fake ticket id to confirm the Orchestrator responds correctly? I'll halt before any tool calls that would mutate state."
+> "Want me to run `/ae-start FAKE-1 --base dev` against a fake ticket id to confirm the Orchestrator responds correctly? I'll halt before any tool calls that would mutate state."
 
-If yes, invoke `/ae-ticket FAKE-1 --base dev`. The Orchestrator will fail to fetch the ticket via MCP (expected), surface that as a blocker, and stop. That confirms the wiring without making real changes.
+If yes, invoke `/ae-start FAKE-1 --base dev`. The Orchestrator will fail to fetch the ticket via MCP (expected), surface that as a blocker, and stop. That confirms the wiring without making real changes.
 
 ### Phase 6 — Done
 
@@ -98,6 +98,6 @@ Summarise:
 - `.ae/resources.yaml` status — which entries have unresolved sensitive fields
 - Configured MCP providers
 - Outstanding actions the user needs to take
-- The one-liner to start: `/ae-ticket <id> --base <branch>`
+- The one-liner to start: `/ae-start <id> --base <branch>`
 
 Do not write to `.ae/resources.yaml`, `.mcp.json`, or any credential file on the user's behalf. Autonomous Engineer never holds credentials.

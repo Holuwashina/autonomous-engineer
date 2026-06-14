@@ -6,10 +6,11 @@
 [![Built on Claude Code](https://img.shields.io/badge/built%20on-Claude%20Code-orange)](https://claude.com/claude-code)
 [![Status: beta](https://img.shields.io/badge/status-beta-yellow)](#)
 
-Drop a ticket ID. Get a Pull Request.
+Drop a ticket ID — or just describe the bug. Get a Pull Request.
 
 ```bash
-/ae-ticket MM-123 --base develop
+/ae-start MM-123 --base develop      # with a ticket ID
+/ae-start                            # bare — it asks what to work on
 ```
 
 Behind that one command, an **Orchestrator** running in the main session loop coordinates five specialist subagents — Intake Analyst, Software Engineer, QA Engineer, a lens-parameterized Reviewer, and Engineering Manager. It reads the ticket, classifies it, assigns a **risk tier**, then runs only as much pipeline as the risk warrants: reproduce or plan, implement, validate with the right evidence method, review through the necessary lenses, loop until clean, open a Pull Request, and update the ticket.
@@ -20,7 +21,7 @@ No separate orchestrator runtime. No parallel AI framework. Just Claude Code's n
 
 ## What it does
 
-When you run `/ae-ticket <id>`, the main session loads the `orchestration` skill and **becomes the Orchestrator**:
+When you run `/ae-start <id>`, the main session loads the `orchestration` skill and **becomes the Orchestrator**:
 
 1. **Fetches the ticket** via the configured MCP (Jira / ClickUp / GitHub Issues).
 2. **Runs the Intake Analyst** — classification, **risk tier**, and repo map in one pass.
@@ -40,7 +41,7 @@ When you run `/ae-ticket <id>`, the main session loads the `orchestration` skill
 
 ```mermaid
 flowchart TD
-    user(["👤 Developer<br/>/ae-ticket MM-123 --base dev"]) --> orch
+    user(["👤 Developer<br/>/ae-start MM-123 --base dev"]) --> orch
 
     orch["🧭 Orchestrator (main loop)<br/>ready message + risk-tier routing"]
     orch --> intake["Intake Analyst<br/>classify + tier + repo map"]
@@ -103,7 +104,7 @@ git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-en
 sh ~/autonomous-engineer/install.sh --global
 ```
 
-### Then, in any project where you'll run `/ae-ticket` — one command
+### Then, in any project where you'll run `/ae-start` — one command
 
 In your **terminal**, from the project AE should work on:
 
@@ -122,10 +123,10 @@ to re-run. Then **open Claude Code in that folder** and finish config:
 `/ae-setup` walks you through QA resources and MCP servers, then you're ready:
 
 ```
-/ae-ticket MM-123 --base dev      ← also inside Claude Code
+/ae-start MM-123 --base dev      ← also inside Claude Code
 ```
 
-> The one rule that trips everyone once: **slash commands (`/ae-setup`, `/ae-ticket`,
+> The one rule that trips everyone once: **slash commands (`/ae-setup`, `/ae-start`,
 > `/ae-selfcheck`) run inside the Claude Code session; `sh …` and `git …` run in the
 > terminal.** Full per-provider MCP commands and troubleshooting in
 > **[SETUP.md](SETUP.md)**.
@@ -144,7 +145,7 @@ to re-run. Then **open Claude Code in that folder** and finish config:
 
 | Command | Argument hint | What it does |
 |---|---|---|
-| `/ae-ticket` | `<id> [--base <branch>] [--as bug\|feature]` | End-to-end: intake → tier-routed pipeline → review → PR. `--as` forces classification |
+| `/ae-start` | `[<id or description>] [--base <branch>] [--as bug\|feature]` | Primary entrypoint — end-to-end: intake → tier-routed pipeline → review → PR. Run it **bare and it asks** for the ticket ID or a description; `--as` forces classification |
 | `/ae-review` | `[--scope code\|security\|perf\|arch\|full]` | Run reviewer lenses on the current diff |
 | `/ae-qa` | `[--journey <name>]` | Run the QA Engineer on the current change |
 | `/ae-pr` | `[--draft] [--base <branch>]` | Engineering Manager opens the PR |
@@ -153,7 +154,7 @@ to re-run. Then **open Claude Code in that folder** and finish config:
 | `/ae-setup` | _(none)_ | Interactive configuration walkthrough |
 | `/ae-selfcheck` | `[security\|bug\|feature\|all]` | Run the golden-ticket eval against the bundled fixture and score it |
 
-All commands are namespaced `ae-` so they don't collide with Claude Code's built-in slash commands (`/review`, `/status`, `/bug`, …). Forcing a classification and reading run logs are flags on `/ae-ticket` and `/ae-status`, not separate commands.
+All commands are namespaced `ae-` so they don't collide with Claude Code's built-in slash commands (`/review`, `/status`, `/bug`, …). Forcing a classification and reading run logs are flags on `/ae-start` and `/ae-status`, not separate commands.
 
 ---
 

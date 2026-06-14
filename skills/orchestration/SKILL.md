@@ -1,6 +1,6 @@
 ---
 name: orchestration
-description: The Autonomous Engineer main-loop protocol. Loaded by /ae-ticket and /ae-resume into the MAIN session — never a subagent. Defines intake, the risk-tier router, parallel specialist fan-out, the loop, and token discipline. Read this first on any run.
+description: The Autonomous Engineer main-loop protocol. Loaded by /ae-start and /ae-resume into the MAIN session — never a subagent. Defines intake, the risk-tier router, parallel specialist fan-out, the loop, and token discipline. Read this first on any run.
 ---
 
 # Orchestration — the main loop

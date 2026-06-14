@@ -219,7 +219,7 @@ Next steps:
   2. (Per project) cp .ae/resources.yaml.example .ae/resources.yaml
      and edit with real values (the live file is gitignored).
   3. Restart Claude Code so it picks up the new agents/commands/skills.
-  4. Try it:  /ae-ticket <YOUR-TICKET-ID> --base <BRANCH>
+  4. Try it:  /ae-start <YOUR-TICKET-ID> --base <BRANCH>
 EOF
 else
     cat <<EOF
@@ -231,7 +231,7 @@ Next steps:
   2. Run /ae-setup to configure resources and MCP servers.
   3. cp .ae/resources.yaml.example .ae/resources.yaml
      Edit .ae/resources.yaml — fill in real values (the file is gitignored).
-  4. Try it:  /ae-ticket <YOUR-TICKET-ID> --base <BRANCH>
+  4. Try it:  /ae-start <YOUR-TICKET-ID> --base <BRANCH>
 
 If your project already had a CLAUDE.md, see CLAUDE.ae.md for the Autonomous Engineer rules to merge in.
 EOF
