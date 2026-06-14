@@ -52,11 +52,9 @@ For bugs, replace this section with **Reproduction & fix**:
 - Fix: <one line>
 - Regression test: `<path>`
 
-## Reviewer panel
-- **Code review**: <approve | approve_with_findings | request_changes> — <one line>
-- **Security review**: <verdict> — <one line>
-- **Performance review**: <verdict> — <one line>
-- **Architecture review**: <verdict> — <one line>
+## Reviewer verdicts (lenses that ran)
+- **<lens>** (`code` | `security` | `perf` | `arch`): <approve | approve_with_findings | request_changes> — <one line>
+- ... (only the lenses the tier required)
 
 (Findings addressed in iteration N are noted with "resolved in iter N".)
 

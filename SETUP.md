@@ -163,7 +163,7 @@ For additional repos (sibling frontend, backend, shared libs, infra), use `/add-
 /add-dir ../shared-types
 ```
 
-The Solutions Architect (`solutions-architect`) surveys all of them automatically. No Autonomous Engineer-side registration is required.
+The Intake Analyst (`intake-analyst`) surveys all of them automatically. No Autonomous Engineer-side registration is required.
 
 > **Tip:** monorepos with multiple packages under one root only need the root directory — Claude Code already sees the whole tree.
 
@@ -284,16 +284,16 @@ Restart Claude Code so the new tools surface.
 The cheapest end-to-end confidence check:
 
 ```
-/ticket FAKE-1 --base main
+/ticket FAKE-1 --base dev
 ```
 
-The Engineering Director will:
+The Orchestrator will:
 
 1. Attempt to fetch ticket `FAKE-1` via the configured ticket MCP.
 2. The fetch will fail (intended — there is no FAKE-1).
-3. Director surfaces the failure as a blocker and stops.
+3. The Orchestrator surfaces the failure as a blocker and stops.
 
-That confirms the wiring without mutating state. If you don't see the seven-section ready message, something upstream is broken — see Troubleshooting.
+That confirms the wiring without mutating state. If you don't see the ready message, something upstream is broken — see Troubleshooting.
 
 Then try a real ticket:
 
@@ -301,7 +301,7 @@ Then try a real ticket:
 /ticket <YOUR-REAL-TICKET-ID> --base develop
 ```
 
-The Director will reply with the seven-section ready message. **No code changes happen until you confirm or redirect.**
+The Orchestrator will reply with the ready message (understanding, classification, risk tier, specialists, workflow, plan, risks, confidence). **No code changes happen until you confirm or redirect.**
 
 ---
 
@@ -311,7 +311,7 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 - Restart Claude Code so it re-scans `.claude/commands/`.
 - Confirm files: `ls .claude/commands/ticket.md` returns a real file.
-- Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see all 13 Autonomous Engineer specialists (`engineering-director`, `technical-lead`, `solutions-architect`, `qa-environment-engineer`, `qa-engineer`, `qa-communications-engineer`, `product-engineer`, `software-engineer`, `code-reviewer`, `security-engineer`, `performance-engineer`, `software-architect`, `engineering-manager`).
+- Confirm the agents loaded: in Claude Code, ask "list my agents" — you should see the 5 Autonomous Engineer specialists (`intake-analyst`, `software-engineer`, `qa-engineer`, `reviewer`, `engineering-manager`). The Orchestrator is the main session loop (the `orchestration` skill), not a listed agent.
 
 ### "Cannot fetch ticket — MCP missing"
 
@@ -326,13 +326,13 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 ### "Account not selectable — no admin role found"
 
-- Confirm your accounts include `role:` fields. The QA Environment Engineer picks by role.
+- Confirm your accounts include `role:` fields. The QA Engineer picks by role.
 - Confirm the role names you use in the file match the ones in the journey (admin / manager / user / customer / guest).
 
-### Director keeps looping
+### Run keeps looping
 
-- 3 iterations is the cap. After that it escalates.
-- If escalation isn't happening, check that `engineering-director.md` is unmodified (specifically the Loop-Until-Done section).
+- The loop cap is per tier (2 for T1, 3 for T2). After that it escalates.
+- If escalation isn't happening, check that `skills/orchestration/SKILL.md` is unmodified (specifically the Loop-Until-Done section).
 
 ### Playwright says "no browser available"
 
@@ -352,12 +352,13 @@ The Director will reply with the seven-section ready message. **No code changes 
 
 ## What's next
 
-Once `/ticket FAKE-1 --base main` produces a ready message, you're configured. The `/setup` skill from inside Claude Code can re-walk this any time, and the `mcp-setup` skill is the canonical reference for adding new providers later.
+Once `/ticket FAKE-1 --base dev` produces a ready message, you're configured. The `/setup` skill from inside Claude Code can re-walk this any time, and the `mcp-setup` skill is the canonical reference for adding new providers later.
 
 For deeper reading, see:
 
 - [`README.md`](README.md) — architecture diagram + overview
 - [`CLAUDE.md`](CLAUDE.md) — iron rules the org operates under
-- [`.claude/skills/workflow-patterns/SKILL.md`](.claude/skills/workflow-patterns/SKILL.md) — the six patterns the Director composes
+- [`.claude/skills/orchestration/SKILL.md`](.claude/skills/orchestration/SKILL.md) — the main-loop protocol + risk tiers
+- [`.claude/skills/workflow-patterns/SKILL.md`](.claude/skills/workflow-patterns/SKILL.md) — the six patterns the Orchestrator composes
 - [`.claude/skills/bug-workflow/SKILL.md`](.claude/skills/bug-workflow/SKILL.md) — full bug pipeline
 - [`.claude/skills/feature-workflow/SKILL.md`](.claude/skills/feature-workflow/SKILL.md) — full feature pipeline

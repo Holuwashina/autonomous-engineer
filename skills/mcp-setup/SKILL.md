@@ -83,9 +83,13 @@ claude mcp add git --command uvx --args mcp-server-git
 
 ---
 
-## Browser automation
+## Browser tools — QA Engineer requires BOTH
 
-### Playwright (canonical: Microsoft's `@playwright/mcp`)
+The QA Engineer uses exactly two browser MCPs, no more. Playwright drives; Chrome DevTools inspects. Both are required, not "pick one." See the `qa-engineer` agent for the per-phase usage rules.
+
+### Playwright MCP (canonical: Microsoft's `@playwright/mcp`)
+
+The *driving* tool. Walks user journeys, asserts acceptance criteria, generates reusable regression scripts.
 
 ```
 claude mcp add playwright --command npx --args "@playwright/mcp"
@@ -93,7 +97,30 @@ claude mcp add playwright --command npx --args "@playwright/mcp"
 
 > ⚠️ The pattern `@modelcontextprotocol/server-playwright` does NOT exist as a published package. Use `@playwright/mcp` (Microsoft's official). If you see the wrong name elsewhere, it's stale.
 
-This brings up a Chromium-driven MCP that the QA Engineer drives (in both `reproduce` and `validate` modes). No credentials required for the server itself. After install, you may also need to run `npx playwright install` once to fetch the browser binaries.
+After install, you may need to run `npx playwright install` once to fetch the browser binaries. No credentials required for the server itself.
+
+### Chrome DevTools MCP (canonical: Google's `chrome-devtools-mcp`)
+
+The *perception* tool. Drives real Chrome and exposes DevTools-level inspection — console with sourcemap-resolved stack traces, network requests with bodies, live DOM/CSS, performance state. Use it when "the bug reproduces but you can't see why" or when validation needs to confirm the symptom is gone at the runtime layer, not just visually.
+
+```
+claude mcp add chrome-devtools --command npx --args "chrome-devtools-mcp"
+```
+
+> ⚠️ Package names in this space shift faster than docs do. Confirm the current canonical package with `claude mcp marketplace search chrome` before running this command. The well-known one as of writing is Google's `chrome-devtools-mcp`.
+
+The `--autoConnect` flag lets it attach to your already-logged-in Chrome session, which is useful for bugs that only show up against your authenticated account state (Playwright's clean profile won't reach those). Add it as a server argument when you need that behaviour:
+
+```
+claude mcp add chrome-devtools --command npx --args "chrome-devtools-mcp" --args "--autoConnect"
+```
+
+### Why both, not one
+
+- Playwright tells you **what** happened from the user's perspective. "I clicked the button, the page navigated, the modal didn't open."
+- Chrome DevTools tells you **why** it happened from the browser's perspective. "The button's click handler threw `Cannot read property 'foo' of undefined` at `src/x.ts:42`; the fetch returned 500 with `{...}`."
+
+Most bug reproductions need both, and so do validations of fixes where the visible behaviour might look right but the runtime is still broken (silent console errors, retried network calls, etc.). Installing only Playwright is a degraded setup; the QA Engineer will surface a blocker on bugs whose root cause can't be seen at the user surface.
 
 ---
 
@@ -106,15 +133,15 @@ claude mcp add mailtrap --command npx --args mailtrap-mcp \
   --env "MAILTRAP_API_TOKEN=${MAILTRAP_API_TOKEN}"
 ```
 
-The QA Communications Engineer reads from the Mailtrap inbox configured in `.ae/resources.yaml`.
+The QA Engineer reads from the Mailtrap inbox configured in `.ae/resources.yaml`.
 
 ### Maildrop (no MCP)
 
-If your `resources.yaml` uses maildrop.cc, no MCP install is needed — the QA Communications Engineer hits `https://api.maildrop.cc/graphql` directly via Bash. Maildrop has no auth, a 10-message cap per mailbox, and 24-hour idle eviction. QA fixtures only.
+If your `resources.yaml` uses maildrop.cc, no MCP install is needed — the QA Engineer hits `https://api.maildrop.cc/graphql` directly via Bash. Maildrop has no auth, a 10-message cap per mailbox, and 24-hour idle eviction. QA fixtures only.
 
 ### Mailpit / MailHog (self-hosted)
 
-No packaged MCP; the Comms Engineer falls back to plain HTTP via the configured `api_url`. No install needed.
+No packaged MCP; the QA Engineer falls back to plain HTTP via the configured `api_url`. No install needed.
 
 ### Twilio (test sandbox, for SMS/OTP)
 
@@ -147,8 +174,8 @@ Autonomous Engineer uses Slack only when the user explicitly wires it into a wor
 
 For most runs the **minimum** is:
 
-1. **Playwright MCP** — bug repro + acceptance validation need it. Without it the QA Engineer blocks every bug run.
-2. **A ticket source** — Jira MCP, GitHub MCP, or claude.ai-hosted ClickUp. Without one, the Director asks the user to paste ticket descriptions.
+1. **Playwright MCP + Chrome DevTools MCP** — bug repro + acceptance validation need both. Without Playwright the QA Engineer can't drive a journey at all; without DevTools it can't explain runtime failures. Either missing → live confirmation blocks.
+2. **A ticket source** — Jira MCP, GitHub MCP, or claude.ai-hosted ClickUp. Without one, the Orchestrator asks the user to paste ticket descriptions.
 
 GitHub MCP, Mailtrap MCP, Slack MCP, Git MCP — all skippable for most projects. The Engineering Manager falls back to `gh` CLI; Mailtrap and Maildrop both work without MCPs (HTTP + Bash); Slack is opt-in.
 
@@ -164,12 +191,12 @@ After installing what you need:
 
 Autonomous Engineer degrades gracefully when a provider is missing:
 
-| Missing MCP | Director behaviour |
+| Missing MCP | Orchestrator behaviour |
 |---|---|
-| Ticket source | Director asks the user to paste the ticket description. |
+| Ticket source | Orchestrator asks the user to paste the ticket description. |
 | GitHub | Engineering Manager uses `gh` CLI via Bash. |
-| Playwright | QA Engineer surfaces a blocker (in either `reproduce` or `validate` mode); Director drops to manual validation steps or escalates. |
-| Mailtrap | QA Communications Engineer surfaces a blocker; email journeys become manual checkpoints (unless you configured maildrop, which needs no MCP). |
+| Playwright | QA Engineer surfaces a blocker (in either `reproduce` or `validate` mode); Orchestrator drops to the method-appropriate evidence or escalates. |
+| Mailtrap | QA Engineer surfaces a blocker on comms checks; email journeys become manual checkpoints (unless you configured maildrop, which needs no MCP). |
 
 ## Anti-patterns
 

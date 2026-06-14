@@ -135,11 +135,11 @@ fi
 # Detect existing Autonomous Engineer install in the target.
 EXISTING=0
 if [ -d "$TARGET/agents" ] && [ "$GLOBAL" -eq 1 ]; then
-    if ls "$TARGET/agents/"engineering-director.md >/dev/null 2>&1; then
+    if ls "$TARGET/agents/"intake-analyst.md >/dev/null 2>&1; then
         EXISTING=1
     fi
 elif [ -d "$TARGET/.claude/agents" ]; then
-    if ls "$TARGET/.claude/agents/"engineering-director.md >/dev/null 2>&1; then
+    if ls "$TARGET/.claude/agents/"intake-analyst.md >/dev/null 2>&1; then
         EXISTING=1
     fi
 fi
@@ -207,8 +207,8 @@ if [ "$GLOBAL" -eq 1 ]; then
 
 Autonomous Engineer installed globally.
 
-The 13 agents, 10 commands, and 10 skills are now available in every
-Claude Code session, regardless of working directory.
+The 5 specialist agents, 11 commands, and 11 skills are now available in
+every Claude Code session, regardless of working directory.
 
 Next steps:
   1. (Per project) Add CLAUDE.md and resources.yaml to each project that

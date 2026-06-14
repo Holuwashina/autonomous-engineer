@@ -1,6 +1,6 @@
 ---
 name: resources-config
-description: How to read and interpret .ae/resources.yaml — the single config file holding environments, tenants, accounts, browsers, communications, and external services (with their secrets inline). Used by the QA Environment Engineer and any agent that needs to know what resources are available.
+description: How to read and interpret .ae/resources.yaml — the single config file holding environments, tenants, accounts, browsers, communications, and external services (with their secrets inline). Used by the QA Engineer (which selects its own environment) and any agent that needs to know what resources are available.
 ---
 
 # Autonomous Engineer Resources
@@ -59,7 +59,7 @@ Treat any field whose name contains `password`, `token`, `secret`, `key`, or `si
 
 ## Reading the file
 
-Pseudocode for the QA Environment Engineer:
+Pseudocode for the QA Engineer (Phase 0 environment selection):
 
 ```python
 data = yaml.safe_load(open(".ae/resources.yaml").read())
@@ -86,7 +86,7 @@ No env-var resolution, no `${...}` expansion, no `fields_from_env` walk. The YAM
 | `reproduce` (internal-found) | `local` | `development` |
 | `validate` (fresh implementation) | `local` | `development` |
 | `validate` (release candidate) | `staging` | n/a |
-| Production read-only | Never used for validation. Reproduction only, with explicit Director approval. | n/a |
+| Production read-only | Never used for validation. Reproduction only, with explicit Orchestrator approval. | n/a |
 
 ### Tenant
 
@@ -113,7 +113,7 @@ No env-var resolution, no `${...}` expansion, no `fields_from_env` walk. The YAM
 
 ## Reporting
 
-The QA Environment Engineer emits a selection payload (see `qa-environment-engineer` output format) that other agents consume directly. The payload includes `unresolved_fields` — entries where a sensitive field still holds `REPLACE_ME` or is empty. Downstream agents check this and stop if anything is unresolved.
+The QA Engineer emits a selection payload (see `qa-engineer` output format) that other agents consume directly. The payload includes `unresolved_fields` — entries where a sensitive field still holds `REPLACE_ME` or is empty. Downstream agents check this and stop if anything is unresolved.
 
 Never print the value of a sensitive field. Only "resolved" or "unresolved".
 

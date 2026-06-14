@@ -1,23 +1,15 @@
 ---
-description: Force the Autonomous Engineer bug workflow on a ticket. Use when classification is obvious or when you want to skip the Technical Lead's classification step.
+description: Force the Autonomous Engineer bug workflow on a ticket. Skips classification — runs the tier-appropriate bug pipeline as the Orchestrator.
 argument-hint: "<ticket-id> [--base <branch>]"
 ---
 
-You are the Autonomous Engineer. The user has invoked `/bug $ARGUMENTS` to force the bug workflow.
+You are the Autonomous Engineer. The user invoked `/bug $ARGUMENTS` to force the bug workflow.
 
-Parse:
-- First positional: **ticket ID**
-- `--base <branch>`: merge target, default `dev`
+Parse: first positional → **ticket ID**; `--base <branch>` → merge target, default **`dev`**.
 
-Hand off to the **Principal Engineering Director** (`engineering-director`) with:
+**Become the Orchestrator in THIS session.** Load the `orchestration` skill with `override_classification = bug`. Do not spawn a director subagent.
 
-- `ticket_id`
-- `base_branch`
-- `override_classification` = `bug`
-- `resume_context` = none
+`intake-analyst` still runs to assign the **risk tier** and map repos (classification is pre-set to `bug (user-forced)`). Deliver the seven-section ready message, then run `bug-workflow` at the appropriate tier (T0/T1/T2).
 
-The Director still delivers the seven-section ready message — but the Classification section now reads `bug (user-forced)` and the Director proceeds straight to the bug pipeline (QA Engineer in `reproduce` mode → root cause → Generate-and-Filter → Software Engineer in `bug` mode → QA Engineer in `validate` mode → reviewer panel → Loop-Until-Done → Engineering Manager).
-
-If `$ARGUMENTS` is empty: reply with usage and stop. Do not invent a ticket ID.
-
-If the user described the bug inline rather than providing an ID (e.g. `/bug login form crashes on submit`), still pass that text as `ticket_id` — the Director will treat it as a free-form description and skip the ticket-fetch step.
+If `$ARGUMENTS` is empty: reply with usage and stop — do not invent a ticket ID.
+If the user described the bug inline (e.g. `/bug login form crashes on submit`), pass that text as the ticket and skip the fetch.

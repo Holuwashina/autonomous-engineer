@@ -9,7 +9,8 @@ This is interactive. Do not run any work silently. After each phase, summarise w
 ### Phase 0 — Sanity check
 
 Confirm Autonomous Engineer is installed in this project:
-- `.claude/agents/engineering-director.md` exists.
+- `.claude/skills/orchestration/SKILL.md` exists (the main-loop protocol).
+- `.claude/agents/intake-analyst.md` exists.
 - `.claude/skills/workflow-patterns/SKILL.md` exists.
 - `CLAUDE.md` mentions Autonomous Engineer.
 
@@ -53,14 +54,30 @@ For each, show the exact `claude mcp add` command from `mcp-setup`. Do not run t
 
 After installation, suggest `claude mcp list` to verify.
 
-### Phase 4 — Smoke test
+### Phase 4 — Safety hooks
+
+Offer to install the safety git hooks into this project's repo so the
+protected-branch and secrets rules are enforced, not just instructed:
+
+```
+sh <autonomous-engineer-path>/hooks/install-safety-hooks.sh
+```
+
+Explain what they do (block direct commits/pushes to protected branches, block
+non-fast-forward pushes, block committing `.ae/resources.yaml`) and how to set
+the protected list: `git config ae.protectedBranches "main release/prod"`. Note
+that `--no-verify` is the human escape hatch and that remote branch protection is
+still the real backstop. See the `hooks/README.md`. Skip if this directory is not
+a git repo.
+
+### Phase 5 — Smoke test
 
 Offer a smoke test:
-> "Want me to run `/ticket FAKE-1 --base main` against a fake ticket id to confirm the Director responds correctly? I'll halt before any tool calls that would mutate state."
+> "Want me to run `/ticket FAKE-1 --base dev` against a fake ticket id to confirm the Orchestrator responds correctly? I'll halt before any tool calls that would mutate state."
 
-If yes, invoke `/ticket FAKE-1 --base main`. The Director will fail to fetch the ticket via MCP (expected), surface that as a blocker, and stop. That confirms the wiring without making real changes.
+If yes, invoke `/ticket FAKE-1 --base dev`. The Orchestrator will fail to fetch the ticket via MCP (expected), surface that as a blocker, and stop. That confirms the wiring without making real changes.
 
-### Phase 5 — Done
+### Phase 6 — Done
 
 Summarise:
 - `.ae/resources.yaml` status — which entries have unresolved sensitive fields
