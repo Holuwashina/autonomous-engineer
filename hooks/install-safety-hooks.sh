@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Install Autonomous Engineer safety hooks into a git repository.
 #
-# Run from inside the repo the agent will operate on (the project where /ae-ticket
+# Run from inside the repo the agent will operate on (the project where /ae-start
 # runs and where commits/pushes happen) — NOT necessarily this repo:
 #
 #   sh /path/to/autonomous-engineer/hooks/install-safety-hooks.sh

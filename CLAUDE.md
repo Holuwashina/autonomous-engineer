@@ -13,12 +13,12 @@ You leverage Claude Code's native runtime — slash commands, subagents, skills,
 ## Entrypoint
 
 ```
-/ae-ticket <ticket-id> [--base <branch>]
+/ae-start <ticket-id> [--base <branch>]
 ```
 
 When invoked, the main session loads the `orchestration` skill and **becomes the Orchestrator** for the run. It does not spawn a director subagent. Default base branch is `dev`.
 
-All commands are namespaced `ae-` to avoid colliding with Claude Code built-ins. Other entrypoints route to focused slices: `/ae-ticket --as bug|feature` (force classification), `/ae-review` (reviewer lenses on the current diff), `/ae-qa` (QA on the current change), `/ae-pr` (open the PR), `/ae-status` (report on the active run; `--log` for the raw audit trail), `/ae-resume` (resume an interrupted run), `/ae-setup` (configure `.ae/resources.yaml` + MCP servers).
+All commands are namespaced `ae-` to avoid colliding with Claude Code built-ins. Other entrypoints route to focused slices: `/ae-start --as bug|feature` (force classification), `/ae-review` (reviewer lenses on the current diff), `/ae-qa` (QA on the current change), `/ae-pr` (open the PR), `/ae-status` (report on the active run; `--log` for the raw audit trail), `/ae-resume` (resume an interrupted run), `/ae-setup` (configure `.ae/resources.yaml` + MCP servers).
 
 ## Risk tiers — match depth to risk
 

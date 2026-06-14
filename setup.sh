@@ -27,7 +27,7 @@ echo "Autonomous Engineer — setting up: $TARGET"
 echo ""
 
 # 1) Commands / agents / skills (project-local, no ~/.claude writes) -----------
-if [ -f "$TARGET/.claude/commands/ae-ticket.md" ]; then
+if [ -f "$TARGET/.claude/commands/ae-start.md" ]; then
   echo "• AE already installed here — refreshing agents/commands/skills"
   mkdir -p "$TARGET/.claude/agents" "$TARGET/.claude/commands" "$TARGET/.claude/skills"
   cp -f "$AE_SRC"/agents/*.md       "$TARGET/.claude/agents/"
@@ -71,10 +71,10 @@ NEXT: open Claude Code in this folder, then run   /ae-setup
       to finish configuration (QA resources + MCP servers).
 
 How commands work — this trips everyone once:
-  • Slash commands  (/ae-setup, /ae-ticket, /ae-selfcheck)  run INSIDE Claude Code.
+  • Slash commands  (/ae-setup, /ae-start, /ae-selfcheck)  run INSIDE Claude Code.
   • Shell commands  (sh …, git …)                  run here in the terminal.
   Typing /ae-setup in this terminal will just say "no such file or directory".
 
-Then drop a ticket:   (inside Claude Code)   /ae-ticket <id> --base $BASE
+Then drop a ticket:   (inside Claude Code)   /ae-start <id> --base $BASE
 ────────────────────────────────────────────────────────────────────────
 EOF

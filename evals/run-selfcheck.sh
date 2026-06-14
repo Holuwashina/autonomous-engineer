@@ -10,7 +10,7 @@
 #   sh evals/run-selfcheck.sh score [scope]            # score; scope = security|bug|feature|all (default all)
 #   sh evals/run-selfcheck.sh reset                    # restore the fixture to its starting state (git)
 #
-# The scope MUST match the scope of the /ae-selfcheck (or /ae-ticket) run, so a scoped
+# The scope MUST match the scope of the /ae-selfcheck (or /ae-start) run, so a scoped
 # run is judged only on its own oracle and not on tickets it correctly left alone.
 
 set -eu

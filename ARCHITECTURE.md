@@ -8,15 +8,15 @@
 
 ## 1. The one change that makes everything else work
 
-Today `/ae-ticket` invokes the **Engineering Director as a subagent**, and the Director is expected to spawn 12 more subagents (including parallel fan-outs). In Claude Code, **a subagent generally cannot spawn its own subagents** — only the top-level session can. As written, the Director cannot call `Agent` at all, so the whole orchestration silently fails or degrades into the Director doing everything itself in one context (the opposite of the design).
+Today `/ae-start` invokes the **Engineering Director as a subagent**, and the Director is expected to spawn 12 more subagents (including parallel fan-outs). In Claude Code, **a subagent generally cannot spawn its own subagents** — only the top-level session can. As written, the Director cannot call `Agent` at all, so the whole orchestration silently fails or degrades into the Director doing everything itself in one context (the opposite of the design).
 
 **Fix:** the Orchestrator becomes the **main session loop**, not a subagent.
 
-- `/ae-ticket` no longer hands off to a `engineering-director` subagent. Instead it loads the orchestration protocol **into the main loop** (via a skill the command reads, e.g. `orchestration`).
+- `/ae-start` no longer hands off to a `engineering-director` subagent. Instead it loads the orchestration protocol **into the main loop** (via a skill the command reads, e.g. `orchestration`).
 - The main loop is the only thing that spawns specialists. Specialists are **leaf nodes** — they never spawn other agents.
 - This is also faster and cheaper: we remove one full agent-context hop (the Director's own subagent context) from every single run.
 
-This must be proven before anything else ships. Acceptance test: from a `/ae-ticket` run, confirm the main loop successfully spawns two specialists *in parallel in one response* and reads both returns.
+This must be proven before anything else ships. Acceptance test: from a `/ae-start` run, confirm the main loop successfully spawns two specialists *in parallel in one response* and reads both returns.
 
 ---
 
@@ -100,7 +100,7 @@ These are the concrete levers, in order of payoff:
 
 ## 7. Migration plan (incremental, each step shippable)
 
-1. **Prove §1** — convert `/ae-ticket` to drive the main loop; verify parallel spawn + dual return from a real run. *(Blocking gate — nothing else proceeds until green.)*
+1. **Prove §1** — convert `/ae-start` to drive the main loop; verify parallel spawn + dual return from a real run. *(Blocking gate — nothing else proceeds until green.)*
 2. **Land the eval harness** (§6) with the current behavior as the baseline, so every later step is measured against it.
 3. **Consolidate the Reviewer** (4 files → 1 lens-parameterized agent); confirm 4 parallel instances still run on a T2 ticket.
 4. **Consolidate QA** (3 → 1 with modes); confirm env-selection and comms-on-demand still work.

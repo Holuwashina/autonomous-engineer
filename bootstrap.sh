@@ -50,7 +50,7 @@ Next steps:
 
   1. RESTART Claude Code so it picks up the new agents/commands/skills.
 
-  2. In any project where you'll run /ae-ticket, drop in the per-project
+  2. In any project where you'll run /ae-start, drop in the per-project
      resources template:
 
        cd <your-project>
@@ -68,7 +68,7 @@ Next steps:
 
   4. Restart Claude Code AGAIN after MCP installs, then:
 
-       /ae-ticket <TICKET-ID> --base <BRANCH>
+       /ae-start <TICKET-ID> --base <BRANCH>
 
 Update later with:
 

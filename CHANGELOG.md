@@ -7,7 +7,7 @@ All notable changes to Autonomous Engineer are documented here.
 Major redesign for correctness, speed, and token efficiency. See `ARCHITECTURE.md` for the rationale.
 
 ### Changed — architecture
-- **Orchestrator is now the main session loop, not a subagent.** `/ae-ticket`, `/bug`, `/feature`, and `/ae-resume` load the new `orchestration` skill and drive the run from the main loop. This fixes the v1 flaw where the Engineering Director (a subagent) was expected to spawn subagents — something the runtime does not reliably allow.
+- **Orchestrator is now the main session loop, not a subagent.** `/ae-start`, `/bug`, `/feature`, and `/ae-resume` load the new `orchestration` skill and drive the run from the main loop. This fixes the v1 flaw where the Engineering Director (a subagent) was expected to spawn subagents — something the runtime does not reliably allow.
 - **Roster consolidated from 13 agents to 5.**
   - `intake-analyst` replaces `technical-lead` + `solutions-architect` (classify + risk tier + repo map in one pass).
   - `software-engineer` absorbs `product-engineer` via a new `plan` mode (modes: `plan` / `bug` / `feature`).
@@ -25,7 +25,7 @@ Major redesign for correctness, speed, and token efficiency. See `ARCHITECTURE.m
 - `CHANGELOG.md` and a `version` bump to 2.0.0 in `plugin.json`.
 
 ### Fixed
-- **Command names namespaced + de-duplicated.** All slash commands now carry an `ae-` prefix so they no longer collide with Claude Code built-ins (`/bug`, `/review`, `/status`, `/resume`). Folded the thin wrappers: `/bug` and `/feature` became `/ae-ticket --as bug|feature`, and `/log` became `/ae-status --log`. Net: 11 commands → 8 (`ae-ticket`, `ae-review`, `ae-qa`, `ae-pr`, `ae-status`, `ae-resume`, `ae-setup`, `ae-selfcheck`).
+- **Command names namespaced + de-duplicated.** All slash commands now carry an `ae-` prefix so they no longer collide with Claude Code built-ins (`/bug`, `/review`, `/status`, `/resume`). Folded the thin wrappers: `/bug` and `/feature` became `/ae-start --as bug|feature`, and `/log` became `/ae-status --log`. Net: 11 commands → 8 (`ae-start`, `ae-review`, `ae-qa`, `ae-pr`, `ae-status`, `ae-resume`, `ae-setup`, `ae-selfcheck`).
 - Default base branch unified to `dev` across all entrypoints (was `main` in the Director, `dev` elsewhere).
 - Removed the duplicated "When you may pause mid-run" block (the old Director file carried it twice).
 - `install.sh` and `/ae-setup` install-detection markers updated from the removed `engineering-director.md` to v2 files.

@@ -5,7 +5,7 @@
 **Expected risk tier:** T1
 **Target repo:** `evals/fixtures/ts-cart`
 
-## Description (give this to `/ae-ticket`)
+## Description (give this to `/ae-start`)
 
 Today the cart only supports percentage discounts. Add support for a
 **fixed-dollar** discount — e.g. "$15 off" — as a new function

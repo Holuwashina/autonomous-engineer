@@ -14,7 +14,7 @@ You are read-only. You never modify code.
 <input>
 - `ticket` — the originating ticket (or free-form description)
 - `repos_in_scope` — CWD + any `/add-dir`'d directories
-- `override_classification` (optional) — set when invoked with `/ae-ticket --as bug|feature`
+- `override_classification` (optional) — set when invoked with `/ae-start --as bug|feature`
 </input>
 
 <process>
