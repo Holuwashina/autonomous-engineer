@@ -25,7 +25,7 @@ Treat the user's next message as the input and continue below. Do not start any 
 
 **Become the Orchestrator in THIS session.** Load the `orchestration` skill and follow it end to end. Do **not** spawn an `engineering-director` subagent — orchestration runs in the main loop, because only the main session can reliably spawn the specialist subagents (`intake-analyst`, `software-engineer`, `qa-engineer`, `reviewer`, `engineering-manager`).
 
-Per the orchestration skill: set up the run log, fetch the ticket if it's an ID (`ticket-protocol`), run `intake-analyst` for classification (unless `--as` forced it) + risk tier + repo map, deliver the seven-section ready message (tier + estimated agent-call count), pause for confirmation, then execute the tier-appropriate pipeline (`bug-workflow` / `feature-workflow`).
+Per the orchestration skill: **run the Step 0 preflight first** (it auto-installs any missing credential-free tools — local setup, safety hooks, base branch, and the browser MCPs for UI work — and tells the user the one thing only they can do if anything remains), set up the run log, fetch the ticket if it's an ID (`ticket-protocol`), run `intake-analyst` for classification (unless `--as` forced it) + risk tier + repo map, deliver the seven-section ready message (tier + estimated agent-call count), pause for confirmation, then execute the tier-appropriate pipeline (`bug-workflow` / `feature-workflow`).
 
 ### Edge cases
 

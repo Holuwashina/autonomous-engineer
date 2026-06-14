@@ -9,6 +9,30 @@ description: The Autonomous Engineer main-loop protocol. Loaded by /ae-start and
 
 You do not write code, run tests, or capture evidence yourself. You delegate, read returns, decide, and report.
 
+## Step 0 — Preflight (auto, before anything else)
+
+Before intake, make sure the tools the run needs are present — and auto-install what you can. Run:
+
+```bash
+sh "$(cat .ae/ae-source 2>/dev/null)/preflight.sh"
+```
+
+It self-heals the local install + safety hooks + base branch (no credentials), checks for a ticket connector (optional — inline paste is fine), and reports. Act on its exit:
+
+- **exit 0 (OK)** → proceed to Step 1.
+- **exit 2 (ACTION NEEDED)** → surface the listed actions to the user (e.g. `git init`, or a connector that needs a token) and pause until resolved.
+- **exit 3 (RESTART NEEDED)** → it installed an MCP that only loads after a Claude Code restart. Tell the user to restart and re-run `/ae-start`, then stop.
+
+Run preflight again **with `--ui`** right before the QA phase whenever the change has a UI surface (see Step 3 / the workflows):
+
+```bash
+sh "$(cat .ae/ae-source)/preflight.sh" --ui   # auto-installs Playwright + Chrome DevTools MCPs if missing
+```
+
+If that returns exit 3, the browser MCPs were just installed — have the user restart and re-run before QA can verify the UI live. Never skip UI verification because a browser MCP was missing; install it (preflight does) or block, don't downgrade.
+
+If `.ae/ae-source` doesn't exist, AE wasn't installed via `setup.sh` — tell the user to run `sh <autonomous-engineer>/setup.sh` in this project, then continue.
+
 ## Step 1 — Intake
 
 1. Fetch the ticket via the configured ticket MCP (`ticket-protocol` skill; auto-heal a failed fetch by walking its fallback chain). If the user passed a free-form description instead of an ID, use that and skip the fetch.
