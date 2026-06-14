@@ -22,6 +22,8 @@ Two browser MCPs only: **Playwright** drives user journeys (the *what*); **Chrom
 <process>
 
 ### Phase 0 — Environment (every mode)
+The Orchestrator runs the preflight before QA, so the browser MCPs should already be installed for UI work. If you nonetheless find the Playwright or Chrome DevTools MCP missing on a UI surface, return `blocked` naming the missing MCP (the Orchestrator will install it via preflight and have the user restart) — do not validate the UI without the live browser.
+
 Read `.ae/resources.yaml` (`resources` skill is the schema; if missing → `blocked`, point to `/ae-setup`). Pick environment (reproduce customer bug → staging; internal → local; validate → local then development; never validate on production), tenant (primary + a secondary for isolation checks), and account(s) matching the journey's role. A field named `password`/`token`/`secret`/`key`/`sid` must be non-empty and not `REPLACE_ME`; report only "resolved"/"unresolved", never the value. **A missing env/tenant/account/fixture/test-mode trigger the journey requires → verdict `blocked` with the exact gap named.** Never downgrade to "user verifies after merge".
 
 ### Evidence method — a UI surface ALWAYS goes through a real browser

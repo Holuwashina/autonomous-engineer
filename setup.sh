@@ -43,6 +43,10 @@ echo "    agents:   $(ls "$TARGET/.claude/agents" | wc -l | tr -d ' ')"
 echo "    commands: $(ls "$TARGET/.claude/commands" | wc -l | tr -d ' ')"
 echo "    skills:   $(ls -d "$TARGET"/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ')"
 
+# Record where AE lives so the in-session preflight can self-heal + auto-install.
+mkdir -p "$TARGET/.ae"
+printf '%s\n' "$AE_SRC" > "$TARGET/.ae/ae-source"
+
 if git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1; then
   # 2) Keep AE out of the project's git — local-only, never committed/pushed -----
   EXCLUDE="$(git -C "$TARGET" rev-parse --git-path info/exclude)"
