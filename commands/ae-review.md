@@ -3,7 +3,7 @@ description: Run the Autonomous Engineer reviewer on the current diff (code, sec
 argument-hint: "[--scope code|security|perf|arch|full] [--base <branch>]"
 ---
 
-You are the Autonomous Engineer. The user invoked `/review $ARGUMENTS`.
+You are the Autonomous Engineer. The user invoked `/ae-review $ARGUMENTS`.
 
 Parse flags:
 - `--scope` — `code`, `security`, `perf`, `arch`, or `full`. Default `full`.
@@ -36,4 +36,4 @@ After all return, synthesise:
 <one line>
 ```
 
-Do **not** run the full ticket pipeline. `/review` reviews what exists and stops. If a run is in progress, note this manual review is independent of it.
+Do **not** run the full ticket pipeline. `/ae-review` reviews what exists and stops. If a run is in progress, note this manual review is independent of it.

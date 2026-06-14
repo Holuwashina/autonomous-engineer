@@ -1,4 +1,4 @@
-# Autonomous Engineer — Evals (`/selfcheck`)
+# Autonomous Engineer — Evals (`/ae-selfcheck`)
 
 This is the project's own regression gate. It exists so the system is **proven to
 run** and so any change to the agents/skills/commands is **measurable** instead of
@@ -69,7 +69,7 @@ Orchestrator the main loop and treats specialists as leaf nodes. The v1 design
 ## The one step that must run inside Claude Code
 
 Everything above validates the **logic** and the **harness**. The remaining proof
-— that Claude Code actually drives the `/ticket` main-loop and spawns the
+— that Claude Code actually drives the `/ae-ticket` main-loop and spawns the
 specialist subagents — can only be done where the slash commands and agents are
 installed. Two minutes:
 
@@ -78,11 +78,11 @@ installed. Two minutes:
 sh evals/run-selfcheck.sh baseline          # expect: 3 passing tests
 
 # 2. In Claude Code, with this project installed, run the eval:
-/selfcheck all
+/ae-selfcheck all
 #   (or run the tickets manually:)
-#   /ticket "$(cat evals/golden/bug-rounding.md)" --base dev
-#   /ticket "$(cat evals/golden/feature-fixed-discount.md)" --base dev
-#   /ticket "$(cat evals/golden/security-override.md)" --base dev   # T2 — watch for the security lens
+#   /ae-ticket "$(cat evals/golden/bug-rounding.md)" --base dev
+#   /ae-ticket "$(cat evals/golden/feature-fixed-discount.md)" --base dev
+#   /ae-ticket "$(cat evals/golden/security-override.md)" --base dev   # T2 — watch for the security lens
 
 # 3. Score and reset:
 sh evals/run-selfcheck.sh score             # expect: SELFCHECK: PASS

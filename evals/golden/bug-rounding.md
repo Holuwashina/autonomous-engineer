@@ -5,7 +5,7 @@
 **Expected risk tier:** T1 (no trust-boundary surface)
 **Target repo:** `evals/fixtures/ts-cart`
 
-## Description (give this to `/ticket`)
+## Description (give this to `/ae-ticket`)
 
 Customers report that discounted prices sometimes display with three or more
 decimal places — e.g. a $19.99 item with a 10% discount shows as **$17.991**

@@ -8,15 +8,15 @@
 
 ## 1. The one change that makes everything else work
 
-Today `/ticket` invokes the **Engineering Director as a subagent**, and the Director is expected to spawn 12 more subagents (including parallel fan-outs). In Claude Code, **a subagent generally cannot spawn its own subagents** — only the top-level session can. As written, the Director cannot call `Agent` at all, so the whole orchestration silently fails or degrades into the Director doing everything itself in one context (the opposite of the design).
+Today `/ae-ticket` invokes the **Engineering Director as a subagent**, and the Director is expected to spawn 12 more subagents (including parallel fan-outs). In Claude Code, **a subagent generally cannot spawn its own subagents** — only the top-level session can. As written, the Director cannot call `Agent` at all, so the whole orchestration silently fails or degrades into the Director doing everything itself in one context (the opposite of the design).
 
 **Fix:** the Orchestrator becomes the **main session loop**, not a subagent.
 
-- `/ticket` no longer hands off to a `engineering-director` subagent. Instead it loads the orchestration protocol **into the main loop** (via a skill the command reads, e.g. `orchestration`).
+- `/ae-ticket` no longer hands off to a `engineering-director` subagent. Instead it loads the orchestration protocol **into the main loop** (via a skill the command reads, e.g. `orchestration`).
 - The main loop is the only thing that spawns specialists. Specialists are **leaf nodes** — they never spawn other agents.
 - This is also faster and cheaper: we remove one full agent-context hop (the Director's own subagent context) from every single run.
 
-This must be proven before anything else ships. Acceptance test: from a `/ticket` run, confirm the main loop successfully spawns two specialists *in parallel in one response* and reads both returns.
+This must be proven before anything else ships. Acceptance test: from a `/ae-ticket` run, confirm the main loop successfully spawns two specialists *in parallel in one response* and reads both returns.
 
 ---
 
@@ -89,7 +89,7 @@ These are the concrete levers, in order of payoff:
 
 ## 6. Professionalism: make it measurable and consistent
 
-- **Eval harness (new).** A `/selfcheck` command runs 3–5 golden tickets against a fixture repo and reports pass/fail + agent-call count. Nothing ships to the agent/skill files without a green selfcheck. This is what turns prompt edits from guesswork into engineering.
+- **Eval harness (new).** A `/ae-selfcheck` command runs 3–5 golden tickets against a fixture repo and reports pass/fail + agent-call count. Nothing ships to the agent/skill files without a green selfcheck. This is what turns prompt edits from guesswork into engineering.
 - **Fix the concrete defects found in v1:**
   - `engineering-director.md` — the *"When you may pause for the user mid-run"* block is duplicated verbatim. Remove one copy.
   - **Default base branch is inconsistent three ways:** `ticket.md`→`dev`, `engineering-director.md`→`main`, `software-engineer.md`→`dev`. Standardize on **`dev`** everywhere (matches the command and the engineer).
@@ -100,7 +100,7 @@ These are the concrete levers, in order of payoff:
 
 ## 7. Migration plan (incremental, each step shippable)
 
-1. **Prove §1** — convert `/ticket` to drive the main loop; verify parallel spawn + dual return from a real run. *(Blocking gate — nothing else proceeds until green.)*
+1. **Prove §1** — convert `/ae-ticket` to drive the main loop; verify parallel spawn + dual return from a real run. *(Blocking gate — nothing else proceeds until green.)*
 2. **Land the eval harness** (§6) with the current behavior as the baseline, so every later step is measured against it.
 3. **Consolidate the Reviewer** (4 files → 1 lens-parameterized agent); confirm 4 parallel instances still run on a T2 ticket.
 4. **Consolidate QA** (3 → 1 with modes); confirm env-selection and comms-on-demand still work.
@@ -124,7 +124,7 @@ Each step keeps the system runnable and is independently revertable.
 | Review independence | 4 separate files | 4 parallel instances, 1 prompt |
 | Context passed to specialists | Unspecified | Sliced to the needed artifact |
 | Cost visibility | None | Tier + estimated calls in ready message |
-| Correctness measurement | None | `/selfcheck` golden tickets |
+| Correctness measurement | None | `/ae-selfcheck` golden tickets |
 | Known defects | dup block, 3-way branch mismatch | fixed |
 
 **Bottom line:** same quality gates, far less waste. The headline wins are (1) an orchestrator that actually works, (2) rigor that scales with risk instead of running flat-out every time, and (3) measurable correctness so the system can be improved with evidence instead of vibes.

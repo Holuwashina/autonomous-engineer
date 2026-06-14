@@ -27,7 +27,7 @@ sh /path/to/autonomous-engineer/hooks/install-safety-hooks.sh
 ```
 
 It copies the hooks into that repo's `.git/hooks/`, backing up any existing hook
-to `<hook>.pre-ae`. `/setup` offers to run this for you.
+to `<hook>.pre-ae`. `/ae-setup` offers to run this for you.
 
 ## Verified behaviour
 

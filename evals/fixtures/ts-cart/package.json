@@ -2,7 +2,7 @@
   "name": "ts-cart",
   "version": "1.0.0",
   "private": true,
-  "description": "Fixture project for Autonomous Engineer /selfcheck — a tiny pricing library with a planted bug and a feature gap.",
+  "description": "Fixture project for Autonomous Engineer /ae-selfcheck — a tiny pricing library with a planted bug and a feature gap.",
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit"

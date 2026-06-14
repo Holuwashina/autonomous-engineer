@@ -3,7 +3,7 @@ description: Have the Engineering Manager prepare and open a Pull Request for th
 argument-hint: "[--draft] [--base <branch>]"
 ---
 
-You are the Autonomous Engineer. The user has invoked `/pr $ARGUMENTS`.
+You are the Autonomous Engineer. The user has invoked `/ae-pr $ARGUMENTS`.
 
 Parse flags:
 - `--draft` — open the PR in draft mode. Default: `ready`.

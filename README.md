@@ -9,7 +9,7 @@
 Drop a ticket ID. Get a Pull Request.
 
 ```bash
-/ticket MM-123 --base develop
+/ae-ticket MM-123 --base develop
 ```
 
 Behind that one command, an **Orchestrator** running in the main session loop coordinates five specialist subagents — Intake Analyst, Software Engineer, QA Engineer, a lens-parameterized Reviewer, and Engineering Manager. It reads the ticket, classifies it, assigns a **risk tier**, then runs only as much pipeline as the risk warrants: reproduce or plan, implement, validate with the right evidence method, review through the necessary lenses, loop until clean, open a Pull Request, and update the ticket.
@@ -20,7 +20,7 @@ No separate orchestrator runtime. No parallel AI framework. Just Claude Code's n
 
 ## What it does
 
-When you run `/ticket <id>`, the main session loads the `orchestration` skill and **becomes the Orchestrator**:
+When you run `/ae-ticket <id>`, the main session loads the `orchestration` skill and **becomes the Orchestrator**:
 
 1. **Fetches the ticket** via the configured MCP (Jira / ClickUp / GitHub Issues).
 2. **Runs the Intake Analyst** — classification, **risk tier**, and repo map in one pass.
@@ -40,7 +40,7 @@ When you run `/ticket <id>`, the main session loads the `orchestration` skill an
 
 ```mermaid
 flowchart TD
-    user(["👤 Developer<br/>/ticket MM-123 --base dev"]) --> orch
+    user(["👤 Developer<br/>/ae-ticket MM-123 --base dev"]) --> orch
 
     orch["🧭 Orchestrator (main loop)<br/>ready message + risk-tier routing"]
     orch --> intake["Intake Analyst<br/>classify + tier + repo map"]
@@ -103,7 +103,7 @@ git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-en
 sh ~/autonomous-engineer/install.sh --global
 ```
 
-### Then, in any project where you'll run `/ticket` — one command
+### Then, in any project where you'll run `/ae-ticket` — one command
 
 In your **terminal**, from the project AE should work on:
 
@@ -116,17 +116,17 @@ installs the safety git hooks, and creates the `dev` base branch — idempotent,
 to re-run. Then **open Claude Code in that folder** and finish config:
 
 ```
-/setup        ← run this INSIDE Claude Code, not in the terminal
+/ae-setup        ← run this INSIDE Claude Code, not in the terminal
 ```
 
-`/setup` walks you through QA resources and MCP servers, then you're ready:
+`/ae-setup` walks you through QA resources and MCP servers, then you're ready:
 
 ```
-/ticket MM-123 --base dev      ← also inside Claude Code
+/ae-ticket MM-123 --base dev      ← also inside Claude Code
 ```
 
-> The one rule that trips everyone once: **slash commands (`/setup`, `/ticket`,
-> `/selfcheck`) run inside the Claude Code session; `sh …` and `git …` run in the
+> The one rule that trips everyone once: **slash commands (`/ae-setup`, `/ae-ticket`,
+> `/ae-selfcheck`) run inside the Claude Code session; `sh …` and `git …` run in the
 > terminal.** Full per-provider MCP commands and troubleshooting in
 > **[SETUP.md](SETUP.md)**.
 
@@ -136,7 +136,7 @@ to re-run. Then **open Claude Code in that folder** and finish config:
 
 1. **Expose repositories.** The CWD is already in scope. `/add-dir <path>` for additional repos; the Intake Analyst surveys all of them.
 2. **Configure resources.** `cp .ae/resources.yaml.example .ae/resources.yaml`, then edit. Environments, tenants, accounts (with passwords), communications, external services — all inline. The live file is gitignored.
-3. **Add MCP servers.** Run `/setup` or read the `mcp-setup` skill. Typical: a ticket source (Jira / ClickUp / GitHub Issues) · GitHub (code host + PR) · Playwright · Mailtrap (optional email validation).
+3. **Add MCP servers.** Run `/ae-setup` or read the `mcp-setup` skill. Typical: a ticket source (Jira / ClickUp / GitHub Issues) · GitHub (code host + PR) · Playwright · Mailtrap (optional email validation).
 
 ---
 
@@ -144,17 +144,16 @@ to re-run. Then **open Claude Code in that folder** and finish config:
 
 | Command | Argument hint | What it does |
 |---|---|---|
-| `/ticket` | `<id> [--base <branch>]` | End-to-end: intake → tier-routed pipeline → review → PR |
-| `/bug` | `<id> [--base <branch>]` | Force bug workflow |
-| `/feature` | `<id> [--base <branch>]` | Force feature workflow |
-| `/review` | `[--scope code\|security\|perf\|arch\|full]` | Run reviewer lenses on the current diff |
-| `/qa` | `[--journey <name>]` | Run the QA Engineer on the current change |
-| `/pr` | `[--draft] [--base <branch>]` | Engineering Manager opens the PR |
-| `/status` | _(none)_ | Report state of the active run |
-| `/resume` | `[<id>]` | Resume an interrupted run |
-| `/setup` | _(none)_ | Interactive configuration walkthrough |
-| `/log` | `[<id>] [--follow]` | Surface the run audit trail |
-| `/selfcheck` | `[bug\|feature\|all]` | Run the golden-ticket eval against the bundled fixture and score it |
+| `/ae-ticket` | `<id> [--base <branch>] [--as bug\|feature]` | End-to-end: intake → tier-routed pipeline → review → PR. `--as` forces classification |
+| `/ae-review` | `[--scope code\|security\|perf\|arch\|full]` | Run reviewer lenses on the current diff |
+| `/ae-qa` | `[--journey <name>]` | Run the QA Engineer on the current change |
+| `/ae-pr` | `[--draft] [--base <branch>]` | Engineering Manager opens the PR |
+| `/ae-status` | `[--log] [<id>] [--follow]` | Report state of the active run; `--log` surfaces the raw audit trail |
+| `/ae-resume` | `[<id>]` | Resume an interrupted run |
+| `/ae-setup` | _(none)_ | Interactive configuration walkthrough |
+| `/ae-selfcheck` | `[security\|bug\|feature\|all]` | Run the golden-ticket eval against the bundled fixture and score it |
+
+All commands are namespaced `ae-` so they don't collide with Claude Code's built-in slash commands (`/review`, `/status`, `/bug`, …). Forcing a classification and reading run logs are flags on `/ae-ticket` and `/ae-status`, not separate commands.
 
 ---
 
@@ -209,7 +208,7 @@ The `reviewer` and `qa-engineer` agents declare `memory: project` — each gets 
 
 The "never push to a protected branch" and "never rewrite shared history" rules
 are not prompt-only — they're enforced by git hooks (`hooks/`, installed via
-`/setup` or `hooks/install-safety-hooks.sh`). See [`hooks/README.md`](hooks/README.md).
+`/ae-setup` or `hooks/install-safety-hooks.sh`). See [`hooks/README.md`](hooks/README.md).
 
 ---
 

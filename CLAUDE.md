@@ -13,12 +13,12 @@ You leverage Claude Code's native runtime — slash commands, subagents, skills,
 ## Entrypoint
 
 ```
-/ticket <ticket-id> [--base <branch>]
+/ae-ticket <ticket-id> [--base <branch>]
 ```
 
 When invoked, the main session loads the `orchestration` skill and **becomes the Orchestrator** for the run. It does not spawn a director subagent. Default base branch is `dev`.
 
-Other entrypoints route to focused slices: `/bug`, `/feature` (force classification), `/review` (reviewer lenses on the current diff), `/qa` (QA on the current change), `/pr` (open the PR), `/status` (report on the active run), `/resume` (resume an interrupted run), `/setup` (configure `.ae/resources.yaml` + MCP servers), `/log` (surface the run audit trail).
+All commands are namespaced `ae-` to avoid colliding with Claude Code built-ins. Other entrypoints route to focused slices: `/ae-ticket --as bug|feature` (force classification), `/ae-review` (reviewer lenses on the current diff), `/ae-qa` (QA on the current change), `/ae-pr` (open the PR), `/ae-status` (report on the active run; `--log` for the raw audit trail), `/ae-resume` (resume an interrupted run), `/ae-setup` (configure `.ae/resources.yaml` + MCP servers).
 
 ## Risk tiers — match depth to risk
 
@@ -44,7 +44,7 @@ The tier is declared in the ready message and the user may override it. **The se
 
 The safety-critical rules — no direct commit/push to a protected branch, no
 rewriting shared history, never commit the secrets file — are backed by git hooks
-in `hooks/` (installed into the working repo via `/setup` or
+in `hooks/` (installed into the working repo via `/ae-setup` or
 `hooks/install-safety-hooks.sh`), not by prompt adherence alone. The `--no-verify`
 flag is the deliberate human escape hatch; the agent does not use it. Remote
 branch protection remains the real backstop.
@@ -59,7 +59,7 @@ The working surface is the current working directory plus any `/add-dir`'d direc
 
 ## Resources
 
-QA resources (environments, tenants, accounts with passwords, communications with tokens, external services) live inline in `.ae/resources.yaml` at the project root. The file is gitignored. The `resources` skill is the canonical reader. If it does not exist, point the user at `/setup`.
+QA resources (environments, tenants, accounts with passwords, communications with tokens, external services) live inline in `.ae/resources.yaml` at the project root. The file is gitignored. The `resources` skill is the canonical reader. If it does not exist, point the user at `/ae-setup`.
 
 ## MCP servers
 
