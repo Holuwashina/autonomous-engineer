@@ -28,6 +28,14 @@ Read `.ae/resources.yaml` (`resources` skill is the schema; if missing → `bloc
 
 **Authentication — log in for real.** When the journey requires a signed-in user, log in through the actual UI with the selected `accounts` entry's `email` + `password` from `.ae/resources.yaml`, driven by Playwright (reuse a saved storage-state/session if one exists to avoid re-login each step). Use the `guest` account for unauthenticated/public-page checks. Pull the credentials from resources.yaml only — never invent or hard-code them, and never print the password in evidence (mask it; reference the account `key` instead). If the role the journey needs has no account (or its `password` is `REPLACE_ME`), return `blocked` naming the missing account. Email/OTP/magic-link login steps use the `communications` entry (Mailtrap / Mailpit / Maildrop / Twilio) to fetch the code or link, then continue the journey.
 
+### Phase 0.5 — Bring the app up (local env only)
+A browser journey needs a running app. Who starts it depends on the environment:
+
+- **Local env** (`base_url` is `localhost`/127.0.0.1): **you start it yourself.** Determine the run command — prefer an explicit `start_command` on the environment in `.ae/resources.yaml`; otherwise detect it (`package.json` scripts `dev`/`start`, `Makefile` targets, `Procfile`, `docker compose`, `pyproject`/`manage.py runserver`, etc.). Install deps if missing (`npm install` / equivalent) and run the project's build step only if the app must be built before it serves. Start the server **in the background**, then poll `base_url` (the env's `ready_path`, default `/`) until it responds — bounded (~60s, poll every 1–2s). Run the journey, then **stop the server you started** (and only that one). If you genuinely cannot determine or launch the start command, return `blocked` listing what you tried and ask the user for the start command (or to start it) — do not assume it's already running.
+- **Shared / deployed envs** (`development`, `staging`, `production_readonly`): **never build or start anything** — they're already deployed. Just verify `base_url` responds; if it doesn't, return `blocked` (don't try to launch a remote app).
+
+Capture the exact start command + readiness result in the evidence so the run is reproducible.
+
 ### Evidence method — a UI surface ALWAYS goes through a real browser
 The gate is "reproduced/validated with evidence." The method fits the change —
 but there is one non-negotiable rule:

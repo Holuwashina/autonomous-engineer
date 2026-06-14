@@ -22,7 +22,13 @@
 environments:
   - key: local
     base_url: http://localhost:3000
-    notes: Default development server. Used by the QA Engineer when reproducing locally.
+    # Optional — how the QA Engineer brings this local app up before a browser run.
+    # If omitted, QA auto-detects (package.json dev/start, Makefile, Procfile, docker compose, etc.).
+    # Only used for local envs; shared/deployed envs are never started by QA.
+    start_command: "npm run dev"   # e.g. "pnpm dev", "make dev", "docker compose up -d"
+    ready_path: "/"                # path polled until the server responds
+    ready_timeout: 60              # seconds to wait for readiness before blocking
+    notes: Default development server. QA starts it itself, waits for readiness, then tears it down.
 
   - key: development
     base_url: https://dev.example.com
