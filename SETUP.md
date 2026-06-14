@@ -4,6 +4,23 @@ Bring Autonomous Engineer up in a new project in under 10 minutes.
 
 This is the canonical walkthrough. The `/setup` slash command runs an interactive version of these same steps from inside Claude Code — use whichever you prefer.
 
+## TL;DR — the fast path
+
+In your **terminal**, from the project AE should work on:
+
+```bash
+sh /path/to/autonomous-engineer/setup.sh
+```
+
+This installs commands/agents/skills project-locally (no `~/.claude` writes),
+installs the safety git hooks, and creates the `dev` base branch. Then **open
+Claude Code in that folder** and run `/setup` to finish (resources + MCP).
+
+**The one rule:** slash commands (`/setup`, `/ticket`, `/selfcheck`) run *inside
+Claude Code*; `sh …` and `git …` run in the *terminal*. Typing a `/command` at a
+shell prompt just gives `no such file or directory`. The detailed steps below are
+for when you want to do it by hand or troubleshoot.
+
 ---
 
 ## Contents
