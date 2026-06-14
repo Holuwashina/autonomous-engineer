@@ -103,22 +103,32 @@ git clone https://github.com/Holuwashina/autonomous-engineer.git ~/autonomous-en
 sh ~/autonomous-engineer/install.sh --global
 ```
 
-### Then, in any project where you'll run `/ticket`
+### Then, in any project where you'll run `/ticket` — one command
+
+In your **terminal**, from the project AE should work on:
 
 ```bash
-cd <your-project>
-mkdir -p .ae
-cp ~/.autonomous-engineer/.ae/resources.yaml.example .ae/resources.yaml
-$EDITOR .ae/resources.yaml        # fill in real values
-
-# Minimum MCP for QA reproduction / validation:
-claude mcp add playwright --command npx --args "@playwright/mcp"
-
-# Restart Claude Code, then:
-/ticket MM-123 --base dev
+sh /path/to/autonomous-engineer/setup.sh
 ```
 
-Full per-provider MCP commands and troubleshooting in **[SETUP.md](SETUP.md)**.
+That installs the commands/agents/skills project-locally (no `~/.claude` writes),
+installs the safety git hooks, and creates the `dev` base branch — idempotent, safe
+to re-run. Then **open Claude Code in that folder** and finish config:
+
+```
+/setup        ← run this INSIDE Claude Code, not in the terminal
+```
+
+`/setup` walks you through QA resources and MCP servers, then you're ready:
+
+```
+/ticket MM-123 --base dev      ← also inside Claude Code
+```
+
+> The one rule that trips everyone once: **slash commands (`/setup`, `/ticket`,
+> `/selfcheck`) run inside the Claude Code session; `sh …` and `git …` run in the
+> terminal.** Full per-provider MCP commands and troubleshooting in
+> **[SETUP.md](SETUP.md)**.
 
 ---
 

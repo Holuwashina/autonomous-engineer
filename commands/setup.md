@@ -6,6 +6,12 @@ You are the Autonomous Engineer. The user has invoked `/setup`. Your job is to b
 
 This is interactive. Do not run any work silently. After each phase, summarise what was done and ask before moving to the next phase.
 
+First, set expectations clearly (this is the #1 thing first-time users get wrong):
+**slash commands like `/setup`, `/ticket`, `/selfcheck` run HERE, inside Claude
+Code. Shell commands (`sh …`, `git …`) run in the terminal.** Whenever you tell the
+user to run a `sh …` line, say "in your terminal"; never imply a slash command
+works at a shell prompt.
+
 ### Phase 0 — Sanity check
 
 Confirm Autonomous Engineer is installed in this project:
@@ -14,7 +20,16 @@ Confirm Autonomous Engineer is installed in this project:
 - `.claude/skills/workflow-patterns/SKILL.md` exists.
 - `CLAUDE.md` mentions Autonomous Engineer.
 
-If any are missing, tell the user to (re-)run `install.sh` from the Autonomous Engineer repo, then stop.
+If any are missing, the terminal-side setup hasn't run. Tell the user (in their
+terminal):
+
+```
+sh <autonomous-engineer-path>/setup.sh
+```
+
+That one command installs the commands/agents/skills project-locally (no
+`~/.claude` writes), installs the safety hooks, and creates the base branch — then
+they reload Claude Code and re-run `/setup`. Stop here until it's installed.
 
 ### Phase 1 — Repository exposure
 
