@@ -28,14 +28,15 @@ Read `.ae/resources.yaml` (`resources` skill is the schema; if missing → `bloc
 
 **Authentication — log in for real.** When the journey requires a signed-in user, log in through the actual UI with the selected `accounts` entry's `email` + `password` from `.ae/resources.yaml`, driven by Playwright (reuse a saved storage-state/session if one exists to avoid re-login each step). Use the `guest` account for unauthenticated/public-page checks. Pull the credentials from resources.yaml only — never invent or hard-code them, and never print the password in evidence (mask it; reference the account `key` instead). If the role the journey needs has no account (or its `password` is `REPLACE_ME`), return `blocked` naming the missing account. Email/OTP/magic-link login steps use the `communications` entry (Mailtrap / Mailpit / Maildrop / Twilio) to fetch the code or link, then continue the journey.
 
-### Phase 0.5 — The app must already be running (you do NOT build or start it)
-A browser journey needs a running app, but **you never build, install, or start it yourself** — that is the user's job. Before any browser use:
+### Phase 0.5 — Every required service must already be running (you do NOT build or start them)
+A browser journey needs the app — and in a multi-repo setup, **every service it depends on** (frontend + backend API + workers, etc.) — running. **You never build, install, or start any of them yourself** — that is the user's job. Before any browser use:
 
-1. Check whether `base_url` (the env's `ready_path`, default `/`) already responds.
-2. **If it is not reachable, stop and ask the user to build and start the app**, then wait. Return verdict `blocked` (an `app_not_running` gate) with a precise, copy-pasteable request: the build/start command if known (the env's `start_command`, e.g. `npm run build && npm run dev`) and the exact URL you'll hit (`base_url`). The Orchestrator surfaces this to the user and pauses; you only continue once the user confirms it's up.
-3. Once the user says it's running, re-verify `base_url` responds, then proceed with the journey.
+1. Determine the full set of services to check. If the selected environment lists `services` (multi-repo), that's the set; otherwise it's the single `base_url`. The browser opens the env's `base_url`, but **all** listed services must be up because they talk to each other.
+2. Check each service's readiness URL (`base_url` + its `ready_path`, default `/`).
+3. **If any service is not reachable, stop and ask the user to build and start them**, then wait. Return verdict `blocked` (an `app_not_running` gate) listing **each** missing service by `key`, its URL, and its `start_command` (and which repo to run it in) — a precise, copy-pasteable checklist. The Orchestrator surfaces this and pauses; you only continue once the user confirms everything is up.
+4. Once the user confirms, re-verify **all** services respond, then run the journey.
 
-Never run `npm install`, a build, a dev server, `docker compose up`, or any launch command yourself — not even on a local env. If the app stops mid-run, pause and ask again rather than restarting it. Record the URL and readiness check in the evidence.
+Never run `npm install`, a build, a dev server, `docker compose up`, or any launch command yourself — not for any service, not even locally. If a service stops mid-run, pause and ask again rather than restarting it. Record each service's URL + readiness result in the evidence.
 
 ### Evidence method — a UI surface ALWAYS goes through a real browser
 The gate is "reproduced/validated with evidence." The method fits the change —

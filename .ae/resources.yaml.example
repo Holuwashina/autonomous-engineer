@@ -27,7 +27,21 @@ environments:
     # the app is up. Shown in the request so you know exactly what to run.
     start_command: "npm run build && npm run dev"   # e.g. "pnpm dev", "make dev", "docker compose up -d"
     ready_path: "/"                # path QA checks to confirm the app responds
-    notes: You build and start this app; QA waits for your go-ahead, then drives the browser.
+    # MULTI-REPO: if a browser journey needs more than one service running
+    # (frontend + backend API, workers, etc.), list every one here. QA will ask
+    # you to build & start EACH and will verify ALL are reachable before the
+    # browser run. `base_url` above is the URL the browser actually opens.
+    # (Expose the other repos to Claude Code with /add-dir so it can read them.)
+    services:
+      - key: frontend
+        base_url: http://localhost:3000
+        ready_path: "/"
+        start_command: "npm run dev"          # run inside the frontend repo
+      - key: backend_api
+        base_url: http://localhost:8080
+        ready_path: "/health"
+        start_command: "npm run start:dev"    # run inside the backend repo
+    notes: You build and start every service; QA waits for your go-ahead, verifies each, then drives the browser.
 
   - key: development
     base_url: https://dev.example.com

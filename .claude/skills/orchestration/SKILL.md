@@ -31,7 +31,7 @@ sh "$(cat .ae/ae-source)/preflight.sh" --ui   # auto-installs Playwright + Chrom
 
 If that returns exit 3, the browser MCPs were just installed — have the user restart and re-run before QA can verify the UI live. Never skip UI verification because a browser MCP was missing; install it (preflight does) or block, don't downgrade.
 
-**App-running checkpoint (UI work).** The agent never builds or starts the user's app. Right before the QA browser phase on a UI surface, pause and ask the user to **build and start the app** and confirm it's up — e.g. "Please build and start the app at `<base_url>` (`<start_command>` if set), then tell me it's running." Wait for confirmation, then run QA. If QA returns the `app_not_running` blocked verdict, relay its request to the user and pause again — do not start the app yourself.
+**App-running checkpoint (UI work).** The agent never builds or starts the user's services. Right before the QA browser phase on a UI surface, pause and ask the user to **build and start every service the journey needs** and confirm they're up. For a single app that's one URL; for a **multi-repo** setup (frontend + backend API, etc.) list each service from the env's `services` so the user starts them all — e.g. "Please build and start: frontend `npm run dev` (http://localhost:3000), backend `npm run start:dev` (http://localhost:8080), then tell me they're running." Wait for confirmation, then run QA. If QA returns the `app_not_running` blocked verdict, relay its per-service checklist to the user and pause again — do not start anything yourself.
 
 If `.ae/ae-source` doesn't exist, AE wasn't installed via `setup.sh` — tell the user to run `sh <autonomous-engineer>/setup.sh` in this project, then continue.
 
