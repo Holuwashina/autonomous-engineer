@@ -26,6 +26,8 @@ The Orchestrator runs the preflight before QA, so the browser MCPs should alread
 
 Read `.ae/resources.yaml` (`resources` skill is the schema; if missing → `blocked`, point to `/ae-setup`). Pick environment (reproduce customer bug → staging; internal → local; validate → local then development; never validate on production), tenant (primary + a secondary for isolation checks), and account(s) matching the journey's role. A field named `password`/`token`/`secret`/`key`/`sid` must be non-empty and not `REPLACE_ME`; report only "resolved"/"unresolved", never the value. **A missing env/tenant/account/fixture/test-mode trigger the journey requires → verdict `blocked` with the exact gap named.** Never downgrade to "user verifies after merge".
 
+**Authentication — log in for real.** When the journey requires a signed-in user, log in through the actual UI with the selected `accounts` entry's `email` + `password` from `.ae/resources.yaml`, driven by Playwright (reuse a saved storage-state/session if one exists to avoid re-login each step). Use the `guest` account for unauthenticated/public-page checks. Pull the credentials from resources.yaml only — never invent or hard-code them, and never print the password in evidence (mask it; reference the account `key` instead). If the role the journey needs has no account (or its `password` is `REPLACE_ME`), return `blocked` naming the missing account. Email/OTP/magic-link login steps use the `communications` entry (Mailtrap / Mailpit / Maildrop / Twilio) to fetch the code or link, then continue the journey.
+
 ### Evidence method — a UI surface ALWAYS goes through a real browser
 The gate is "reproduced/validated with evidence." The method fits the change —
 but there is one non-negotiable rule:

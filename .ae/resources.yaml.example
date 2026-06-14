@@ -1,20 +1,20 @@
-# CCEO QA Resource Registry
+# Autonomous Engineer QA Resource Registry
 #
 # Single source of truth for environments, tenants, accounts, browsers,
-# communications, and external services CCEO uses for QA work.
+# communications, and external services Autonomous Engineer uses for QA work.
 #
 # Usage:
-#   cp .cceo/resources.yaml.example .cceo/resources.yaml
-#   # edit .cceo/resources.yaml, filling in real values for passwords/tokens
+#   cp .ae/resources.yaml.example .ae/resources.yaml
+#   # edit .ae/resources.yaml, filling in real values for passwords/tokens
 #
-# .cceo/resources.yaml is gitignored — secrets live there, never in this
+# .ae/resources.yaml is gitignored — secrets live there, never in this
 # .example file. The .example is the schema reference + scaffolding template.
 #
 # Conventions:
 #   - Every entry has a stable `key` (snake_case, unique within its section).
 #   - Test-fixture data (emails, slugs, subdomains, inbox IDs) is inline.
 #   - Secret fields are inline too — passwords, API tokens, OAuth secrets.
-#     Replace the REPLACE_ME placeholders in your live .cceo/resources.yaml.
+#     Replace the REPLACE_ME placeholders in your live .ae/resources.yaml.
 #   - Delete sections your project doesn't use (e.g. tenants for single-tenant
 #     apps, external_services for projects without third-party integrations).
 
@@ -22,7 +22,7 @@
 environments:
   - key: local
     base_url: http://localhost:3000
-    notes: Default development server. Used by QA Reproducer when reproducing locally.
+    notes: Default development server. Used by the QA Engineer when reproducing locally.
 
   - key: development
     base_url: https://dev.example.com
@@ -102,7 +102,7 @@ browsers:
     engine: chromium
     headless: true
     viewport: { width: 1440, height: 900 }
-    notes: Default browser. Used by QA Reproducer and QA Validator via the Playwright MCP.
+    notes: Default browser. Used by the QA Engineer via the Playwright MCP.
 
   - key: playwright_mobile
     engine: chromium
@@ -117,7 +117,7 @@ communications:
     provider: mailtrap
     inbox_id: 1234567
     api_token: REPLACE_ME
-    notes: Preferred. Used by QA Communications Engineer for email/OTP/magic-link validation.
+    notes: Preferred. Used by the QA Engineer for email/OTP/magic-link validation.
 
   - key: mailpit
     kind: email
