@@ -28,13 +28,14 @@ Read `.ae/resources.yaml` (`resources` skill is the schema; if missing → `bloc
 
 **Authentication — log in for real.** When the journey requires a signed-in user, log in through the actual UI with the selected `accounts` entry's `email` + `password` from `.ae/resources.yaml`, driven by Playwright (reuse a saved storage-state/session if one exists to avoid re-login each step). Use the `guest` account for unauthenticated/public-page checks. Pull the credentials from resources.yaml only — never invent or hard-code them, and never print the password in evidence (mask it; reference the account `key` instead). If the role the journey needs has no account (or its `password` is `REPLACE_ME`), return `blocked` naming the missing account. Email/OTP/magic-link login steps use the `communications` entry (Mailtrap / Mailpit / Maildrop / Twilio) to fetch the code or link, then continue the journey.
 
-### Phase 0.5 — Bring the app up (local env only)
-A browser journey needs a running app. Who starts it depends on the environment:
+### Phase 0.5 — The app must already be running (you do NOT build or start it)
+A browser journey needs a running app, but **you never build, install, or start it yourself** — that is the user's job. Before any browser use:
 
-- **Local env** (`base_url` is `localhost`/127.0.0.1): **you start it yourself.** Determine the run command — prefer an explicit `start_command` on the environment in `.ae/resources.yaml`; otherwise detect it (`package.json` scripts `dev`/`start`, `Makefile` targets, `Procfile`, `docker compose`, `pyproject`/`manage.py runserver`, etc.). Install deps if missing (`npm install` / equivalent) and run the project's build step only if the app must be built before it serves. Start the server **in the background**, then poll `base_url` (the env's `ready_path`, default `/`) until it responds — bounded (~60s, poll every 1–2s). Run the journey, then **stop the server you started** (and only that one). If you genuinely cannot determine or launch the start command, return `blocked` listing what you tried and ask the user for the start command (or to start it) — do not assume it's already running.
-- **Shared / deployed envs** (`development`, `staging`, `production_readonly`): **never build or start anything** — they're already deployed. Just verify `base_url` responds; if it doesn't, return `blocked` (don't try to launch a remote app).
+1. Check whether `base_url` (the env's `ready_path`, default `/`) already responds.
+2. **If it is not reachable, stop and ask the user to build and start the app**, then wait. Return verdict `blocked` (an `app_not_running` gate) with a precise, copy-pasteable request: the build/start command if known (the env's `start_command`, e.g. `npm run build && npm run dev`) and the exact URL you'll hit (`base_url`). The Orchestrator surfaces this to the user and pauses; you only continue once the user confirms it's up.
+3. Once the user says it's running, re-verify `base_url` responds, then proceed with the journey.
 
-Capture the exact start command + readiness result in the evidence so the run is reproducible.
+Never run `npm install`, a build, a dev server, `docker compose up`, or any launch command yourself — not even on a local env. If the app stops mid-run, pause and ask again rather than restarting it. Record the URL and readiness check in the evidence.
 
 ### Evidence method — a UI surface ALWAYS goes through a real browser
 The gate is "reproduced/validated with evidence." The method fits the change —

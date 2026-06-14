@@ -31,6 +31,8 @@ sh "$(cat .ae/ae-source)/preflight.sh" --ui   # auto-installs Playwright + Chrom
 
 If that returns exit 3, the browser MCPs were just installed — have the user restart and re-run before QA can verify the UI live. Never skip UI verification because a browser MCP was missing; install it (preflight does) or block, don't downgrade.
 
+**App-running checkpoint (UI work).** The agent never builds or starts the user's app. Right before the QA browser phase on a UI surface, pause and ask the user to **build and start the app** and confirm it's up — e.g. "Please build and start the app at `<base_url>` (`<start_command>` if set), then tell me it's running." Wait for confirmation, then run QA. If QA returns the `app_not_running` blocked verdict, relay its request to the user and pause again — do not start the app yourself.
+
 If `.ae/ae-source` doesn't exist, AE wasn't installed via `setup.sh` — tell the user to run `sh <autonomous-engineer>/setup.sh` in this project, then continue.
 
 ## Step 1 — Intake
