@@ -36,11 +36,10 @@ Process:
    Reproduction/validation method is **unit tests** (bug class = logic), not a
    browser — this is the v2 method-flexible gate.
 
-3. **Score objectively.** Run it with the SAME scope you ran, so it only checks
-   the oracle(s) for the tickets you actually ran:
-   `sh evals/run-selfcheck.sh score <scope>`  (scope = `security` | `bug` | `feature` | `all`)
-   It checks: the pipeline's own tests pass, type-check passes, the scope's golden
-   acceptance oracle passes against the implementation, and the pipeline added at
+3. **Score objectively.** Run:
+   `sh evals/run-selfcheck.sh score`
+   It checks: the pipeline's own tests pass, type-check passes, the golden
+   acceptance spec passes against the implementation, and the pipeline added at
    least one of its own tests. Report the `SELFCHECK: PASS/FAIL` line plus the
    per-ticket agent-call count you observed (token-budget signal).
 
