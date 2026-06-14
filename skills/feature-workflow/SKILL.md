@@ -26,7 +26,7 @@ As T1 plus the **full reviewer panel** (`code`+`security`+`perf`+`arch`) in one 
 **Multi-repo features:** the Orchestrator may fan out one `software-engineer` (`feature`) per repo in a single response, then synthesise — Fanout-and-Synthesize. Only when the streams share no types/contracts that must land first; when in doubt, serialize.
 
 ## Verdict gate (validate)
-Only an evidenced verdict clears validation. `blocked` (env shortfall, missing fixture/test-mode trigger) → Orchestrator escalates; never downgrade to "user verifies after merge". Passing unit/integration tests are necessary but not sufficient — the acceptance journey must be exercised by the method appropriate to the feature.
+Only an evidenced verdict clears validation. `blocked` (env shortfall, missing fixture/test-mode trigger) → Orchestrator escalates; never downgrade to "user verifies after merge". Passing unit/integration tests are necessary but not sufficient — the acceptance journey must be exercised by the method appropriate to the feature. **If the feature has any UI surface, that method is a live Playwright run in a real browser (+ Chrome DevTools as needed) — a UI feature is not validated by unit/component tests alone.**
 
 ## Parallelization map
 | Phase | Mode |
