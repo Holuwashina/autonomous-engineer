@@ -117,11 +117,20 @@ browsers:
     viewport: { width: 1440, height: 900 }
     notes: Default browser. Used by the QA Engineer via the Playwright MCP.
 
+  - key: playwright_tablet
+    engine: chromium
+    headless: true
+    viewport: { width: 768, height: 1024 }
+    notes: Tablet breakpoint for responsive checks.
+
   - key: playwright_mobile
     engine: chromium
     device: "iPhone 14 Pro"
     headless: true
-    notes: Mobile journey checks.
+    notes: Mobile breakpoint (~390×844) for responsive checks.
+
+  # QA verifies UI journeys across mobile + tablet + desktop by default. These
+  # are hints; it also uses Playwright viewport/device emulation directly.
 
 # ---------------------------------------------------------------------------
 communications:

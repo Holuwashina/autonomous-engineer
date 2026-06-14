@@ -65,6 +65,8 @@ The non-browser methods below apply only to genuinely **non-UI** classes:
 When in doubt whether a change touches the UI (e.g. a backend change that alters
 what a page renders), treat it as UI and verify in the browser.
 
+**Responsive — verify across screen sizes by default.** A UI surface is not validated at one width. Exercise the journey at, at minimum, **mobile (~390×844), tablet (~768×1024), and desktop (~1440×900)** — use the `browsers` profiles in `.ae/resources.yaml` (`playwright_mobile` etc.) plus Playwright viewport/device emulation. Screenshot each breakpoint and check for: overflow/clipping, overlapping or cut-off text, controls pushed off-screen or unreachable, broken nav/hamburger, images not scaling, and touch targets too small on mobile. Report results per breakpoint; a layout that works on desktop but breaks on mobile is a **fail**, not a pass. The ticket may narrow the set (e.g. "desktop-only admin"), but absent that, all three are covered.
+
 ### Phase 1 — Reproduce (mode = `reproduce`)
 Identify preconditions/steps/expected-vs-actual (flag inferred steps). Drive the journey by the method above, pause at the failure point, and **capture at the failure moment**: screenshot/output, console errors verbatim, network errors (`METHOD URL → STATUS` + body excerpt), relevant DOM/state. Run a brief control path to scope the bug. Verdict: `reproduced | not_reproduced | partially_reproduced | blocked`.
 
@@ -75,7 +77,9 @@ Confirm the implementation is live on the selected env. Run the primary journey 
 journey in a real browser via Playwright and screenshot each meaningful state;
 attach Chrome DevTools when you need to confirm the runtime is clean (no console
 errors, network calls succeed), not just that the page *looks* right.** A UI
-feature is not "validated" until it has been exercised end to end in the browser.
+feature is not "validated" until it has been exercised end to end in the browser
+**at mobile, tablet, and desktop widths** (see Responsive above) — report pass/fail
+per breakpoint, not just once.
 
 ### Communications (inline, only when the journey sends a message)
 Skip entirely unless the journey involves email/OTP/magic-link/invite/push/SMS. When applicable: confirm the provider is reachable; for each artefact wait with a bounded retry (~15s, poll 1–2s — a miss after the bound is a finding); quote subject/From/To and required content verbatim; extract link/code atomically; never click a destructive link; a reset for user A must not message user B.
@@ -85,7 +89,7 @@ Emit the mode's report; write the payload to `.ae/runs/<run-id>/specialists/NN-q
 </process>
 
 <output_format>
-Return the mode-appropriate report. **reproduce:** verdict, env/tenant/account, journey executed, inferred steps, observed vs expected outcome, evidence (screenshot/output/console/network/comms), control path, hand-off. **validate:** verdict (`pass | pass_with_findings | fail | blocked`), acceptance-criteria table with evidence, edge cases, regression spot-checks, cross-role/tenant, comms (or "n/a"), blocking + non-blocking findings with suggested owner. Append a JSON selection block (environment_key, base_url, tenant_keys, account_keys, comms_key, unresolved_fields).
+Return the mode-appropriate report. **reproduce:** verdict, env/tenant/account, journey executed, inferred steps, observed vs expected outcome, evidence (screenshot/output/console/network/comms), control path, hand-off. **validate:** verdict (`pass | pass_with_findings | fail | blocked`), acceptance-criteria table with evidence, edge cases, regression spot-checks, **responsive results per breakpoint (mobile/tablet/desktop) with a screenshot each for UI work**, cross-role/tenant, comms (or "n/a"), blocking + non-blocking findings with suggested owner. Append a JSON selection block (environment_key, base_url, tenant_keys, account_keys, comms_key, unresolved_fields).
 </output_format>
 
 <rules>
