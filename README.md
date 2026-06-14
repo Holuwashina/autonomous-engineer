@@ -171,6 +171,7 @@ Then **open Claude Code in that folder** and finish config:
 | `/ae-resume` | `[<id>]` | Resume an interrupted run |
 | `/ae-setup` | _(none)_ | Interactive configuration walkthrough |
 | `/ae-selfcheck` | `[security\|bug\|feature\|all]` | Run the golden-ticket eval against the bundled fixture and score it |
+| `/ae-clean` | `[runs\|branches\|all] [--days N\|--all]` | Prune accumulated run logs/evidence and stale merged branches (dry-run; deletion confirmed) |
 
 All commands are namespaced `ae-` so they don't collide with Claude Code's built-in slash commands (`/review`, `/status`, `/bug`, …). Forcing a classification and reading run logs are flags on `/ae-start` and `/ae-status`, not separate commands.
 

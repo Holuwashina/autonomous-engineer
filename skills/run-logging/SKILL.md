@@ -158,7 +158,7 @@ Default: keep all runs locally. They're cheap (each `run.log` is typically <50KB
 find .ae/runs -maxdepth 1 -type d -mtime +30 -exec rm -rf {} +
 ```
 
-Autonomous Engineer does not auto-delete runs — old logs are evidence for retrospectives.
+Autonomous Engineer does not auto-delete runs — old logs are evidence for retrospectives. Use **`/ae-clean`** to prune them (and stale merged `fix/*`/`feat/*` branches) when they grow: it's dry-run by default and confirms before deleting. `/ae-clean runs --days 14 --yes`, `/ae-clean runs --all --yes`, `/ae-clean branches --yes`, or `/ae-clean all --yes`.
 
 ## Anti-patterns
 
