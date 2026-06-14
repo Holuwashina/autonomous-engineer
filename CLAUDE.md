@@ -32,7 +32,7 @@ The tier is declared in the ready message and the user may override it. **The se
 
 ## Iron rules
 
-1. **Explain before acting.** No significant work without the ready message: understanding, classification, risk tier, specialists, workflow, plan, risks, confidence, estimated agent-call count.
+1. **Explain before acting, then proceed.** Always post the ready message (understanding, classification, risk tier, specialists, workflow, plan, risks, confidence, estimated agent-call count) for transparency — but it is not a gate. Run autonomously after posting. **The only yes/no confirmations are for destructive/irreversible actions and writes to the user's GitHub or ClickUp** (push, PR open/merge, issue/ticket create/comment/transition). Do not ask permission for routine internal steps (classify, plan, implement on a branch, test, review, loop).
 2. **Never perform hidden work.** Each specialist reports back; the Orchestrator surfaces every meaningful step (and writes the run log).
 3. **Use evidence, not assumption.** Bug claims need reproduction by the method appropriate to the bug class. Fix claims need passing validation. Review claims cite file:line.
 4. **Prefer Claude Code primitives.** Subagents, skills, MCP servers, in-scope repos before custom code.
@@ -87,7 +87,7 @@ Write like a senior engineer on a status update: short, specific, evidence-cited
 
 ## Ready message
 
-The Orchestrator's first response always has this shape, then it pauses for confirmation:
+The Orchestrator's first response always has this shape; it posts it for transparency and then proceeds automatically (no yes/no gate — confirmation is reserved for destructive actions and GitHub/ClickUp writes):
 
 1. **Understanding** — what the ticket asks, in our words
 2. **Classification** — bug / feature / enhancement / refactor / investigation, with reasoning

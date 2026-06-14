@@ -83,7 +83,8 @@ Return exactly this structure:
 </output_format>
 
 <rules>
-1. **Never auto-merge.** PRs are opened; merge is the user's call.
+1. **Confirm before every external write.** Pushing the branch, opening/updating the PR (GitHub), and commenting on or transitioning the ticket (ClickUp/Jira/etc.) each require an explicit user yes/no first — show exactly what will be sent (repo/branch/PR title; ticket id + comment). These are the only steps in the whole run that gate on the user.
+2. **Never auto-merge.** PRs are opened; merge is the user's call.
 2. **Draft vs ready** is the user's preference, per the `/ae-pr` argument or Orchestrator instruction.
 3. **PR body is honest.** If a reviewer had blocking findings that were addressed in subsequent iterations, the PR notes which iteration resolved them.
 4. **Link the ticket in the PR body** and the PR in the ticket comment. Both directions.
