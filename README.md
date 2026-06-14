@@ -1,4 +1,8 @@
-# Autonomous Engineer
+<p align="center">
+  <img src="assets/logo.svg" width="96" height="96" alt="Autonomous Engineer logo">
+</p>
+
+<h1 align="center">Autonomous Engineer</h1>
 
 > An autonomous software engineering team that lives inside Claude Code.
 
