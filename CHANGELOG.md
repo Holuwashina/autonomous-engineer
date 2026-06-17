@@ -24,6 +24,11 @@ Major redesign for correctness, speed, and token efficiency. See `ARCHITECTURE.m
 - **Safety git hooks** (`hooks/`): `pre-commit` blocks direct commits to protected branches and commits of the secrets file; `pre-push` blocks direct pushes to protected branches and non-fast-forward (force) pushes. Installed via `hooks/install-safety-hooks.sh` or `/ae-setup` Phase 4. Turns the protected-branch / shared-history iron rules from prompt-only into deterministic gates (with `--no-verify` as the human escape hatch). Verified against a throwaway repo.
 - `CHANGELOG.md` and a `version` bump to 2.0.0 in `plugin.json`.
 
+### Added — speed
+- **Per-agent models** (frontmatter `model:`): `intake-analyst` + `engineering-manager` → `haiku`, `qa-engineer` + `reviewer` → `sonnet`, `software-engineer` → session model. Cuts latency/cost on the cheap roles; tune per your plan.
+- **Speed levers** in the orchestration skill: strict tier sizing (T1 skips reproduce), T1 review defaults to the code lens (one risk lens only if the diff touches it), targeted re-validation on loop iterations, responsive screenshots at key states only, reviewers always parallel.
+- **`/ae-start --fast`** — minimal pipeline (no reproduce, single code review, loop cap 1) for low-risk changes; ignored for T2.
+
 ### Fixed
 - **Command names namespaced + de-duplicated.** All slash commands now carry an `ae-` prefix so they no longer collide with Claude Code built-ins (`/bug`, `/review`, `/status`, `/resume`). Folded the thin wrappers: `/bug` and `/feature` became `/ae-start --as bug|feature`, and `/log` became `/ae-status --log`. Net: 11 commands → 8 (`ae-start`, `ae-review`, `ae-qa`, `ae-pr`, `ae-status`, `ae-resume`, `ae-setup`, `ae-selfcheck`).
 - Default base branch unified to `dev` across all entrypoints (was `main` in the Director, `dev` elsewhere).

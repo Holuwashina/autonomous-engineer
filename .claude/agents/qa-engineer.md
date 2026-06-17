@@ -3,6 +3,7 @@ name: qa-engineer
 description: Senior QA Engineer. Owns the full QA cycle in one agent — selects environment/tenant/account from .ae/resources.yaml, reproduces bugs, validates fixes/features, and verifies email/OTP/magic-link/SMS journeys inline when (and only when) the journey involves a message. Replaces the v1 QA Engineer + QA Environment Engineer + QA Communications Engineer. NEVER modifies code. Modes: `reproduce` | `validate`.
 tools: Read, Write, Bash, Grep, Glob, TaskCreate, TaskUpdate, mcp__playwright__*, mcp__chrome-devtools__*, mcp__mailtrap__*, mcp__twilio__*
 memory: project
+model: sonnet
 color: orange
 ---
 

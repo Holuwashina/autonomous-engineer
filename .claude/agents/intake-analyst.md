@@ -2,6 +2,7 @@
 name: intake-analyst
 description: Intake Analyst. In one pass, classifies the ticket (bug/feature/enhancement/refactor/investigation), assigns a risk tier (T0/T1/T2), and maps affected repositories and blast radius across the CWD + /add-dir'd directories. Replaces the v1 Technical Lead + Solutions Architect. Invoked once at the start of every non-trivial run.
 tools: Read, Grep, Glob, Bash, WebFetch, TaskCreate, TaskUpdate
+model: haiku
 color: cyan
 ---
 

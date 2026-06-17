@@ -52,7 +52,7 @@ Classification (via `intake-analyst`) returns a **tier**. Match pipeline depth t
 | Tier | Trigger | Pipeline | ~calls |
 |---|---|---|---|
 | **T0 Trivial** | Typo, copy/string, comment, doc, one-line config; blast radius "none" | `software-engineer` → `reviewer`(code) → `engineering-manager` | ~3 |
-| **T1 Standard** | Normal bug/feature, no trust-boundary surface | `intake-analyst` → engineer → `qa-engineer` validate → `reviewer` ×2 (code + the one risk lens) → loop(≤2) → EM | ~6 |
+| **T1 Standard** | Normal bug/feature, no trust-boundary surface | `intake-analyst` → engineer → `qa-engineer` validate → `reviewer` ×1–2 (code; + one risk lens only if the diff touches it) → loop(≤2) → EM | ~5 |
 | **T2 High-risk** | Auth, sessions, payments, persistence, migrations, file upload, external API, or production incident | intake → qa reproduce → engineer (Generate-and-Filter, optional Adversarial) → qa validate → `reviewer` ×4 → loop(≤3) → EM | ~10+ |
 
 The tier is shown in the ready message; the user may override it. **Security lens is mandatory for T2 — no exceptions.**
@@ -84,6 +84,18 @@ Hand to `engineering-manager`: open the PR against `base_branch` (never merge), 
 3. **Cache stable artifacts.** Intake + repo map computed once, reused across loop iterations.
 4. **Lazy skills.** Load a skill only on the branch that needs it.
 5. **Budget visibility.** Report estimated calls + tier in the ready message; a hard ceiling triggers escalation, never silent runaway.
+
+## Speed (keep wall-clock down)
+
+Latency is the **sequential chain** of agent calls — each spawn is a fresh full-context call. Minimise it:
+
+1. **Right-size the tier — don't over-run.** T0 = engineer → 1 code reviewer → EM. T1 = engineer → validate → review → EM (**no reproduce**). Run reproduce only for T2 or a genuinely unclear bug.
+2. **Faster models on cheap roles.** `intake-analyst` + `engineering-manager` run on `haiku`, `qa-engineer` + `reviewer` on `sonnet`, `software-engineer` on the session model (set via agent frontmatter `model:` — change it to suit your plan).
+3. **Lean reviews.** T1 default = the **code** lens only; add **one** risk lens (security/perf/arch) *only if the diff actually touches that surface*. T2 = all four. Always spawn the lenses in **one parallel response** — never serial (parallel ≈ free wall-clock).
+4. **Targeted re-validation on loops.** On iteration 2+, re-validate only the changed area, not the whole journey/suite. Reuse the cached intake + repo map — never recompute.
+5. **Don't reload context.** Pass each specialist only its slice; load a skill only when its branch needs it.
+6. **Responsive = key states, not every interaction.** Screenshot the meaningful states per breakpoint, not each click.
+7. **`--fast` override.** `/ae-start … --fast` forces the minimal path for a low-risk change: skip reproduce, single `code` review, loop cap 1. **Refused for T2** — auth/payments/persistence/etc. still get full rigor and the mandatory security lens.
 
 ## Autonomy & confirmation policy
 

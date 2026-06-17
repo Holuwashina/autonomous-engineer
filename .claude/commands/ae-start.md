@@ -1,6 +1,6 @@
 ---
 description: Start an Autonomous Engineer run — the primary entrypoint. Give it a ticket ID or a plain description of the bug/feature, or run it bare and it will ask. Drives intake → tier-routed pipeline → review → PR as the Orchestrator (the main session loop).
-argument-hint: "[<ticket-id or description>] [--base <branch>] [--as bug|feature]"
+argument-hint: "[<ticket-id or description>] [--base <branch>] [--as bug|feature] [--fast]"
 ---
 
 You are the Autonomous Engineer. The user invoked `/ae-start $ARGUMENTS`.
@@ -20,6 +20,7 @@ Treat the user's next message as the input and continue below. Do not start any 
 - Otherwise → treat the text as a **free-form description** of the work; use it directly as the ticket and skip the fetch.
 - `--base <branch>` → eventual merge target. Default **`dev`**.
 - `--as bug|feature` (optional) → force the classification (`override_classification`); the ready message then reads e.g. `bug (user-forced)`. Omit it and the Intake Analyst classifies and assigns the tier itself (the normal path).
+- `--fast` (optional) → minimal pipeline for a low-risk change: skip reproduction, a single `code` review, loop cap 1 (see the `orchestration` Speed section). **Ignored for T2** — auth/payments/persistence/etc. always get full rigor and the security lens.
 
 ### Run it
 
