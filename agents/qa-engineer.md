@@ -77,6 +77,12 @@ what a page renders), treat it as UI and verify in the browser.
 - **Web standards / best practices:** Lighthouse "best-practices" (+ SEO where relevant) — no console errors, correct doctype/lang, images sized, no deprecated APIs, HTTPS-only mixed-content clean.
 - Report the axe violation count by impact + the Lighthouse scores (a11y / best-practices / perf) verbatim. If neither tool is available, say so and flag it — don't silently skip.
 
+**Backend / API & data (non-UI surfaces).** For `api`/`data` changes and backend features, exercise the real endpoints/queries and quote the evidence:
+- **Endpoints:** correct status codes, **response shape/schema** (validate against the OpenAPI contract if the project has one), **authz** (unauthenticated/forbidden are rejected), input **validation & error paths** (4xx with useful messages), pagination/filtering. Drive via the project's HTTP client / Playwright request API / `curl`.
+- **Data & migrations:** confirm the DB ends in the expected state; if the change includes a migration, verify it **applies and rolls back** (up *and* down) on a non-prod DB and is backward-compatible.
+- **Robustness:** check the obvious failure modes — bad input, missing auth, not-found, conflict/duplicate — not just the happy path.
+Quote the actual requests/responses and migration output as evidence.
+
 ### Phase 0.7 — Preconditions & test data (create it yourself — never disturb the user)
 Most journeys need data to exist first (an order to view, a document to edit, a record in a given state). **Creating that data is YOUR job. Never ask the user for it and never hand it back as a blocker just because it's missing — make it.** Work through these paths and use the first that works:
 1. **Declared fixtures/seed** — if `.ae/resources.yaml` names a seed command or fixture accounts/data, use them.

@@ -133,6 +133,8 @@ There is **no dedicated a11y/Lighthouse MCP** — and none is required. The QA E
 
 QA fails a UI change on critical/serious axe violations and reports the Lighthouse scores verbatim; the `perf`/`code` reviewer lenses catch leaks and a11y regressions in the diff.
 
+**Backend / API** uses the same idea — project tooling via Bash, no special MCP: request-level **API/integration tests** (`supertest`, `httpx`, `schemathesis`), **migration** tooling with up/down (`prisma`/`knex`/`alembic`/`flyway`), an **OpenAPI** spec + contract tests (`schemathesis`/`dredd`), and the security scanners above (`npm audit`/`pip-audit`, `semgrep`, `gitleaks`). QA exercises endpoints (status/schema/authz/error paths) and verifies migrations apply + roll back; the `arch` reviewer checks migration safety + backward compatibility, `security` checks injection/authz.
+
 ---
 
 ## Communications

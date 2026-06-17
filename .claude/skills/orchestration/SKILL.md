@@ -86,7 +86,7 @@ If validation or any reviewer returns blocking findings, re-invoke `software-eng
 
 ## Step 6 — Close-out
 
-Hand to `engineering-manager`: open the PR against `base_branch` (never merge), comment on the ticket with PR link + evidence. **These are GitHub/ClickUp writes — confirm with the user immediately before each** (show the PR title/base and the ticket id + comment). Pushing the branch is also a GitHub write — confirm it too. Then deliver the final summary: what shipped, what was validated, reviewer verdicts, PR link, follow-ups, confidence.
+Hand to `engineering-manager`: open the PR against `base_branch` (never merge), comment on the ticket with PR link + evidence. **These are GitHub/ClickUp writes — confirm with the user immediately before each** (show the PR title/base and the ticket id + comment). Pushing the branch is also a GitHub write — confirm it too. Then deliver the final summary. **Lead with a plain-language, non-technical recap (no code, no file names): the issue or feature in user terms, and what was done to solve it — phrased as the user-facing outcome / user story** (e.g. "Customers no longer see fractional cents on discounted prices; a $19.99 item at 10% off now shows $17.99"). A PM or stakeholder should understand it without reading the diff. Put the engineering detail (PR link, validation evidence, reviewer verdicts, follow-ups, confidence) *below* that, clearly separated.
 
 ## Token discipline (always on)
 

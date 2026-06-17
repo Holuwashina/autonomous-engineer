@@ -106,6 +106,13 @@ When the Engineering Manager opens the PR and the Orchestrator declares completi
 ```
 Orchestrator — Completion
 
+In plain language (no code):
+- The issue / feature: <what the user was experiencing or asked for, in their words>
+- What we did: <the change as a user-facing outcome / user story — "As a <user>, … now …">
+- What it means for users: <the observable result, e.g. "discounted prices show correct cents">
+
+— technical detail below —
+
 Ticket: <id> — <title>
 Risk tier: <T0 | T1 | T2>
 PR: <url>

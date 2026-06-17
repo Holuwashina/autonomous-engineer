@@ -58,6 +58,27 @@ if [ -x "$ROOT/.git/hooks/pre-commit" ] && grep -q "Autonomous Engineer" "$ROOT/
 echo ""
 echo "Frontend / a11y"
 if dep_has '@axe-core/playwright' || dep_has 'eslint-plugin-jsx-a11y'; then good "a11y tooling present (axe / jsx-a11y)"; else soft "no a11y tooling — npm i -D @axe-core/playwright eslint-plugin-jsx-a11y (QA falls back / flags)"; fi
+if dep_has '"react"'; then
+  good "React detected"
+  if dep_has '@testing-library/react'; then good "  React Testing Library (component tests)"; else soft "  no @testing-library/react — add for component-level tests"; fi
+  if dep_has 'eslint-plugin-react-hooks'; then good "  react-hooks lint (deps/cleanup → catches leaks)"; else soft "  no eslint-plugin-react-hooks — catches missing effect cleanup / dependency bugs (memory leaks)"; fi
+fi
+
+echo ""
+echo "Backend / API"
+backend=0
+if [ -f "$ROOT/package.json" ] && grep -qE '"(express|fastify|@nestjs/core|koa|@hapi/hapi)"' "$ROOT/package.json"; then backend=1; fi
+if grep -qiE 'fastapi|flask|django' "$ROOT/pyproject.toml" 2>/dev/null; then backend=1; fi
+if [ -f "$ROOT/Gemfile" ] && grep -qi 'rails' "$ROOT/Gemfile" 2>/dev/null; then backend=1; fi
+if [ -f "$ROOT/go.mod" ]; then backend=1; fi
+if [ "$backend" = 1 ]; then
+  good "backend / API project detected"
+  if { [ -f "$ROOT/package.json" ] && grep -qE '"(supertest|@nestjs/testing|pactum|frisby)"' "$ROOT/package.json"; } || grep -qiE 'httpx|requests|schemathesis|pytest-django' "$ROOT/pyproject.toml" 2>/dev/null; then good "API/integration test tooling"; else soft "no API/integration test tooling (supertest / httpx / schemathesis) — endpoints need request-level tests"; fi
+  if file_any prisma/migrations migrations db/migrate alembic.ini db/migrations || { [ -f "$ROOT/package.json" ] && grep -qE '"(knex|sequelize|typeorm|prisma|@mikro-orm/core)"' "$ROOT/package.json"; }; then good "DB migration tooling (reversible up/down)"; else soft "no migration tooling — if you use a DB, add migrations with up/down so schema changes are safe + reversible"; fi
+  if file_any openapi.yaml openapi.yml openapi.json swagger.yaml swagger.json api/openapi.yaml; then good "OpenAPI/contract spec present"; else soft "no OpenAPI spec — consider one + contract tests (schemathesis/dredd) so the API contract is verified"; fi
+else
+  soft "no backend framework detected (skip if frontend-only)"
+fi
 
 echo ""
 echo "MCP servers"
