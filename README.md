@@ -43,47 +43,7 @@ When you run `/ae-start <id>`, the main session loads the `orchestration` skill 
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    user(["👤 Developer<br/>/ae-start MM-123 --base dev"]) --> orch
-
-    orch["🧭 Orchestrator (main loop)<br/>ready message + risk-tier routing"]
-    orch --> intake["Intake Analyst<br/>classify + tier + repo map"]
-    intake --> orch
-
-    orch -- "bug" --> bug
-    orch -- "feature" --> feat
-
-    subgraph bug["🐛 Bug pipeline (tier-scaled)"]
-        direction TB
-        repro["QA Engineer (reproduce)<br/>method fits bug class"] --> swe["Software Engineer (bug)<br/>root cause + min-risk fix + test"]
-    end
-
-    subgraph feat["✨ Feature pipeline (tier-scaled)"]
-        direction TB
-        plan["Software Engineer (plan)<br/>acceptance criteria + plan"] --> fs["Software Engineer (feature)<br/>implement + tests"]
-    end
-
-    bug --> val["QA Engineer (validate)<br/>+ comms inline if journey sends a message"]
-    feat --> val
-    val --> panel
-
-    subgraph panel["⚖️ Reviewer — parallel instances of one agent"]
-        direction LR
-        cr["lens=code"]
-        sec["lens=security"]
-        perf["lens=perf"]
-        arc["lens=arch"]
-    end
-
-    panel -- "blocking findings" --> loop{"🔁 Loop-Until-Done<br/>cap by tier"}
-    loop -- "iterate" --> bug
-    loop -- "iterate" --> feat
-    panel -- "all approve" --> em["Engineering Manager<br/>open PR + update ticket"]
-    em --> done(["✅ PR ready for review<br/>ticket commented"])
-```
-
-The Orchestrator is the only node that delegates, and it is the **main loop** — not a subagent — so it can reliably spawn the specialists. Workflow patterns (Classify-and-Act, Fanout-and-Synthesize, Adversarial Verification, Generate-and-Filter, Tournament, Loop-Until-Done) are composed per tier, never all by default.
+A main-loop **Orchestrator** owns each run and delegates to five leaf specialists: the **Intake Analyst** (classify + risk tier + repo map), the **Software Engineer** (plan / bug / feature), the **QA Engineer** (reproduce / validate), the **Reviewer** (one lens-parameterized agent run as parallel `code`/`security`/`perf`/`arch` instances), and the **Engineering Manager** (open the PR, update the ticket). The flow: intake → reproduce-or-plan → implement → validate ‖ review → loop until clean → PR. The Orchestrator is the only node that delegates, and it's the **main loop** — not a subagent — so it can reliably spawn the specialists. Workflow patterns (Classify-and-Act, Fanout-and-Synthesize, Adversarial Verification, Generate-and-Filter, Tournament, Loop-Until-Done) are composed per tier, never all by default.
 
 ---
 
@@ -156,6 +116,31 @@ Then **open Claude Code in that folder** and finish config:
 1. **Expose repositories.** The CWD is already in scope. `/add-dir <path>` for additional repos; the Intake Analyst surveys all of them.
 2. **Configure resources.** `cp .ae/resources.yaml.example .ae/resources.yaml`, then edit. Environments, tenants, accounts (with passwords), communications, external services — all inline. The live file is gitignored.
 3. **Add MCP servers.** Run `/ae-setup` or read the `mcp-setup` skill. Typical: a ticket source (Jira / ClickUp / GitHub Issues) · GitHub (code host + PR) · Playwright · Mailtrap (optional email validation).
+
+---
+
+## Project readiness — what your project should have
+
+AE works on any repo, but it's only as strong as the standards your project already has — it **uses your tooling, it doesn't invent it.** The more of this you set up, the more rigorous (and autonomous) the pipeline:
+
+**Essential**
+- **Git repo** with a base branch (`dev` by default) and a clean tree. Enable **remote branch protection** on `main` — the real backstop; nothing local can bypass it.
+- **A test runner + `test` script** (`jest`, `pytest`, `go test`, …). AE is test-first (red→green); without test infra it falls back to documented manual steps — much weaker.
+- **`.ae/resources.yaml`** filled in: at least the env `base_url`, an account per role (with credentials), and (if features send messages) an email sink.
+
+**Strongly recommended**
+- **Lint + format + type-check** configured (`eslint`/`prettier`, `ruff`/`black`, `tsc`/`mypy`) with scripts — the engineer runs them and fixes what it introduces.
+- **Run scripts** the agent can detect: `dev`/`start` (serve), `build`, `test`, `typecheck`, and optionally `seed`/`seed:test` for test data.
+- **MCPs:** Playwright **+ Chrome DevTools** (UI repro/validation, a11y, Lighthouse, memory), a ticket source, and GitHub (or the `gh` CLI). See `mcp-setup`.
+
+**For frontend work**
+- A startable dev server (so QA can drive it — you'll be asked to start it), and accessibility/standards tooling: `@axe-core/playwright`, Lighthouse (via Chrome DevTools MCP), `eslint-plugin-jsx-a11y`.
+
+**For higher assurance (optional)**
+- Security tooling the security reviewer will use: dependency audit (`npm audit`/`pip-audit`), SAST (`semgrep`), secret scan (`gitleaks`).
+- A `CLAUDE.md` in your project capturing house conventions (naming, patterns) so changes match your style.
+
+Anything missing degrades gracefully — AE flags what it couldn't run (e.g. "no a11y tooling configured") rather than silently skipping. Full per-item walkthrough in **[SETUP.md](SETUP.md)**.
 
 ---
 
