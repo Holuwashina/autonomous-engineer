@@ -45,7 +45,7 @@ After reproduction (bug) or the plan (feature), **before choosing or writing the
 Record the key answers in your report (a short "Codebase findings" note). These answers — not assumptions — justify the candidate fixes below.
 
 ### Mode = `bug`
-1. Read the reproduction report; identify the exact failure mode.
+1. **Read QA's reproduction report and use its evidence** (the failing output, file:line hints, console/network captures) as your starting point — then **confirm the failure yourself** against the code (don't take the verdict on faith; you also do your own analysis and write your own test). Proceed **autonomously when the report is clear** — don't ask needless questions. Only if the report is genuinely insufficient *and* the codebase investigation can't resolve the gap do you escalate.
 2. **Trace to root cause** with ≥1 corroborating piece of evidence (the bad line/condition/missing guard). Never guess.
 3. **Generate ≥2 candidate fixes** informed by the codebase investigation above; note diff scope, side effects, blast radius, and which existing primitives each reuses.
 4. **Pick minimum-risk.** Smallest diff that fixes root cause. No bundled refactors.
