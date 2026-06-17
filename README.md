@@ -109,6 +109,22 @@ Then **open Claude Code in that folder** and finish config:
 > terminal.** Full per-provider MCP commands and troubleshooting in
 > **[SETUP.md](SETUP.md)**.
 
+### Staying up to date
+
+The files AE installs into a project are **copies** of this repo, so a release
+reaches a project in two steps — both run by one command. Inside Claude Code:
+
+```
+/ae-update       ← pulls the newest source, re-syncs this project
+```
+
+It pulls the latest source, re-copies changed agents/commands/skills, **prunes
+anything removed upstream** (tracked in `.ae/manifest`, so your own files are never
+touched), refreshes the hooks + git-excludes, and re-stamps `.ae/ae-version`. Every
+`/ae-start` preflight already **warns when a project is behind** the source, so
+clients know when to run it. Plugin installs (`/plugin install …`) update through
+`/plugin` instead. Restart Claude Code afterward so the new files load.
+
 ---
 
 ## Configure
@@ -161,6 +177,7 @@ Anything missing degrades gracefully — AE flags what it couldn't run (e.g. "no
 | `/ae-selfcheck` | `[security\|bug\|feature\|all]` | Run the golden-ticket eval against the bundled fixture and score it |
 | `/ae-clean` | `[runs\|branches\|all] [--days N\|--all]` | Prune accumulated run logs/evidence and stale merged branches (dry-run; deletion confirmed) |
 | `/ae-doctor` | _(none)_ | Check this project's readiness for AE (test runner, lint/type-check, resources, MCPs, hooks, a11y/security) — read-only |
+| `/ae-update` | _(none)_ | Update this project to the latest AE release — pulls newest source, re-syncs files, prunes anything removed upstream, re-stamps the version |
 
 All commands are namespaced `ae-` so they don't collide with Claude Code's built-in slash commands (`/review`, `/status`, `/bug`, …). Forcing a classification and reading run logs are flags on `/ae-start` and `/ae-status`, not separate commands.
 

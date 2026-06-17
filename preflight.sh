@@ -54,6 +54,15 @@ else
   say "• Local install + safety hooks: present"
 fi
 
+# 1b) Staleness — is this project behind the AE source? (warn, never block)
+if [ -n "$AE_SRC" ] && [ -f "$AE_SRC/.claude-plugin/plugin.json" ]; then
+  src_ver="$(grep -m1 '"version"' "$AE_SRC/.claude-plugin/plugin.json" 2>/dev/null | sed 's/.*: *"//; s/".*//')"
+  inst_ver="$(cat "$TARGET/.ae/ae-version" 2>/dev/null || echo '')"
+  if [ -n "$src_ver" ] && [ "$inst_ver" != "$src_ver" ]; then
+    say "• Update available: installed '${inst_ver:-unknown}' vs source '$src_ver' — run /ae-update (non-blocking)."
+  fi
+fi
+
 # 2) MCP servers (only if the claude CLI is reachable from this shell)
 if command -v claude >/dev/null 2>&1; then
   mcp_list="$(claude mcp list 2>/dev/null || true)"

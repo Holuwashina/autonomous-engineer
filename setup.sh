@@ -59,6 +59,30 @@ echo "    skills:   $(ls -d "$TARGET"/.claude/skills/*/ 2>/dev/null | wc -l | tr
 mkdir -p "$TARGET/.ae"
 printf '%s\n' "$AE_SRC" > "$TARGET/.ae/ae-source"
 
+# Manifest + version stamp — lets updates PRUNE files removed upstream and lets
+# preflight detect a stale install. The manifest lists only AE's own files, so a
+# project's own agents/commands/skills are never touched.
+NEW_MANIFEST="$TARGET/.ae/manifest"
+OLD_MANIFEST="$TARGET/.ae/manifest.prev"
+[ -f "$NEW_MANIFEST" ] && cp "$NEW_MANIFEST" "$OLD_MANIFEST"
+{
+  for f in "$AE_SRC"/agents/*.md;   do [ -e "$f" ] && echo ".claude/agents/$(basename "$f")"; done
+  for f in "$AE_SRC"/commands/*.md; do [ -e "$f" ] && echo ".claude/commands/$(basename "$f")"; done
+  for d in "$AE_SRC"/skills/*/;     do [ -d "$d" ] && echo ".claude/skills/$(basename "$d")"; done
+} > "$NEW_MANIFEST"
+# Prune AE files that were installed before but are gone from this release.
+if [ -f "$OLD_MANIFEST" ]; then
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    grep -qxF "$p" "$NEW_MANIFEST" && continue
+    rm -rf "$TARGET/$p" && echo "    pruned (removed upstream): $p"
+  done < "$OLD_MANIFEST"
+  rm -f "$OLD_MANIFEST"
+fi
+# Version stamp (read from the plugin manifest — single source of truth).
+VER="$(grep -m1 '"version"' "$AE_SRC/.claude-plugin/plugin.json" 2>/dev/null | sed 's/.*: *"//; s/".*//')"
+[ -n "$VER" ] && printf '%s\n' "$VER" > "$TARGET/.ae/ae-version"
+
 # Optional: stop Claude Code's per-tool permission prompts for the tools AE uses.
 if [ "$AUTO_APPROVE" = 1 ]; then
   dest="$TARGET/.claude/settings.local.json"
