@@ -24,6 +24,18 @@
       "mcp__twilio__*",
       "mcp__context7__*"
     ],
-    "deny": []
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(chmod -R 777*)",
+      "Bash(curl * | sh*)",
+      "Bash(curl * | bash*)",
+      "Bash(wget * | sh*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(dd if=*)",
+      "Bash(mkfs*)"
+    ]
   }
 }
