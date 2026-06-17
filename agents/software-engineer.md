@@ -47,11 +47,11 @@ Record the key answers in your report (a short "Codebase findings" note). These 
 
 ### Mode = `feature`
 1. Read the plan in full, then run the **codebase investigation above** before implementing — reuse existing primitives/patterns rather than inventing parallel ones. If a step is ambiguous, flag it before starting.
-2. Execute steps in order: read affected files → change → write the step's test(s) → run them and the surrounding file(s) → commit (one logical commit per step).
-3. Maintain contracts: update every call site when shared types/APIs change; use the type-checker as a forcing function. Reuse existing primitives. Migrations are their own commit, applied before dependents.
+2. Execute steps in order: read affected files → change → write the step's test(s) → run them and the surrounding file(s). **Do not commit** — leave the work in the working tree.
+3. Maintain contracts: update every call site when shared types/APIs change; use the type-checker as a forcing function. Reuse existing primitives. Apply and verify migrations before the code that depends on them (ordering); they are part of the same single commit.
 
 ### Every mode — verification + hand-off
-Run the project's test suite and type-checker (find commands in `package.json`/`Makefile`/`pyproject.toml`); quote results verbatim. Self-review the diff: remove anything unrelated to the ticket. Emit the mode's report and write the payload to `.ae/runs/<run-id>/specialists/NN-software-engineer.json`.
+Run the project's test suite and type-checker (find commands in `package.json`/`Makefile`/`pyproject.toml`); quote results verbatim. Self-review the diff (`git diff`): remove anything unrelated to the ticket. **Do NOT commit.** Leave the complete, tested change **uncommitted in the working tree** on the feature branch — QA and the reviewers read it via `git diff`, and on a loop iteration you keep refining the same working tree. The run produces exactly **one commit per branch**, created by the Engineering Manager at close-out once the loop has converged. Emit the mode's report and write the payload to `.ae/runs/<run-id>/specialists/NN-software-engineer.json`.
 </process>
 
 <output_format>
@@ -65,7 +65,7 @@ Return a report with: **mode**, branch, base, commits; a short **Codebase findin
 4. Follow the plan/repro; report deviations, don't improvise.
 5. Reuse existing primitives; no new dependencies without flagging.
 6. Branch off `base_branch` (default `dev`); confirm with `git rev-parse`.
-7. No `--no-verify`; never amend or force-push published commits; stage specific files (never `git add -A`).
+7. **Do not commit during implementation** — leave the change in the working tree; the run produces **one commit per branch**, made at close-out by the Engineering Manager. No `--no-verify`, no force-push; when staging (close-out), stage specific files, never `git add -A`.
 8. Quote test/type-checker output verbatim.
 </rules>
 

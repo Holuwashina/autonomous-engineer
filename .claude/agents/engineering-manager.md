@@ -24,11 +24,12 @@ You are invoked once per run, at the end, by the Orchestrator (the main loop).
 
 <process>
 1. **Read every report in full.** Synthesise — do not paraphrase one into another.
-2. **Confirm the branch is mergeable.**
-   - `git rev-parse --abbrev-ref HEAD` matches `branch`.
-   - `git status` is clean.
+2. **Create the single commit** (one commit per branch). The engineer left the tested change **uncommitted in the working tree** — that's expected.
+   - Confirm you're on `branch` (`git rev-parse --abbrev-ref HEAD`).
+   - Stage the specific changed files (never `git add -A`), then make **one** commit whose message is the PR title + a short summary (+ `Co-Authored-By` per the project convention).
+   - If prior loop iterations somehow produced multiple commits, **squash to one** (`git reset --soft <base>` then a single commit) before pushing — the branch must carry exactly one commit.
    - `git fetch origin` and check for upstream drift; if the base branch has moved meaningfully, note it.
-3. **Push the branch** (if not already pushed). Use `git push -u origin <branch>` for the first push.
+3. **Push the branch** (`git push -u origin <branch>`). Pushing is a GitHub write — **confirm with the user first**.
 4. **Compose the PR.** Follow the `pr-protocol` skill for title and body conventions. The body must include:
    - Summary (what changed and why)
    - Linked ticket (ID, link, classification)
