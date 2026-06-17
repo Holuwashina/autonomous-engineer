@@ -30,18 +30,18 @@ You are invoked once per run, at the end, by the Orchestrator (the main loop).
    - If prior loop iterations somehow produced multiple commits, **squash to one** (`git reset --soft <base>` then a single commit) before pushing — the branch must carry exactly one commit.
    - `git fetch origin` and check for upstream drift; if the base branch has moved meaningfully, note it.
 3. **Push the branch** (`git push -u origin <branch>`). Pushing is a GitHub write — **confirm with the user first**.
-4. **Compose the PR.** Follow the `pr-protocol` skill for title and body conventions. The body must include:
+4. **Compose the PR.** Follow the `pr-protocol` skill exactly — **Conventional Commits title** (`type(scope): summary (TICKET-ID)`) and the standard body. The body must include:
    - Summary (what changed and why)
    - Linked ticket (ID, link, classification)
    - Implementation overview
    - Validation evidence (acceptance criteria results, communication checks)
    - Reviewer summary (each lens that ran, with its verdict, one-line)
-   - Test plan checklist (so the reviewer on GitHub can re-verify)
+   - **How to test** — concrete, human-runnable steps (preconditions/data, steps, expected result, edge cases, screens for UI), **built from QA's validation journey** — not a vague "test the feature"
    - Follow-ups (anything identified but not included)
    - Risks and rollback notes
 5. **Open the PR** via the GitHub MCP. Set draft mode if `pr_mode=draft`. Do not auto-merge.
 6. **Update the ticket** via the ticket MCP (Jira / ClickUp / GitHub Issues):
-   - Comment with the PR link and the validation summary.
+   - Comment with the PR link, the validation summary, and the **How to test (for QA)** block from `ticket-protocol` — concrete manual steps a QA person follows to re-verify, derived from QA's validation journey.
    - Transition status if the project's workflow expects it (per the `ticket-protocol` skill). When unsure, do not transition — leave a comment recommending the transition.
 7. **Remove the worktree.** Once the PR is open (the branch is safely on the remote), tear down the ticket's isolated worktree so they don't pile up: `git worktree remove .ae/worktrees/<branch>` (use `--force` only if it refuses due to the untracked-but-now-committed state). The branch itself remains on the remote for review. Skip if the engineer fell back to an in-place branch (no worktree).
 8. **Final completion summary.** Hand back to the Orchestrator the PR URL, ticket URL, and a one-paragraph close-out.

@@ -7,24 +7,23 @@ description: Autonomous Engineer Pull Request conventions — title format, body
 
 PRs are written to be useful to the human reviewer on GitHub — not as a marketing summary of what was done.
 
-## Title format
+## Title format — Conventional Commits
 
 ```
-[<ticket-id>] <verb> <subject>
+<type>(<scope>): <imperative summary> (<ticket-id>)
 ```
 
-- Verb: `Fix`, `Add`, `Update`, `Refactor`, `Remove`, `Investigate`. Match the classification.
-- Subject: ≤70 chars total. Crisp. No emoji.
+- **type** (maps from the classification): `fix` (bug) · `feat` (feature/enhancement) · `refactor` · `perf` · `docs` · `test` · `build` · `chore`. Trust-boundary/security fixes still use `fix`.
+- **scope** (optional): the affected area in parens, e.g. `(auth)`, `(cart)`, `(billing)`. Omit if it spans many.
+- **summary**: imperative mood, lowercase start, **≤72 chars total**, no trailing period, no emoji.
+- **ticket-id**: append in parens (or omit for a standalone `/ae-pr`). It's also linked in the body.
 
 Examples:
-- `[MM-123] Fix logout redirect loop on Safari`
-- `[ENG-4521] Add CSV export to reports dashboard`
-- `[#456] Update billing webhook signature verification`
+- `fix(auth): stop logout redirect loop on Safari (MM-123)`
+- `feat(reports): add CSV export to the dashboard (ENG-4521)`
+- `fix(billing): verify webhook signature before processing (#456)`
 
-If the run has no ticket (e.g. standalone `/ae-pr`):
-```
-<verb> <subject>
-```
+This matches the Conventional Commits standard so titles are greppable, changelog-friendly, and consistent across the team.
 
 ## Body template
 
@@ -58,10 +57,16 @@ For bugs, replace this section with **Reproduction & fix**:
 
 (Findings addressed in iteration N are noted with "resolved in iter N".)
 
-## Test plan (for the reviewer)
-- [ ] <step the reviewer should run to verify locally>
-- [ ] <step>
-- [ ] <step>
+## How to test (for the reviewer / QA)
+A human-runnable plan — anyone should be able to follow it without reading the diff:
+- **Preconditions / test data:** <accounts, seed data, feature flags, the env + URL>
+- **Steps:**
+  1. <concrete action — "log in as manager_acme, open /cart">
+  2. <action>
+- **Expected result:** <what they should see — the fix's observable behaviour>
+- **Edge / negative cases:** <e.g. non-manager is denied; empty cart>
+- **Screens (UI only):** verified at mobile / tablet / desktop — re-check at each
+- **Automated:** `<exact test command>` → all green
 
 ## Risks and rollback
 - Risks: <bulleted or "none beyond standard release risk">
