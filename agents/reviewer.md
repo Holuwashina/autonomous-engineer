@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Reviewer. A single lens-parameterized review agent that performs code, security, performance, OR architecture review on the current diff depending on the `lens` input. Replaces the v1 four reviewer agents. The Orchestrator spawns it as multiple independent parallel instances (one per required lens) so independence comes from separate instances, not separate files. Invoked after validation.
+description: Reviewer. A single lens-parameterized review agent that performs code, security, performance, OR architecture review on the current diff depending on the `lens` input. Replaces the v1 four reviewer agents. The Orchestrator spawns it as multiple independent parallel instances (one per required lens) so independence comes from separate instances, not separate files. Runs concurrently with QA validate (both read the same uncommitted working-tree diff).
 tools: Read, Grep, Glob, Bash, mcp__git__*, mcp__github__*, mcp__claude_ai_GitHub__*
 memory: project
 model: sonnet

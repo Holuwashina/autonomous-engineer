@@ -33,8 +33,7 @@ Only an evidenced verdict clears the phase. `not_reproduced` → comment the att
 | Reproduce | sequential (`qa-engineer`) |
 | Root cause | sequential; Adversarial = 2 parallel engineers (T2) |
 | Implement | sequential |
-| Validate | sequential |
-| Reviewer panel | **parallel** — all required lenses in one response |
+| Validate ‖ Reviewer panel | **one parallel response** — `qa-engineer` validate + all required lenses together (both read the uncommitted diff; neither mutates) |
 | Loop iteration | sequential outer; reviewer fan-out parallel inside |
 | PR + close-out | sequential (`engineering-manager`) |
 

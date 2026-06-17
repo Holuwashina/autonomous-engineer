@@ -52,8 +52,8 @@ Classification (via `intake-analyst`) returns a **tier**. Match pipeline depth t
 | Tier | Trigger | Pipeline | ~calls |
 |---|---|---|---|
 | **T0 Trivial** | Typo, copy/string, comment, doc, one-line config; blast radius "none" | `software-engineer` → `reviewer`(code) → `engineering-manager` | ~3 |
-| **T1 Standard** | Normal bug/feature, no trust-boundary surface | `intake-analyst` → engineer → `qa-engineer` validate → `reviewer` ×1–2 (code; + one risk lens only if the diff touches it) → loop(≤2) → EM | ~5 |
-| **T2 High-risk** | Auth, sessions, payments, persistence, migrations, file upload, external API, or production incident | intake → qa reproduce → engineer (Generate-and-Filter, optional Adversarial) → qa validate → `reviewer` ×2–4 (code + security always; +perf/+arch only if the diff touches them) → loop(≤3) → EM | ~8+ |
+| **T1 Standard** | Normal bug/feature, no trust-boundary surface | `intake-analyst` → engineer → **`qa-engineer` validate ‖ `reviewer` ×1–2** (parallel) → loop(≤2) → EM | ~5 |
+| **T2 High-risk** | Auth, sessions, payments, persistence, migrations, file upload, external API, or production incident | intake → qa reproduce → engineer (Generate-and-Filter, optional Adversarial) → **qa validate ‖ `reviewer` ×2–4** (parallel; code+security always, +perf/+arch if the diff touches them) → loop(≤3) → EM | ~8+ |
 
 The tier is shown in the ready message; the user may override it. **Security lens is mandatory for T2 — no exceptions.**
 
@@ -65,6 +65,7 @@ Concurrency is concrete: **multiple `Agent` calls in a single response run concu
 
 - Intake: `intake-analyst` does classification + repo map in one pass (no fan-out needed).
 - Reviewer panel: spawn the required lenses as **separate parallel `reviewer` instances in one response** (`lens=code|security|perf|arch`). Independence comes from separate instances, not separate files.
+- **Validate ‖ review together.** QA `validate` and the reviewer lenses both *read* the same uncommitted working-tree diff and neither mutates it — so spawn `qa-engineer` (`validate`) **in the same parallel response** as the reviewer lenses. Don't serialize validate-then-review; collapse them into one fan-out, then synthesise. If either validation or any lens returns blocking findings, loop. (Exception: skip this only if validation needs state a reviewer would change — it never does here.)
 - Multi-repo feature: optionally fan out one `software-engineer` per repo, then synthesise.
 
 Log a `[PARALLEL]` line naming the agents before fanning out.
@@ -93,9 +94,10 @@ Latency is the **sequential chain** of agent calls — each spawn is a fresh ful
 2. **Faster models on cheap roles.** `intake-analyst` + `engineering-manager` run on `haiku`, `qa-engineer` + `reviewer` on `sonnet`, `software-engineer` on the session model (set via agent frontmatter `model:` — change it to suit your plan).
 3. **Lean reviews — spawn a lens only when it has something to review.** T1 default = the **code** lens only; add **one** risk lens *only if the diff touches that surface*. T2 = **code + security always**; add **perf** only if the diff touches a hot path / DB queries / payload-or-bundle size, and **arch** only if it changes module boundaries / public contracts / migrations. So a typical T2 runs 2–3 lenses, not a reflexive 4. Always spawn them in **one parallel response** — never serial (parallel ≈ free wall-clock).
 4. **Targeted re-validation on loops.** On iteration 2+, re-validate only the changed area, not the whole journey/suite. Reuse the cached intake + repo map — never recompute.
-5. **Don't reload context.** Pass each specialist only its slice; load a skill only when its branch needs it.
-6. **Responsive = key states, not every interaction.** Screenshot the meaningful states per breakpoint, not each click.
-7. **`--fast` override.** `/ae-start … --fast` forces the minimal path for a low-risk change: skip reproduce, single `code` review, loop cap 1. **Refused for T2** — auth/payments/persistence/etc. still get full rigor and the mandatory security lens.
+5. **Don't reload context — pass artifacts downstream, don't re-derive.** Give QA and the reviewers the **intake repo map** and the engineer's **codebase-findings** note so they don't re-scan structure. QA reuses its environment/account selection across `reproduce`→`validate` (don't re-pick). Load a skill only when its branch needs it.
+6. **Validate ‖ review in one parallel response** (see Step 4) — collapses the two heaviest sequential phases into one; the single biggest natural speedup with no quality cost.
+7. **Responsive = key states, not every interaction.** Screenshot the meaningful states per breakpoint, not each click.
+8. **`--fast` override.** `/ae-start … --fast` forces the minimal path for a low-risk change: skip reproduce, single `code` review, loop cap 1. **Refused for T2** — auth/payments/persistence/etc. still get full rigor and the mandatory security lens.
 
 ## Autonomy & confirmation policy
 

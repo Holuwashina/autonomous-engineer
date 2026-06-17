@@ -34,8 +34,7 @@ Only an evidenced verdict clears validation. `blocked` (env shortfall, missing f
 | Intake | one `intake-analyst` |
 | Plan | sequential (`software-engineer` `plan`) |
 | Implement | sequential; per-repo fan-out parallel for multi-repo |
-| Validate | sequential |
-| Reviewer panel | **parallel** — required lenses in one response |
+| Validate ‖ Reviewer panel | **one parallel response** — `qa-engineer` validate + required lenses together (both read the uncommitted diff; neither mutates) |
 | Loop iteration | sequential outer; reviewer fan-out parallel inside |
 | PR + close-out | sequential |
 
