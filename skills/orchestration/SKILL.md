@@ -59,6 +59,10 @@ The tier is shown in the ready message; the user may override it. **Security len
 
 See `bug-workflow` / `feature-workflow` for the per-class pipelines.
 
+## Isolation — one worktree per ticket
+
+The `software-engineer` does its work in an **isolated git worktree** (`.ae/worktrees/<branch>`), not by switching the shared working tree. This is what lets a second ticket/branch be started without disturbing an in-flight one — each has its own checkout. Capture the worktree path from the engineer's return and pass it to `qa-engineer`, `reviewer`, and `engineering-manager` so they all operate in the same worktree. The Engineering Manager commits/pushes from it and removes it at close-out; `/ae-clean` prunes any left behind. (`.ae/` is git-excluded, so worktrees never show in the project's status.)
+
 ## Step 4 — Running specialists in parallel
 
 Concurrency is concrete: **multiple `Agent` calls in a single response run concurrently**; sequential responses do not. When a phase is parallel, emit all `Agent` calls together, then synthesise.
@@ -98,6 +102,8 @@ Latency is the **sequential chain** of agent calls — each spawn is a fresh ful
 6. **Validate ‖ review in one parallel response** (see Step 4) — collapses the two heaviest sequential phases into one; the single biggest natural speedup with no quality cost.
 7. **Responsive = key states, not every interaction.** Screenshot the meaningful states per breakpoint, not each click.
 8. **`--fast` override.** `/ae-start … --fast` forces the minimal path for a low-risk change: skip reproduce, single `code` review, loop cap 1. **Refused for T2** — auth/payments/persistence/etc. still get full rigor and the mandatory security lens.
+9. **Fewer round-trips per call.** Within an agent, batch independent file reads into one step and run tests + type-check in a single shell invocation — fewer tool hops = less wall-clock per agent.
+10. **Fold plan into implement for small features.** A T1 feature: `software-engineer` plans and builds in **one** invocation (plan kept internal). Split the `plan` call out only for large or multi-repo features that genuinely warrant a separate checkpoint.
 
 ## Autonomy & confirmation policy
 

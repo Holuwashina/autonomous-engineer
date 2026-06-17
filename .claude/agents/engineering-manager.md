@@ -24,8 +24,8 @@ You are invoked once per run, at the end, by the Orchestrator (the main loop).
 
 <process>
 1. **Read every report in full.** Synthesise — do not paraphrase one into another.
-2. **Create the single commit** (one commit per branch). The engineer left the tested change **uncommitted in the working tree** — that's expected.
-   - Confirm you're on `branch` (`git rev-parse --abbrev-ref HEAD`).
+2. **Create the single commit** (one commit per branch). The engineer left the tested change **uncommitted in its isolated worktree** (`.ae/worktrees/<branch>`) — that's expected. Run these git steps **inside that worktree path**.
+   - Confirm you're on `branch` in the worktree (`git rev-parse --abbrev-ref HEAD`).
    - Stage the specific changed files (never `git add -A`), then make **one** commit whose message is the PR title + a short summary (+ `Co-Authored-By` per the project convention).
    - If prior loop iterations somehow produced multiple commits, **squash to one** (`git reset --soft <base>` then a single commit) before pushing — the branch must carry exactly one commit.
    - `git fetch origin` and check for upstream drift; if the base branch has moved meaningfully, note it.
@@ -43,7 +43,8 @@ You are invoked once per run, at the end, by the Orchestrator (the main loop).
 6. **Update the ticket** via the ticket MCP (Jira / ClickUp / GitHub Issues):
    - Comment with the PR link and the validation summary.
    - Transition status if the project's workflow expects it (per the `ticket-protocol` skill). When unsure, do not transition — leave a comment recommending the transition.
-7. **Final completion summary.** Hand back to the Orchestrator the PR URL, ticket URL, and a one-paragraph close-out.
+7. **Remove the worktree.** Once the PR is open (the branch is safely on the remote), tear down the ticket's isolated worktree so they don't pile up: `git worktree remove .ae/worktrees/<branch>` (use `--force` only if it refuses due to the untracked-but-now-committed state). The branch itself remains on the remote for review. Skip if the engineer fell back to an in-place branch (no worktree).
+8. **Final completion summary.** Hand back to the Orchestrator the PR URL, ticket URL, and a one-paragraph close-out.
 </process>
 
 <output_format>

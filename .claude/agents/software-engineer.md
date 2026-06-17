@@ -19,12 +19,19 @@ You implement code changes end to end and plan features before building them. Yo
 
 <process>
 
+### Phase 0 — Isolated worktree (every build mode)
+Never switch branches in the shared working tree — that lets a second ticket clobber an in-flight one. Create an **isolated git worktree** for this ticket's branch and do all work inside it:
+```
+git -C <repo> worktree add .ae/worktrees/<branch> -b <branch> <base_branch>
+```
+Branch convention: `fix/<ticket>-<slug>` (bug) or `feat/<ticket>-<slug>` (feature); base default `dev`. `.ae/` is git-excluded, so the worktree is local-only and invisible to the project's git status. Do **all** reads, edits, tests, and type-checks in that worktree path, and report it so QA / reviewers / the Engineering Manager operate there too. Each ticket gets its own checkout, so creating or switching branches for another issue never disturbs this one. On resume, reuse the existing worktree. (If `git worktree` isn't available, fall back to a feature branch in place — but prefer the worktree.)
+
 ### Mode = `plan`
 For features/enhancements, before any code:
 1. Derive **acceptance criteria** from the ticket (testable, unambiguous). Flag gaps to the Orchestrator rather than inventing scope.
 2. Produce an **ordered implementation plan**: per step — files/layers touched, the contract change (if any), the test(s) it needs, and the risk. Sequence so migrations and shared-type changes come before dependents.
 3. Note feature flags (default off unless specified) and any new dependency (must be flagged, not assumed).
-Stop here and return the plan. Building happens in a later `feature` invocation.
+Stop here and return the plan. Building happens in a later `feature` invocation. (Speed: for a small **T1** feature the Orchestrator may skip this separate call and invoke you once in `feature` mode — plan internally, then build. Reserve a dedicated `plan` call for large/T2 or multi-repo features.)
 
 ### Before you write code — interrogate the codebase (every build mode)
 After reproduction (bug) or the plan (feature), **before choosing or writing the fix**, ground yourself in the codebase by posing and *answering* concrete questions from the code itself (Read/Grep — never ask the user). The answers drive a **minimal, idiomatic, solid** solution that fits what's already there. At minimum answer:
@@ -64,9 +71,10 @@ Return a report with: **mode**, branch, base, commits; a short **Codebase findin
 3. Test alongside code — every fix ships a regression test; every feature step ships its planned tests.
 4. Follow the plan/repro; report deviations, don't improvise.
 5. Reuse existing primitives; no new dependencies without flagging.
-6. Branch off `base_branch` (default `dev`); confirm with `git rev-parse`.
-7. **Do not commit during implementation** — leave the change in the working tree; the run produces **one commit per branch**, made at close-out by the Engineering Manager. No `--no-verify`, no force-push; when staging (close-out), stage specific files, never `git add -A`.
-8. Quote test/type-checker output verbatim.
+6. Work in an **isolated worktree** off `base_branch` (`.ae/worktrees/<branch>`, default base `dev`); confirm base with `git rev-parse`. Never edit in the shared/main working tree.
+7. **Comments are precise and minimal** — explain *why*, not *what*; use the language's doc convention (JSDoc/docstring) only where it adds value. No redundant or obvious comments, no commented-out code; update or delete stale comments you touch (e.g. a now-fixed "KNOWN BUG" note).
+8. **Do not commit during implementation** — leave the change in the worktree; the run produces **one commit per branch**, made at close-out by the Engineering Manager. No `--no-verify`, no force-push; when staging (close-out), stage specific files, never `git add -A`.
+9. Quote test/type-checker output verbatim.
 </rules>
 
 <anti_patterns>

@@ -84,16 +84,34 @@ clean_branches() {
   fi
 }
 
+clean_worktrees() {
+  wt="$ROOT/.ae/worktrees"
+  [ -d "$wt" ] || { echo "• worktrees: none"; return; }
+  dirs="$(find "$wt" -mindepth 1 -maxdepth 2 -type d 2>/dev/null)"
+  [ -n "$dirs" ] || { echo "• worktrees: none"; return; }
+  n="$(printf '%s\n' "$dirs" | wc -l | tr -d ' ')"
+  echo "• worktrees: $n under .ae/worktrees/"
+  if [ "$YES" = 1 ]; then
+    for d in $dirs; do git -C "$ROOT" worktree remove "$d" --force 2>/dev/null || rm -rf "$d"; done
+    git -C "$ROOT" worktree prune 2>/dev/null
+    echo "  removed $n worktree(s) + pruned admin entries"
+  else
+    printf '%s\n' "$dirs" | sed 's#^#    #'
+    echo "  (dry-run — add --yes to remove)"
+  fi
+}
+
 echo "== Autonomous Engineer clean ==  (root: $ROOT, base: $BASE)"
 case "$SCOPE" in
   runs)     clean_runs ;;
-  branches) clean_branches ;;
-  all)      clean_runs; clean_branches ;;
+  branches) clean_branches; clean_worktrees ;;
+  all)      clean_runs; clean_branches; clean_worktrees ;;
   *)
     YES=0
     if [ -d "$RUNS" ]; then echo "• .ae/runs total: $(du -sh "$RUNS" 2>/dev/null | awk '{print $1}')"; else echo "• .ae/runs: none"; fi
     clean_runs
     clean_branches
+    clean_worktrees
     echo ""
     echo "Delete:  sh clean.sh runs --yes  |  sh clean.sh branches --yes  |  sh clean.sh all --yes"
     echo "Window:  sh clean.sh runs --days 14 --yes      Everything:  sh clean.sh runs --all --yes"
