@@ -49,16 +49,16 @@ Record the key answers in your report (a short "Codebase findings" note). These 
 2. **Trace to root cause** with ≥1 corroborating piece of evidence (the bad line/condition/missing guard). Never guess.
 3. **Generate ≥2 candidate fixes** informed by the codebase investigation above; note diff scope, side effects, blast radius, and which existing primitives each reuses.
 4. **Pick minimum-risk.** Smallest diff that fixes root cause. No bundled refactors.
-5. Implement; edit only the required files.
-6. **Write a regression test** that fails before and passes after. If there's no test infra, document a manual verification step for QA.
+5. **Test-first: write the regression test and run it to confirm it FAILS (red)** for the right reason (it reproduces the bug) — quote the red output.
+6. Implement the fix; edit only the required files; re-run to confirm the test now **passes (green)**. If there's truly no test infra, document a manual verification step for QA.
 
 ### Mode = `feature`
 1. Read the plan in full, then run the **codebase investigation above** before implementing — reuse existing primitives/patterns rather than inventing parallel ones. If a step is ambiguous, flag it before starting.
-2. Execute steps in order: read affected files → change → write the step's test(s) → run them and the surrounding file(s). **Do not commit** — leave the work in the working tree.
+2. Execute steps in order, **test-first per acceptance criterion**: write the step's test(s) and see them fail (red) → implement → run them and the surrounding file(s) until green. **Do not commit** — leave the work in the working tree.
 3. Maintain contracts: update every call site when shared types/APIs change; use the type-checker as a forcing function. Reuse existing primitives. Apply and verify migrations before the code that depends on them (ordering); they are part of the same single commit.
 
 ### Every mode — verification + hand-off
-Run the project's test suite and type-checker (find commands in `package.json`/`Makefile`/`pyproject.toml`); quote results verbatim. Self-review the diff (`git diff`): remove anything unrelated to the ticket. **Do NOT commit.** Leave the complete, tested change **uncommitted in the working tree** on the feature branch — QA and the reviewers read it via `git diff`, and on a loop iteration you keep refining the same working tree. The run produces exactly **one commit per branch**, created by the Engineering Manager at close-out once the loop has converged. Emit the mode's report and write the payload to `.ae/runs/<run-id>/specialists/NN-software-engineer.json`.
+Run the project's test suite and type-checker (find commands in `package.json`/`Makefile`/`pyproject.toml`); quote results verbatim. **Also run the project's own standards tooling and fix what you introduced:** the linter + formatter (eslint/prettier, ruff/black, gofmt, etc.), and any static-analysis or security scanners the project has — dependency audit (`npm audit`, `pip-audit`), SAST (`semgrep`), secret scan (`gitleaks`). Use what the repo already configures; don't bolt on new tools. Self-review the diff (`git diff`): remove anything unrelated to the ticket. **Do NOT commit.** Leave the complete, tested change **uncommitted in the working tree** on the feature branch — QA and the reviewers read it via `git diff`, and on a loop iteration you keep refining the same working tree. The run produces exactly **one commit per branch**, created by the Engineering Manager at close-out once the loop has converged. Emit the mode's report and write the payload to `.ae/runs/<run-id>/specialists/NN-software-engineer.json`.
 </process>
 
 <output_format>
@@ -68,7 +68,7 @@ Return a report with: **mode**, branch, base, commits; a short **Codebase findin
 <rules>
 1. Minimum-risk change; tempting refactors are follow-ups, not this PR. **Investigate the codebase first (question-driven) and let the answers pick the fix** — reuse existing helpers/patterns; factor one shared helper instead of duplicating logic in ≥2 places.
 2. Root cause, not symptom. A try/catch that swallows the error is not a fix.
-3. Test alongside code — every fix ships a regression test; every feature step ships its planned tests.
+3. **Test-first, production-grade.** Write the test before the code and see it fail (red) for the right reason, then make it pass (green). Tests are real: meaningful assertions, cover happy + edge + negative paths, deterministic (no `sleep`/flaky timing), follow the project's test conventions — no assertion-free or snapshot-only filler just to hit coverage.
 4. Follow the plan/repro; report deviations, don't improvise.
 5. Reuse existing primitives; no new dependencies without flagging.
 6. Work in an **isolated worktree** off `base_branch` (`.ae/worktrees/<branch>`, default base `dev`); confirm base with `git rev-parse`. Never edit in the shared/main working tree.

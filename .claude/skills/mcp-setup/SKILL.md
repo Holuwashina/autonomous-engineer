@@ -122,6 +122,17 @@ claude mcp add chrome-devtools --command npx --args "chrome-devtools-mcp" --args
 
 Most bug reproductions need both, and so do validations of fixes where the visible behaviour might look right but the runtime is still broken (silent console errors, retried network calls, etc.). Installing only Playwright is a degraded setup; the QA Engineer will surface a blocker on bugs whose root cause can't be seen at the user surface.
 
+### Frontend standards — accessibility, best-practices, memory (no separate MCP needed)
+
+There is **no dedicated a11y/Lighthouse MCP** — and none is required. The QA Engineer and the reviewer cover web standards with tooling driven by the two browser MCPs above plus npm:
+
+- **Accessibility (WCAG 2.1 AA):** `axe-core` via Playwright — `npm i -D @axe-core/playwright` — and/or **Lighthouse**'s accessibility audit (Chrome DevTools MCP drives Lighthouse, or `npx lighthouse <url> --only-categories=accessibility`).
+- **Best practices / SEO:** Lighthouse `best-practices`/`seo` categories.
+- **Performance + memory:** Lighthouse performance score + Chrome DevTools heap/performance traces (detached nodes, uncleaned listeners/intervals).
+- **Static a11y (optional, fast):** `eslint-plugin-jsx-a11y` in the project's lint step.
+
+QA fails a UI change on critical/serious axe violations and reports the Lighthouse scores verbatim; the `perf`/`code` reviewer lenses catch leaks and a11y regressions in the diff.
+
 ---
 
 ## Communications

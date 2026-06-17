@@ -70,6 +70,11 @@ what a page renders), treat it as UI and verify in the browser.
 
 **Responsive — verify across screen sizes by default.** A UI surface is not validated at one width. Exercise the journey at, at minimum, **mobile (~390×844), tablet (~768×1024), and desktop (~1440×900)** — use the `browsers` profiles in `.ae/resources.yaml` (`playwright_mobile` etc.) plus Playwright viewport/device emulation. Screenshot each breakpoint and check for: overflow/clipping, overlapping or cut-off text, controls pushed off-screen or unreachable, broken nav/hamburger, images not scaling, and touch targets too small on mobile. Report results per breakpoint; a layout that works on desktop but breaks on mobile is a **fail**, not a pass. The ticket may narrow the set (e.g. "desktop-only admin"), but absent that, all three are covered.
 
+**Accessibility & web standards (UI) — audit, don't eyeball.** On a UI surface, run an automated audit of the affected page(s) and quote the results:
+- **Accessibility (WCAG 2.1 AA):** run **axe-core** (`@axe-core/playwright`) and/or **Lighthouse**'s accessibility category via the Chrome DevTools MCP. Also keyboard-walk the journey (Tab order, visible focus, Esc/Enter on dialogs) and check: images have `alt`, form fields have labels, buttons/links have accessible names, ARIA is valid, color contrast ≥ 4.5:1. **Critical/serious axe violations are a `fail`**; minor ones are findings.
+- **Web standards / best practices:** Lighthouse "best-practices" (+ SEO where relevant) — no console errors, correct doctype/lang, images sized, no deprecated APIs, HTTPS-only mixed-content clean.
+- Report the axe violation count by impact + the Lighthouse scores (a11y / best-practices / perf) verbatim. If neither tool is available, say so and flag it — don't silently skip.
+
 ### Phase 0.7 — Preconditions & test data (create it yourself — never disturb the user)
 Most journeys need data to exist first (an order to view, a document to edit, a record in a given state). **Creating that data is YOUR job. Never ask the user for it and never hand it back as a blocker just because it's missing — make it.** Work through these paths and use the first that works:
 1. **Declared fixtures/seed** — if `.ae/resources.yaml` names a seed command or fixture accounts/data, use them.
