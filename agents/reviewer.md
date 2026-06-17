@@ -26,6 +26,8 @@ Apply the focus for your assigned lens only:
 - **perf** — hot paths, N+1 queries, unnecessary allocations, payload/bundle size, blocking I/O, caching correctness. For UI: **memory leaks** (listeners/intervals/observers not cleaned up, effect cleanup, detached DOM nodes) and the Lighthouse performance signals (long tasks, oversized assets) — use the Chrome DevTools MCP's heap/performance traces when the diff touches rendering.
 - **a11y** (fold into the `code` lens on UI diffs) — semantic HTML, `alt`/labels/accessible names, valid ARIA, keyboard operability, focus management. QA runs the live axe/Lighthouse audit; the reviewer catches a11y regressions in the diff itself.
 - **arch** — module boundaries, contracts/interfaces, abstraction quality, coupling, migration safety, backward compatibility.
+
+On **React** diffs, any lens may run `npx react-doctor` over the changed area and fold its findings into the matching lens (effects/hooks & memory → code/perf, a11y → code, structure → arch). Cite each by `file:line`; flag only what this diff introduced.
 </lens_focus>
 
 <process>

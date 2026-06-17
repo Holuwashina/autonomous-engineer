@@ -130,6 +130,7 @@ There is **no dedicated a11y/Lighthouse MCP** — and none is required. The QA E
 - **Best practices / SEO:** Lighthouse `best-practices`/`seo` categories.
 - **Performance + memory:** Lighthouse performance score + Chrome DevTools heap/performance traces (detached nodes, uncleaned listeners/intervals).
 - **Static a11y (optional, fast):** `eslint-plugin-jsx-a11y` in the project's lint step.
+- **React (zero-install):** `npx react-doctor` — scans changed React code for effect/hook & memory, performance, a11y, and architecture anti-patterns. The engineer runs it on the changed area; reviewers fold its findings into the matching lens.
 
 QA fails a UI change on critical/serious axe violations and reports the Lighthouse scores verbatim; the `perf`/`code` reviewer lenses catch leaks and a11y regressions in the diff.
 

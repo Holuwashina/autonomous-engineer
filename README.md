@@ -134,7 +134,7 @@ AE works on any repo, but it's only as strong as the standards your project alre
 - **MCPs:** Playwright **+ Chrome DevTools** (UI repro/validation, a11y, Lighthouse, memory), a ticket source, and GitHub (or the `gh` CLI). See `mcp-setup`.
 
 **For frontend work**
-- A startable dev server (so QA can drive it — you'll be asked to start it), and accessibility/standards tooling: `@axe-core/playwright`, Lighthouse (via Chrome DevTools MCP), `eslint-plugin-jsx-a11y`. React projects: `@testing-library/react` + `eslint-plugin-react-hooks` (catches missing effect cleanup / dependency bugs — i.e. memory leaks).
+- A startable dev server (so QA can drive it — you'll be asked to start it), and accessibility/standards tooling: `@axe-core/playwright`, Lighthouse (via Chrome DevTools MCP), `eslint-plugin-jsx-a11y`. React projects: `@testing-library/react` + `eslint-plugin-react-hooks`, and AE runs **`npx react-doctor`** (zero-install) on React diffs to catch effect/hook, performance, a11y, and architecture anti-patterns.
 
 **For backend / API work**
 - Request-level **API/integration tests** (`supertest`, `httpx`, `schemathesis`), **migration** tooling with up/down (`prisma`/`knex`/`alembic`/`flyway`), and ideally an **OpenAPI** spec + contract tests so the API contract is verified. The `security` reviewer uses `npm audit`/`pip-audit`, `semgrep`, `gitleaks` where present.

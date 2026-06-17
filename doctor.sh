@@ -62,6 +62,7 @@ if dep_has '"react"'; then
   good "React detected"
   if dep_has '@testing-library/react'; then good "  React Testing Library (component tests)"; else soft "  no @testing-library/react — add for component-level tests"; fi
   if dep_has 'eslint-plugin-react-hooks'; then good "  react-hooks lint (deps/cleanup → catches leaks)"; else soft "  no eslint-plugin-react-hooks — catches missing effect cleanup / dependency bugs (memory leaks)"; fi
+  good "  React audit: AE runs 'npx react-doctor' (zero-install) on React diffs — effects/perf/a11y/architecture"
 fi
 
 echo ""
