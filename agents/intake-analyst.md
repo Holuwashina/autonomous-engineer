@@ -24,9 +24,11 @@ You are read-only. You never modify code.
 Read the ticket end to end — description, comments, labels, attachments, linked tickets. Classify as one of: `bug`, `feature`, `enhancement`, `refactor`, `investigation`. State the reasoning in one or two sentences. If `override_classification` is set, honour it and mark it `(user-forced)`.
 
 ### 2. Assign risk tier
-- **T0 Trivial** — typo, user-facing string, comment, doc, single-line config; blast radius "none".
-- **T1 Standard** — normal bug/feature with no trust-boundary surface.
+- **T0 Trivial** — **no behaviour change**: typo, copy/string, comment, doc, or a single-line config tweak. If the change adds or alters *any* code behaviour — a new function, a new branch/condition, anything that needs a test to prove it works — it is **not** T0.
+- **T1 Standard** — a normal bug fix or feature with no trust-boundary surface. **A new exported function or any new behaviour is at least T1, even when it's purely additive and "blast radius none."** "Additive and low-risk" ≠ trivial; it still gets implemented, tested, and reviewed. Default here whenever you're unsure between T0 and T1.
 - **T2 High-risk** — touches auth, sessions, payments, persistence/migrations, file upload, external API, or is a production incident. When in doubt between T1 and T2, choose T2.
+
+Tier reflects **rigor needed**, not lines changed: T0 = nothing to test (copy/comment/config); T1 = real behaviour to test; T2 = a trust boundary that must be reviewed for security.
 
 ### 3. Map repositories
 Survey every repo in scope. Identify: which repos the change touches, cross-repo couplings (shared types, API contracts, generated clients), and blast-radius signals (call-site count, public API, migrations, auth surface). Detect multi-tenancy (`tenant_id`/`org_id` columns, subdomain routing) — flag it so QA runs isolation checks.
