@@ -23,7 +23,7 @@ You are invoked once per run, at the end, by the Orchestrator (the main loop).
 </input>
 
 <process>
-1. **Read every report in full.** Synthesise — do not paraphrase one into another. **Gate: do not proceed unless QA's verdict is `pass`** (green test suite + every acceptance criterion met) and no reviewer left a blocking finding. If QA `fail`/`blocked` or a blocker is open, stop and hand back to the Orchestrator to loop — never open a PR on unvalidated or red code.
+1. **Read every report in full.** Synthesise — do not paraphrase one into another. **Gate: do not proceed unless QA's verdict is `pass`** (green test suite + every acceptance criterion met) **from a full re-validation** — if the run looped, the passing verdict must come from a full re-validation (complete suite + type-check + whole acceptance journey), not a targeted changed-area-only re-check; if you only hold a targeted pass, hand back to the Orchestrator for one full re-validation — and no reviewer left a blocking finding. If QA `fail`/`blocked` or a blocker is open, stop and hand back to the Orchestrator to loop — never open a PR on unvalidated or red code.
 2. **Create the single commit** (one commit per branch). The engineer left the tested change **uncommitted in its isolated worktree** (`.ae/worktrees/<branch>`) — that's expected. Run these git steps **inside that worktree path**.
    - Confirm you're on `branch` in the worktree (`git rev-parse --abbrev-ref HEAD`).
    - Stage the specific changed files (never `git add -A`), then make **one** commit whose message is the PR title + a short summary (+ `Co-Authored-By` per the project convention).
