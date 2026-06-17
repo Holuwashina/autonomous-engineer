@@ -21,7 +21,7 @@ The Orchestrator (main loop) drives this. Depth scales with the risk tier from `
 6. Loop-Until-Done (≤2). → `engineering-manager`.
 
 **T2 — High-risk** (auth, sessions, payments, persistence/migrations, upload, external API, or production incident)
-As T1 plus: Adversarial Verification on the root cause (spawn a second `software-engineer` to refute), and the **full reviewer panel** (`code`+`security`+`perf`+`arch`) in one parallel response. Loop ≤3. Security lens is mandatory.
+As T1 plus: Adversarial Verification on the root cause (spawn a second `software-engineer` to refute), and the reviewer panel in one parallel response — **`code` + `security` always; add `perf` only if the diff touches a hot path/DB/payload, and `arch` only if it changes boundaries/contracts/migrations** (so 2–4 lenses, not a reflexive 4). Loop ≤3. Security lens is mandatory.
 
 ## Verdict gate (reproduce + validate)
 Only an evidenced verdict clears the phase. `not_reproduced` → comment the attempted journey on the ticket and ask the user for clearer steps; do **not** fix on assumption. `blocked` (missing env/fixture/test-mode) → Orchestrator escalates; never downgrade to "user verifies after merge". The gate is *reproduced/validated with evidence by the appropriate method* — and for any **UI** surface the appropriate method is a **live Playwright run in a real browser (+ Chrome DevTools as needed), never a unit/component test substitute**. Non-UI classes (api/data/build/timing) use their fitting method.

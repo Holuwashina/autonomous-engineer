@@ -21,7 +21,7 @@ The Orchestrator (main loop) drives this for `feature` and `enhancement` tickets
 6. Loop-Until-Done (≤2). → `engineering-manager`.
 
 **T2 — High-risk** (auth/payments/persistence/migrations/upload/external-API surface)
-As T1 plus the **full reviewer panel** (`code`+`security`+`perf`+`arch`) in one parallel response; loop ≤3; security lens mandatory.
+As T1 plus the reviewer panel in one parallel response — **`code` + `security` always; add `perf` only if the diff touches a hot path/DB/payload, and `arch` only if it changes boundaries/contracts/migrations** (2–4 lenses, not a reflexive 4); loop ≤3; security lens mandatory.
 
 **Multi-repo features:** the Orchestrator may fan out one `software-engineer` (`feature`) per repo in a single response, then synthesise — Fanout-and-Synthesize. Only when the streams share no types/contracts that must land first; when in doubt, serialize.
 
