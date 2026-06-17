@@ -74,6 +74,12 @@ Concurrency is concrete: **multiple `Agent` calls in a single response run concu
 
 Log a `[PARALLEL]` line naming the agents before fanning out.
 
+## Visibility — surface each specialist's evidence (anti-hallucination)
+
+After **every** specialist returns — QA reproduce, engineer, QA validate, each reviewer — post an evidence-backed phase report to the user **immediately** (per `progress-reporting`), not just a one-line verdict and not only at the end. Each report quotes the **actual artifact** the specialist produced (verbatim failing test output, the changed `file:line` + real diff lines, per-criterion pass/fail with command output, findings citing `file:line`) and points at `.ae/runs/<run-id>/specialists/NN-*.json` for the full record. This lets the user watch the work happen and confirm it's real.
+
+**A verdict with no verbatim evidence is unverified** — do not accept "reproduced" / "fixed" / "validated" / "approve" on a non-trivial change without the concrete proof. If a specialist returns a claim without its artifact, re-invoke it asking for the evidence, or escalate — never forward an unbacked claim as fact. The persisted run log (`/ae-status --log`) is the durable audit trail.
+
 ## Step 5 — Loop until done
 
 If validation or any reviewer returns blocking findings, re-invoke `software-engineer` with the *specific* findings, then re-validate and re-review. Reuse the cached intake + repo map — never recompute them. Cap: 2 iterations (T1) / 3 (T2) without convergence → escalate.

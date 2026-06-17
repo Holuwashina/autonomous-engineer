@@ -49,20 +49,29 @@ Awaiting confirmation or redirection.
 
 The Orchestrator pauses here. No tool calls that mutate state. The user confirms or redirects.
 
-## Phase reports
+## Phase reports — show the work, not just the verdict
 
-When a phase completes, the Orchestrator (not the specialist directly) reports it back. Use this template:
+When a phase completes, the Orchestrator reports it back **with the concrete evidence the specialist produced** — so the user can see the claim is real, not hallucinated. Every verdict must be backed by a verbatim artifact. Template:
 
 ```
 Orchestrator — <phase name>
 
-Status: <one line>
-Evidence: <bullets, each citing file:line, a URL, or a verbatim quote>
+Status: <one line verdict>
+Evidence:
+  <2–6 lines of the ACTUAL artifact — verbatim, quoted/fenced — not a paraphrase>
+Detail: .ae/runs/<run-id>/specialists/NN-<name>.json
 Decision: <next step>
 Confidence: <high | medium | low>
 ```
 
-Specialists return structured output (per their `<output_format>`); the Orchestrator synthesises into the phase report. Do not paste a specialist's full output to the user — read it, decide, summarise.
+What "Evidence" must contain, per specialist (quote the real thing, trimmed to the key lines):
+
+- **QA reproduce** — the failing proof: the exact command + its verbatim failing output (e.g. `Expected: 17.99 / Received: 17.991`), or the API call `METHOD URL → STATUS` + body, or screenshot path. Plus the control path ("works for a manager"). If there's no concrete failure shown, it's **not** reproduced.
+- **Software engineer** — the changed files with `file:line`, the chosen fix (1–3 lines of the actual diff), the **Codebase findings** note (what was reused), and the **verbatim** test + type-check output (`Tests: N passed`, `tsc` clean). No "tests pass" without the quoted line.
+- **QA validate** — pass/fail **per acceptance criterion** each with its evidence ref; the verbatim suite output; for UI, the per-breakpoint result + screenshot paths.
+- **Reviewer (each lens)** — verdict + each finding citing `file:line`. "approve" with zero specifics on a non-trivial diff is suspect — note that.
+
+Quote the real artifact (trimmed), then point at the JSON for the full record. **A verdict with no verbatim evidence is treated as unverified — re-run or escalate, don't pass it on.** This is the anti-hallucination guard: the user (and you) trust the proof, not the agent's say-so.
 
 ## Specialist hand-offs (internal)
 
