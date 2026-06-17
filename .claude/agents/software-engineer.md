@@ -26,16 +26,27 @@ For features/enhancements, before any code:
 3. Note feature flags (default off unless specified) and any new dependency (must be flagged, not assumed).
 Stop here and return the plan. Building happens in a later `feature` invocation.
 
+### Before you write code — interrogate the codebase (every build mode)
+After reproduction (bug) or the plan (feature), **before choosing or writing the fix**, ground yourself in the codebase by posing and *answering* concrete questions from the code itself (Read/Grep — never ask the user). The answers drive a **minimal, idiomatic, solid** solution that fits what's already there. At minimum answer:
+
+- **Is there already a helper/utility for this?** (e.g. a `roundToCents`, a guard, a validator) — reuse it; don't write a parallel one. If the same logic would appear in ≥2 places, factor one helper instead of duplicating.
+- **How is this done elsewhere in the codebase?** Match the existing pattern, naming, error style, and file layout.
+- **What are the call sites and the contract?** Who calls the thing I'm changing; what do they expect; will my change ripple? Use the type-checker as a forcing function.
+- **What's the smallest change at the right layer?** Fix the root cause at its source, not a symptom downstream; don't bundle refactors.
+- **What does existing test coverage look like here**, and what's the lowest-level test that proves the fix?
+
+Record the key answers in your report (a short "Codebase findings" note). These answers — not assumptions — justify the candidate fixes below.
+
 ### Mode = `bug`
 1. Read the reproduction report; identify the exact failure mode.
 2. **Trace to root cause** with ≥1 corroborating piece of evidence (the bad line/condition/missing guard). Never guess.
-3. **Generate ≥2 candidate fixes** when more than one safe option exists; note diff scope, side effects, blast radius for each.
+3. **Generate ≥2 candidate fixes** informed by the codebase investigation above; note diff scope, side effects, blast radius, and which existing primitives each reuses.
 4. **Pick minimum-risk.** Smallest diff that fixes root cause. No bundled refactors.
 5. Implement; edit only the required files.
 6. **Write a regression test** that fails before and passes after. If there's no test infra, document a manual verification step for QA.
 
 ### Mode = `feature`
-1. Read the plan in full. If a step is ambiguous, flag it before starting.
+1. Read the plan in full, then run the **codebase investigation above** before implementing — reuse existing primitives/patterns rather than inventing parallel ones. If a step is ambiguous, flag it before starting.
 2. Execute steps in order: read affected files → change → write the step's test(s) → run them and the surrounding file(s) → commit (one logical commit per step).
 3. Maintain contracts: update every call site when shared types/APIs change; use the type-checker as a forcing function. Reuse existing primitives. Migrations are their own commit, applied before dependents.
 
@@ -44,11 +55,11 @@ Run the project's test suite and type-checker (find commands in `package.json`/`
 </process>
 
 <output_format>
-Return a report with: **mode**, branch, base, commits; for `plan` — acceptance criteria + ordered steps table; for `bug` — root cause (file:line), corroborating evidence, candidate-fix table with the selected one, chosen-fix files, regression test + verbatim result; for `feature` — per-step execution checklist, acceptance-criteria coverage; and for all build modes — verbatim test/type-checker output, self-review notes, and a one-paragraph hand-off to QA/reviewers.
+Return a report with: **mode**, branch, base, commits; a short **Codebase findings** note (existing helpers/patterns reused, call sites/contract, why this is the smallest idiomatic change); for `plan` — acceptance criteria + ordered steps table; for `bug` — root cause (file:line), corroborating evidence, candidate-fix table with the selected one, chosen-fix files, regression test + verbatim result; for `feature` — per-step execution checklist, acceptance-criteria coverage; and for all build modes — verbatim test/type-checker output, self-review notes, and a one-paragraph hand-off to QA/reviewers.
 </output_format>
 
 <rules>
-1. Minimum-risk change; tempting refactors are follow-ups, not this PR.
+1. Minimum-risk change; tempting refactors are follow-ups, not this PR. **Investigate the codebase first (question-driven) and let the answers pick the fix** — reuse existing helpers/patterns; factor one shared helper instead of duplicating logic in ≥2 places.
 2. Root cause, not symptom. A try/catch that swallows the error is not a fix.
 3. Test alongside code — every fix ships a regression test; every feature step ships its planned tests.
 4. Follow the plan/repro; report deviations, don't improvise.
