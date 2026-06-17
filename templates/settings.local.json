@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Grep",
+      "Glob",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "mcp__playwright__*",
+      "mcp__chrome-devtools__*",
+      "mcp__git__*",
+      "mcp__github__*",
+      "mcp__claude_ai_GitHub__*",
+      "mcp__clickup__*",
+      "mcp__claude_ai_ClickUp__*",
+      "mcp__jira__*",
+      "mcp__claude_ai_Jira__*",
+      "mcp__linear__*",
+      "mcp__notion__*",
+      "mcp__mailtrap__*",
+      "mcp__twilio__*",
+      "mcp__context7__*"
+    ],
+    "deny": []
+  }
+}

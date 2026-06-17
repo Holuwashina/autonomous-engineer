@@ -19,8 +19,20 @@
 set -eu
 
 AE_SRC="$(cd "$(dirname "$0")" && pwd)"
-TARGET="${1:-$PWD}"
 BASE="${AE_BASE:-dev}"
+
+# Parse args: a target dir (optional) + flags. --auto-approve installs a Claude Code
+# permission allow-list so routine AE tools stop prompting.
+AUTO_APPROVE=0
+TARGET=""
+for a in "$@"; do
+  case "$a" in
+    --auto-approve|--yolo) AUTO_APPROVE=1 ;;
+    -*) ;;
+    *) [ -z "$TARGET" ] && TARGET="$a" ;;
+  esac
+done
+[ -n "$TARGET" ] || TARGET="$PWD"
 
 TARGET="$(cd "$TARGET" 2>/dev/null && pwd || true)"
 [ -n "$TARGET" ] || { echo "setup.sh: target directory does not exist." >&2; exit 1; }
@@ -47,6 +59,17 @@ echo "    skills:   $(ls -d "$TARGET"/.claude/skills/*/ 2>/dev/null | wc -l | tr
 mkdir -p "$TARGET/.ae"
 printf '%s\n' "$AE_SRC" > "$TARGET/.ae/ae-source"
 
+# Optional: stop Claude Code's per-tool permission prompts for the tools AE uses.
+if [ "$AUTO_APPROVE" = 1 ]; then
+  dest="$TARGET/.claude/settings.local.json"
+  if [ -f "$dest" ]; then
+    echo "• Auto-approve: $dest already exists — leaving it (merge the allow-list from $AE_SRC/templates/settings.local.json if you want)"
+  else
+    cp "$AE_SRC/templates/settings.local.json" "$dest"
+    echo "• Auto-approve: installed permission allow-list — Claude Code won't prompt for AE's routine tools"
+  fi
+fi
+
 if git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1; then
   # 2) Keep AE out of the project's git — local-only, never committed/pushed -----
   EXCLUDE="$(git -C "$TARGET" rev-parse --git-path info/exclude)"
@@ -58,6 +81,7 @@ if git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1; then
   for d in "$AE_SRC"/skills/*/;     do add_exclude "/.claude/skills/$(basename "$d")/"; done
   add_exclude "/CLAUDE.ae.md"
   add_exclude "/.ae/"
+  add_exclude "/.claude/settings.local.json"
   # CLAUDE.md: exclude ONLY the AE-installed one (untracked + byte-identical to ours).
   # A CLAUDE.md the project already owns/tracks is never touched.
   if [ -f "$TARGET/CLAUDE.md" ] \
@@ -103,6 +127,11 @@ How commands work — this trips everyone once:
 
 Tip: make per-project setup a one-liner —
      alias ae-here='sh $AE_SRC/setup.sh'   then just run  ae-here  in any project.
+
+Tired of Claude Code's permission prompts? Re-run with --auto-approve to install
+an allow-list for AE's tools (no more "allow this?" spam):
+     sh $AE_SRC/setup.sh --auto-approve
+(or launch once with:  claude --dangerously-skip-permissions)
 
 Then start work:   (inside Claude Code)   /ae-start      (it asks what to work on)
 ────────────────────────────────────────────────────────────────────────
