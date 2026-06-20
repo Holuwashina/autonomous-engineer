@@ -110,6 +110,15 @@ feature is not "validated" until it has been exercised end to end in the browser
 **at mobile, tablet, and desktop widths** (see Responsive above) — report pass/fail
 per breakpoint, not just once.
 
+**Save screenshots as files — they get attached to the ticket.** Write every
+validation screenshot to `.ae/runs/<run-id>/evidence/` with a descriptive name
+(`validate-<journey>-<breakpoint>.png`, e.g. `validate-checkout-mobile.png`), not
+just inline in the transcript. List the saved file paths in your report under the
+matching acceptance criterion so the **Engineering Manager attaches them to the
+ticket close-out comment**. Capture at least the key success state per breakpoint
+for UI work, plus a shot of any failure you report. Don't capture anything showing
+a real secret/token on screen.
+
 ### Communications (inline, only when the journey sends a message)
 Skip entirely unless the journey involves email/OTP/magic-link/invite/push/SMS. When applicable: confirm the provider is reachable; for each artefact wait with a bounded retry (~15s, poll 1–2s — a miss after the bound is a finding); quote subject/From/To and required content verbatim; extract link/code atomically; never click a destructive link; a reset for user A must not message user B.
 
@@ -137,7 +146,7 @@ Emit the mode's report; write the payload to `.ae/runs/<run-id>/specialists/NN-q
 </process>
 
 <output_format>
-Return the mode-appropriate report. **reproduce:** verdict, env/tenant/account, journey executed, inferred steps, observed vs expected outcome, evidence (screenshot/output/console/network/comms), control path, hand-off. **validate:** verdict (`pass | pass_with_findings | fail | blocked`), acceptance-criteria table with evidence, edge cases, regression spot-checks, **responsive results per breakpoint (mobile/tablet/desktop) with a screenshot each for UI work**, cross-role/tenant, comms (or "n/a"), blocking + non-blocking findings with suggested owner. Append a JSON selection block (environment_key, base_url, tenant_keys, account_keys, comms_key, unresolved_fields).
+Return the mode-appropriate report. **reproduce:** verdict, env/tenant/account, journey executed, inferred steps, observed vs expected outcome, evidence (screenshot/output/console/network/comms), control path, hand-off. **validate:** verdict (`pass | pass_with_findings | fail | blocked`), acceptance-criteria table with evidence, edge cases, regression spot-checks, **responsive results per breakpoint (mobile/tablet/desktop) with a screenshot each for UI work** — give the **saved file path** of every screenshot (under `.ae/runs/<run-id>/evidence/`) so the Engineering Manager can attach them to the ticket — cross-role/tenant, comms (or "n/a"), blocking + non-blocking findings with suggested owner. Append a JSON selection block (environment_key, base_url, tenant_keys, account_keys, comms_key, unresolved_fields).
 </output_format>
 
 <rules>

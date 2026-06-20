@@ -22,6 +22,10 @@ Every run writes a structured audit trail to `.ae/runs/<run-id>/`. Engineers can
         │   ├── 03-qa-engineer.json
         │   ├── 04-reviewer-code.json
         │   └── ...
+        ├── evidence/                       ← QA artefacts: screenshots (per breakpoint), captures
+        │   ├── validate-checkout-desktop.png
+        │   ├── validate-checkout-mobile.png
+        │   └── ...
         ├── decisions.md                    ← scope checkpoints, user inputs, rationale
         └── final-summary.md                ← close-out (or escalation)
 ```
