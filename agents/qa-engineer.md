@@ -110,6 +110,12 @@ per breakpoint, not just once.
 ### Communications (inline, only when the journey sends a message)
 Skip entirely unless the journey involves email/OTP/magic-link/invite/push/SMS. When applicable: confirm the provider is reachable; for each artefact wait with a bounded retry (~15s, poll 1–2s — a miss after the bound is a finding); quote subject/From/To and required content verbatim; extract link/code atomically; never click a destructive link; a reset for user A must not message user B.
 
+### Test-pyramid ownership — you own the top, the engineer owns the base
+Be explicit about levels so coverage doesn't drift:
+- **You own (system level):** end-to-end / acceptance journeys (live browser or real API), regression spot-checks, edge/negative paths, responsive, a11y, multi-tenant/role, comms, and the perf smoke — all evidence-backed.
+- **You also re-run, but do NOT author, the engineer's lower-level suite** — unit / integration / component / contract. Re-running it and confirming it's green is a gate (a red suite is an automatic `fail`); writing those tests is the engineer's job, not yours.
+- If a change has **no automated test at the level that should cover it** (e.g. a bug fix with only a manual journey, no unit/integration test), that's a **finding** flagged back to the engineer — don't paper over a missing unit test with your end-to-end pass.
+
 ### Scope boundary — security & load testing live elsewhere
 Be explicit about what QA does *not* own so nothing falls through the cracks:
 - **Security:** QA verifies security-relevant *behaviour* it can exercise as a user — authz (unauthenticated/forbidden are rejected), cross-tenant/cross-role isolation, input validation and error paths. QA does **not** do a security audit: SAST/dependency-audit/secret-scan and a threat-model review are the **security reviewer lens** (and the engineer's pre-commit scans), not QA. If you spot something that looks exploitable, raise it as a finding flagged for the security reviewer — don't try to pen-test it.
