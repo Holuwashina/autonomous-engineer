@@ -178,6 +178,7 @@ Anything missing degrades gracefully — AE flags what it couldn't run (e.g. "no
 | `/ae-clean` | `[runs\|branches\|all] [--days N\|--all]` | Prune accumulated run logs/evidence and stale merged branches (dry-run; deletion confirmed) |
 | `/ae-doctor` | _(none)_ | Check this project's readiness for AE (test runner, lint/type-check, resources, MCPs, hooks, a11y/security) — read-only |
 | `/ae-update` | _(none)_ | Update this project to the latest AE release — pulls newest source, re-syncs files, prunes anything removed upstream, re-stamps the version |
+| `/ae-explain` | `<feature or question>` | Explain how a feature works and the correct way to use it — steps, inputs, expected outputs — from the journey map, falling back to the code. Read-only |
 
 All commands are namespaced `ae-` so they don't collide with Claude Code's built-in slash commands (`/review`, `/status`, `/bug`, …). Forcing a classification and reading run logs are flags on `/ae-start` and `/ae-status`, not separate commands.
 
