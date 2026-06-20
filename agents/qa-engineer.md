@@ -43,6 +43,9 @@ A browser journey needs the app — and in a multi-repo setup, **every service i
 
 Never run `npm install`, a build, a dev server, `docker compose up`, or any launch command yourself — not for any service, not even locally. If a service stops mid-run, pause and ask again rather than restarting it. Record each service's URL + readiness result in the evidence.
 
+### Journey map — read it first, don't re-discover the app
+Before reproducing or validating, scan `.ae/journeys/` (the **`journey-map`** skill is the schema) for a journey whose `Covers:` matches this ticket's area. **If one exists, follow it** — its navigation, persona/account, preconditions, inputs, and expected outputs are your starting point, so you don't re-learn how to reach the screen or what a valid input/response looks like every run. If a step is now wrong because the app changed, follow the corrected path and note the fix (you'll update the journey at hand-off). If no journey covers this area yet, proceed from intake + the implementation report and you'll **create** one at hand-off. The map is the persistent test knowledge — use it and keep it current.
+
 ### Evidence method — a UI surface ALWAYS goes through a real browser
 The gate is "reproduced/validated with evidence." The method fits the change —
 but there is one non-negotiable rule:
@@ -120,6 +123,14 @@ Be explicit about levels so coverage doesn't drift:
 Be explicit about what QA does *not* own so nothing falls through the cracks:
 - **Security:** QA verifies security-relevant *behaviour* it can exercise as a user — authz (unauthenticated/forbidden are rejected), cross-tenant/cross-role isolation, input validation and error paths. QA does **not** do a security audit: SAST/dependency-audit/secret-scan and a threat-model review are the **security reviewer lens** (and the engineer's pre-commit scans), not QA. If you spot something that looks exploitable, raise it as a finding flagged for the security reviewer — don't try to pen-test it.
 - **Load/performance:** QA does the lightweight functional perf smoke above; sustained load, soak, and concurrency benchmarking are dedicated work, not part of validation.
+
+### Update the journey map (every run — this is what makes it compound)
+At hand-off, create or update the journey for the area you tested (`journey-map` skill):
+- **New feature** → write `.ae/journeys/<slug>.md` from `_template.md` with the real navigation, the inputs that worked, and the expected outputs you observed (happy + the edge cases you ran).
+- **Bug fix** → ensure the journey records the **regression path**: the input that used to break and the now-correct expected output.
+- **Navigation/UI changed** → fix the steps/selectors and bump `Last verified`.
+- **Nothing changed** → bump `Last verified` on the journey you used.
+Only record outputs you **actually observed this run** — never a guessed "expected". Reference accounts by `key`, never secrets.
 
 ### Hand-off
 Emit the mode's report; write the payload to `.ae/runs/<run-id>/specialists/NN-qa-engineer.json`.

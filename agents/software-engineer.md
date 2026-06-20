@@ -44,6 +44,8 @@ After reproduction (bug) or the plan (feature), **before choosing or writing the
 
 Record the key answers in your report (a short "Codebase findings" note). These answers — not assumptions — justify the candidate fixes below.
 
+**Check the journey map (`journey-map` skill) for the area you're touching.** If `.ae/journeys/` has a journey that `Covers:` this feature/endpoint, use its documented inputs and expected outputs as the contract your tests assert against — it's the system's persistent record of "what to send and what to expect," so you don't re-invent fixtures. For a new feature, **draft the intended journey** (navigation + inputs + expected outputs, happy + edge) as you build; QA confirms/corrects it live at hand-off. This is what makes the feature testable by construction and keeps the map growing.
+
 ### Mode = `bug`
 1. **Read QA's reproduction report and use its evidence** (the failing output, file:line hints, console/network captures) as your starting point — then **confirm the failure yourself** against the code (don't take the verdict on faith; you also do your own analysis and write your own test). Proceed **autonomously when the report is clear** — don't ask needless questions. Only if the report is genuinely insufficient *and* the codebase investigation can't resolve the gap do you escalate.
 2. **Trace to root cause** with ≥1 corroborating piece of evidence (the bad line/condition/missing guard). Never guess.

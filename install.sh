@@ -200,6 +200,11 @@ if [ "$GLOBAL" -eq 0 ]; then
 
     # Resources example
     cp "$SOURCE_DIR/.ae/resources.yaml.example" "$TARGET/.ae/resources.yaml.example"
+
+    # Journey map — scaffold the dir + template/readme (never overwrite real journeys)
+    mkdir -p "$TARGET/.ae/journeys"
+    cp "$SOURCE_DIR/.ae/journeys/_template.md" "$TARGET/.ae/journeys/_template.md"
+    cp "$SOURCE_DIR/.ae/journeys/README.md"    "$TARGET/.ae/journeys/README.md"
 fi
 
 if [ "$GLOBAL" -eq 1 ]; then
@@ -207,7 +212,7 @@ if [ "$GLOBAL" -eq 1 ]; then
 
 Autonomous Engineer installed globally.
 
-The 5 specialist agents, 8 commands, and 11 skills are now available in
+The 5 specialist agents, commands, and skills are now available in
 every Claude Code session, regardless of working directory.
 
 Next steps:

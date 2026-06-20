@@ -47,6 +47,10 @@ if [ -f "$TARGET/.claude/commands/ae-start.md" ]; then
   cp -f "$AE_SRC"/agents/*.md       "$TARGET/.claude/agents/"
   cp -f "$AE_SRC"/commands/*.md     "$TARGET/.claude/commands/"
   cp -Rf "$AE_SRC"/skills/*         "$TARGET/.claude/skills/"
+  # Refresh the journey-map scaffolding only (never touch real journeys).
+  mkdir -p "$TARGET/.ae/journeys"
+  cp -f "$AE_SRC/.ae/journeys/_template.md" "$TARGET/.ae/journeys/_template.md" 2>/dev/null || true
+  cp -f "$AE_SRC/.ae/journeys/README.md"    "$TARGET/.ae/journeys/README.md"    2>/dev/null || true
 else
   echo "• Installing AE (project-local)"
   sh "$AE_SRC/install.sh" "$TARGET" >/dev/null

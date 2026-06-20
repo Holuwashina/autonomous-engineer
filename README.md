@@ -220,6 +220,8 @@ Detail: [`skills/workflow-patterns/SKILL.md`](skills/workflow-patterns/SKILL.md)
 
 The `reviewer` and `qa-engineer` agents declare `memory: project` — each gets a persistent `.claude/agent-memory/<agent>/` directory in the host project (loaded at spawn, tracked in version control) so accumulated knowledge — recurring N+1 patterns, project auth quirks, flaky journeys — survives across runs. Browse and edit with `/memory`.
 
+Alongside it, the **journey map** (`.ae/journeys/`, governed by the `journey-map` skill) is the system's persistent record of *how each part is navigated* — the real user steps, the inputs that work, and the outputs to expect, per feature/endpoint. QA reads the relevant journey before testing so it never re-discovers the app, and QA + the engineer update it at every hand-off, so the map grows with each feature and fix and the system stays testable by construction. Local-only by default; a team can commit `.ae/journeys/` to share it.
+
 ---
 
 ## What it deliberately won't do

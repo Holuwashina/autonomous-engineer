@@ -50,6 +50,11 @@ if [ -f "$ROOT/.ae/resources.yaml" ]; then good ".ae/resources.yaml present"
   if [ "$rm" -eq 0 ] 2>/dev/null; then good "  no unresolved REPLACE_ME fields"; else soft "  $rm unresolved REPLACE_ME field(s) to fill"; fi
 else miss ".ae/resources.yaml missing — cp .ae/resources.yaml.example .ae/resources.yaml (then fill base_url + accounts)"; fi
 
+if [ -d "$ROOT/.ae/journeys" ]; then
+  jc="$(ls "$ROOT"/.ae/journeys/*.md 2>/dev/null | grep -v '_template.md\|README.md' | wc -l | tr -d ' ')"
+  if [ "${jc:-0}" -gt 0 ] 2>/dev/null; then good "journey map: $jc journey(s) recorded"; else soft "journey map empty — QA/engineer will populate .ae/journeys/ as features are tested"; fi
+else soft "no .ae/journeys/ yet — created on first run (persistent navigation + I/O knowledge)"; fi
+
 echo ""
 echo "AE install + safety"
 if file_any .claude/commands/ae-start.md; then good "AE installed (.claude/)"; else miss "AE not installed here — run setup.sh in this project"; fi
