@@ -77,6 +77,8 @@ what a page renders), treat it as UI and verify in the browser.
 - **Web standards / best practices:** Lighthouse "best-practices" (+ SEO where relevant) — no console errors, correct doctype/lang, images sized, no deprecated APIs, HTTPS-only mixed-content clean.
 - Report the axe violation count by impact + the Lighthouse scores (a11y / best-practices / perf) verbatim. If neither tool is available, say so and flag it — don't silently skip.
 
+**Performance smoke (lightweight — not a load test).** QA does a *functional* performance check, not capacity testing. On a UI surface, quote the **Lighthouse performance score** and flag obvious regressions (long tasks, oversized assets, layout shift). On an `api` change, time the affected endpoint(s) over a few sequential calls and flag a response that is clearly slow for what it does (e.g. a simple read in seconds), and watch for **N+1 query** patterns in the logs/network. This catches gross slowdowns a change introduces; it is **not** a stress/soak/concurrency benchmark. True load testing (k6/JMeter, sustained concurrency, throughput SLAs) is out of QA's scope — if the ticket needs it, say so as a finding and recommend it as dedicated work, don't fake it with a couple of requests.
+
 **Backend / API & data (non-UI surfaces).** For `api`/`data` changes and backend features, exercise the real endpoints/queries and quote the evidence:
 - **Endpoints:** correct status codes, **response shape/schema** (validate against the OpenAPI contract if the project has one), **authz** (unauthenticated/forbidden are rejected), input **validation & error paths** (4xx with useful messages), pagination/filtering. Drive via the project's HTTP client / Playwright request API / `curl`.
 - **Data & migrations:** confirm the DB ends in the expected state; if the change includes a migration, verify it **applies and rolls back** (up *and* down) on a non-prod DB and is backward-compatible.
@@ -107,6 +109,11 @@ per breakpoint, not just once.
 
 ### Communications (inline, only when the journey sends a message)
 Skip entirely unless the journey involves email/OTP/magic-link/invite/push/SMS. When applicable: confirm the provider is reachable; for each artefact wait with a bounded retry (~15s, poll 1–2s — a miss after the bound is a finding); quote subject/From/To and required content verbatim; extract link/code atomically; never click a destructive link; a reset for user A must not message user B.
+
+### Scope boundary — security & load testing live elsewhere
+Be explicit about what QA does *not* own so nothing falls through the cracks:
+- **Security:** QA verifies security-relevant *behaviour* it can exercise as a user — authz (unauthenticated/forbidden are rejected), cross-tenant/cross-role isolation, input validation and error paths. QA does **not** do a security audit: SAST/dependency-audit/secret-scan and a threat-model review are the **security reviewer lens** (and the engineer's pre-commit scans), not QA. If you spot something that looks exploitable, raise it as a finding flagged for the security reviewer — don't try to pen-test it.
+- **Load/performance:** QA does the lightweight functional perf smoke above; sustained load, soak, and concurrency benchmarking are dedicated work, not part of validation.
 
 ### Hand-off
 Emit the mode's report; write the payload to `.ae/runs/<run-id>/specialists/NN-qa-engineer.json`.
